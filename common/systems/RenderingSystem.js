@@ -4,10 +4,10 @@ import { Position } from "../components/Position.js";
 import { Sprite } from "../components/Sprite.js";
 
 const query = defineQuery([Position, Sprite]);
-const playerQuery = defineQuery([Me])
+const meQuery = defineQuery([Me])
 
 export const renderingSystem = defineSystem((world) => {
-  const player = playerQuery(world);
+  const player = meQuery(world);
   const { canvas, ctx, images } = world;
   ctx.save();
   // ctx.clearRect(0, 0, canvas.width, canvas.height);
