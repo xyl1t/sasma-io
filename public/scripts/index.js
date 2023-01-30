@@ -1,7 +1,5 @@
 import { renderingSystem } from "/systems/RenderingSystem.js";
-import {
-  setup,
-} from "./setup.js";
+import { setup } from "./setup.js";
 
 $(async () => {
   await setup();
@@ -23,14 +21,10 @@ function gameloop(currentTime = 0) {
   while (accumulator >= world.dt) {
     // NOTE: game logic here (input, client prediction, etc.)
     // gameLogicSomethingSystem(world);
-    inputSystem(world);
+    const inputPayload = getInput();
 
-    if (world.gotInput) {
-      // console.log(queryMe(world));
-      // console.log(deserialize(world, packet, DESERIALIZE_MODE.MAP));
-      const me = queryMe(world); // only send myself
-      const packet = serialize(me);
-      world.socket.emit("playerInput", packet); // TODO: handle in server
+    if (inputPayload) {
+      world.socket.emit("playerInput", inputPayload);
     }
 
     // don't touch this
@@ -42,4 +36,31 @@ function gameloop(currentTime = 0) {
   renderingSystem(world);
 
   window.requestAnimationFrame(gameloop);
+}
+
+let oldInput = { inputY: 0, inputX: 0, angle: 0, shooting: 0 };
+function getInput() {
+  const { mouse, keyboard } = world;
+  const inputPayload = { ...oldInput };
+
+  inputPayload.inputY = (keyboard["w"] ? -1 : 0)
+  inputPayload.inputY += (keyboard["s"] ? 1 : 0)
+  inputPayload.inputX = (keyboard["a"] ? -1 : 0)
+  inputPayload.inputX += (keyboard["d"] ? 1 : 0)
+
+  inputPayload.shooting = (mouse.leftDown || mouse.rightDown)
+
+  inputPayload.angle = Math.round(mouse.angle*100)/100;
+
+  const gotInput =
+    oldInput.inputY != inputPayload.inputY ||
+    oldInput.inputX != inputPayload.inputX ||
+    oldInput.angle != inputPayload.angle ||
+    oldInput.shooting != inputPayload.shooting;
+
+  oldInput = { ...inputPayload };
+
+  if (gotInput) {
+    return inputPayload;
+  }
 }

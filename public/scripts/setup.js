@@ -18,7 +18,7 @@ export async function setup() {
 }
 
 async function setupWorldParameters() {
-  world.tickRate = 60;
+  world.tickRate = 30;
   world.dt = 1 / world.tickRate;
   world.currentTick = 0;
   world.imagePaths = [
@@ -68,6 +68,7 @@ async function loadImages() {
   const imagesMap = {};
 
   const getFileName = (path) => path.split("/").pop().split(".")[0];
+  
 
   for (const imgPath of world.imagePaths) {
     const img = new Image();
