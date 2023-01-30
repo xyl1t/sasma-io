@@ -3,6 +3,7 @@ import {
   defineSystem,
 } from "../bitecs.js";
 
+import { Rotation } from "../components/Rotation.js";
 import { Position } from "../components/Position.js";
 import { Velocity } from "../components/Velocity.js";
 
@@ -23,6 +24,7 @@ export const physicsSystem = defineSystem((world) => {
 
     Position.x[id] += Velocity.x[id] * world.dt;
     Position.y[id] += Velocity.y[id] * world.dt;
+    Rotation.angle[id] += world.dt;
   }
   return world;
 });
