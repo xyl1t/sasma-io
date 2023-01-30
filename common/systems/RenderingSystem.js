@@ -13,7 +13,6 @@ export const renderingSystem = defineSystem((world) => {
   // ctx.clearRect(0, 0, canvas.width, canvas.height);
   ctx.fillStyle = "lightgray";
   ctx.fillRect(0, 0, canvas.width, canvas.height);
-  console.log('xPos:',Position.x[player[0]])
   ctx.translate(world.windowWidth / 2, world.windowHeight / 2);
   
   const renderAbleEntities = query(world);
