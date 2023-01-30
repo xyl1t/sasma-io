@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>io-game</title>
+    <meta charset="UTF-8" />
+    <!-- <meta name="viewport" content="width=device-width, initial-scale=1.0"> -->
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover"
+    />
+
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-title" content="io-game" />
+    <meta name="mobile-web-app-capable" content="yes" />
+    <meta
+      name="apple-mobile-web-app-status-bar-style"
+      content="black-translucent"
+    />
+
+    <link rel="manifest" href="manifest.json" />
+
+    <link rel="icon" type="image/x-icon" href="/assets/favicon.ico" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="./styles/main.css" />
+
+    <script src="/socket.io/socket.io.js" defer></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.1/jquery.min.js"></script>
+    <script type="module" src="./scripts/index.js" defer></script>
+  </head>
+  <body>
+    <div id="container">
+      <div id="gameContainer">
+        <canvas id="canvas" oncontextmenu="return false;"></canvas>
+      </div>
+
+      <div id="startPageContainer">
+        <div id="titleItem">
+          <h1>Sasma.io</h1>
+          <input type="text" name="playerName" id="input" />
+          <button type="button" id="btnJoin">Join</button>
+        </div>
+      </div>
+    </div>
+  </body>
+</html>

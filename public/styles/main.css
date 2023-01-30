@@ -1,0 +1,79 @@
+* {
+  font-family: "Roboto", sans-serif, "Arial";
+}
+
+body {
+  padding: 0px;
+  margin: 0px;
+}
+canvas {
+  display: block;
+  padding: 0px;
+  margin: 0px;
+}
+
+#container {
+  display: grid;
+}
+
+#gameContainer,
+#startPageContainer {
+  grid-area: 1 / 1;
+}
+
+#gameContainer {
+  filter: brightness(50%);
+}
+
+#startPageContainer {
+  height: 100vh;
+  /* for safari because 100vh doesn't work right */
+  /* min-height: -webkit-fill-available; */
+  z-index: 10;
+  /* background-color: red; */
+
+  display: grid;
+  grid-template-areas:
+    "title"
+    "footer";
+  grid-template-rows: 1fr 64px;
+  gap: 10px;
+}
+
+#startPageContainer > div {
+  /* background-color: rgba(255, 255, 255, 0.8); */
+  padding: 20px 0;
+  /* display: flex; */
+  /* justify-content: center; */
+  /* align-items: center; */
+  text-align: center;
+
+  /* place-self: center; */
+}
+
+#titleItem input, button{
+  font-size: 1em;
+}
+
+#titleItem {
+  grid-area: title;
+}
+
+#inputItem {
+  grid-area: name-input;
+}
+
+#titleItem h1 {
+  font-size: 3em;
+  color: white;
+  padding-top: 10vh;
+}
+
+#joinItem {
+  grid-area: join-button;
+}
+
+#aboutFooterItem {
+  grid-area: footer;
+}
+
