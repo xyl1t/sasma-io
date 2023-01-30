@@ -57,8 +57,10 @@ async function loadImages() {
   const imagesMap = {};
 
   const getFileName = (path) => path.split("/").pop().split(".")[0];
+  
 
   for (const imgPath of world.imagePaths) {
+    console.log(imgPath)
     const img = new Image();
     img.src = imgPath;
     await img.decode(); // wait till image is actually loaded
