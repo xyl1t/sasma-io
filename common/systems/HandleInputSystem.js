@@ -14,15 +14,15 @@ export const handleInputSystem = defineSystem((world) => {
   const entities = query(world);
 
   for (const id of entities) {
+
     const inputVec = new Vector(Input.inputX[id], Input.inputY[id]);
     inputVec.normalize();
 
-    Velocity.x[id] = 100 * inputVec.x;
-    Velocity.y[id] = 100 * inputVec.y;
+    Velocity.x[id] = 200 * inputVec.x;
+    Velocity.y[id] = 200 * inputVec.y;
 
     Rotation.angle[id] = Input.angle[id];
   }
-
 
   return world;
 });
