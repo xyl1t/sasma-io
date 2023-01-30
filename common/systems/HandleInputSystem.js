@@ -1,6 +1,7 @@
 import { defineQuery, defineSystem } from "../bitecs.js";
 import { Vector } from "../util.js"
 
+import { Rotation } from "../components/Rotation.js";
 import { Position } from "../components/Position.js";
 import { Velocity } from "../components/Velocity.js";
 import { Player } from "../components/Player.js";
@@ -13,13 +14,15 @@ export const handleInputSystem = defineSystem((world) => {
   const entities = query(world);
 
   for (const id of entities) {
+
     const inputVec = new Vector(Input.inputX[id], Input.inputY[id]);
     inputVec.normalize();
 
-    Velocity.x[id] = 100 * inputVec.x;
-    Velocity.y[id] = 100 * inputVec.y;
-  }
+    Velocity.x[id] = 200 * inputVec.x;
+    Velocity.y[id] = 200 * inputVec.y;
 
+    Rotation.angle[id] = Input.angle[id];
+  }
 
   return world;
 });
