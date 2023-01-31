@@ -16,7 +16,7 @@ const entities = defineQuery([Position]);
 const meQuery = defineQuery([Me]);
 
 export const renderingSystem = defineSystem((world) => {
-  const { canvas, ctx, images, imagesMap } = world;
+  const { canvas, ctx, assetIdMap, getAsset } = world;
   ctx.save();
   // ctx.clearRect(0, 0, canvas.width, canvas.height);
   ctx.fillStyle = "lightgray";
@@ -35,7 +35,7 @@ export const renderingSystem = defineSystem((world) => {
   // NOTE: Draw basic sprites
   const sprites = spriteQuery(world);
   for (const id of sprites) {
-    const img = images[Sprite.texture[id]];
+    const img = getAsset([Sprite.texture[id]]);
     ctx.drawImage(img, Position.x[id] - img.width / 2, Position.y[id] - img.height /2);
   }
 
@@ -64,33 +64,33 @@ export const renderingSystem = defineSystem((world) => {
 });
 
 function drawPlayer(world, id) {
-  const { canvas, ctx, images, imagesMap } = world;
+  const { canvas, ctx, assetIdMap, getAsset } = world;
   ctx.save();
   ctx.translate(Position.x[id], Position.y[id]);
   ctx.save();
   ctx.rotate(Body.angle[id] - Math.PI / 2);
   ctx.translate(
-    -imagesMap.tankBody_blue_outline.width / 2,
-    -imagesMap.tankBody_blue_outline.height / 2
+    -getAsset(assetIdMap.tankBody_blue_outline).width / 2,
+    -getAsset(assetIdMap.tankBody_blue_outline).height / 2
   );
   if (hasComponent(world, Bot, id)) {
-    ctx.drawImage(imagesMap.tankBody_red_outline, 0, 0);
+    ctx.drawImage(getAsset(assetIdMap.tankBody_red_outline), 0, 0);
   } else {
-    ctx.drawImage(imagesMap.tankBody_blue_outline, 0, 0);
+    ctx.drawImage(getAsset(assetIdMap.tankBody_blue_outline), 0, 0);
   }
   ctx.restore();
 
   ctx.save();
   ctx.rotate(Gun.angle[id] - Math.PI / 2);
   ctx.translate(
-    -imagesMap.tankBlue_barrel2_outline.width / 2,
-    -imagesMap.tankBlue_barrel2_outline.height / 2 +
-      imagesMap.tankBody_blue_outline.height / 4
+    -getAsset(assetIdMap.tankBlue_barrel2_outline).width / 2,
+    -getAsset(assetIdMap.tankBlue_barrel2_outline).height / 2 +
+      getAsset(assetIdMap.tankBody_blue_outline).height / 4
   );
   if (hasComponent(world, Bot, id)) {
-    ctx.drawImage(imagesMap.tankRed_barrel2_outline, 0, 0);
+    ctx.drawImage(getAsset(assetIdMap.tankRed_barrel2_outline), 0, 0);
   } else {
-    ctx.drawImage(imagesMap.tankBlue_barrel2_outline, 0, 0);
+    ctx.drawImage(getAsset(assetIdMap.tankBlue_barrel2_outline), 0, 0);
   }
   ctx.restore();
 

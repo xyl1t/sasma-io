@@ -64,21 +64,22 @@ async function setupWorldParameters() {
 }
 
 async function loadImages() {
-  const images = [];
-  const imagesMap = {};
+  const placeholder = new Image();
+  placeholder.src = "/assets/placeholder.png";
+  await placeholder.decode();
+  world.placeholder = placeholder;
 
-  const getFileName = (path) => path.split("/").pop().split(".")[0];
-  
-
-  for (const imgPath of world.imagePaths) {
-    const img = new Image();
-    img.src = imgPath;
-    await img.decode(); // wait till image is actually loaded
-    images.push(img);
-    imagesMap[getFileName(imgPath)] = img; // ehhh, not the best option
+  world.getAsset = (assetId) => {
+    if (world.assets[assetId]) {
+      return world.assets[assetId];
+    } else {
+      return world.placeholder;
+    }
   }
-  world.images = images;
-  world.imagesMap = imagesMap;
+
+  world.assets = [];
+  world.assetIdMap = {};
+  world.assetPathMap = {};
 }
 
 async function setupCanvas() {
