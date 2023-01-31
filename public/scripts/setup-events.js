@@ -13,10 +13,10 @@ export async function setupEvents() {
 }
 
 function btnJoinClick(e) {
-  console.log("join clicked")
+  console.log("join clicked");
   $("#startPageContainer").css("display", "none");
   $("#gameContainer").css("filter", "none");
-  world.socket.emit("join"/*, name, x, y, z*/);
+  world.socket.emit("join" /*, name, x, y, z*/);
 }
 
 function mousedown(e) {
@@ -71,8 +71,24 @@ function wheel(e) {
 
 function keydown(e) {
   world.keyboard[e.key.toLowerCase()] = true;
-  if (world.keyboard["r"]) {
 
+  // debug
+  if (
+    (world.keyboard["alt"] || world.keyboard["meta"]) &&
+    world.keyboard["control"]
+  ) {
+    // ids
+    if (world.keyboard["i"]) {
+      world.debug.showIds = !world.debug.showIds;
+    }
+    // velocity
+    if (world.keyboard["v"]) {
+      world.debug.showVelocity = !world.debug.showVelocity;
+    }
+    // collision
+    if (world.keyboard["c"]) {
+      world.debug.showCollision = !world.debug.showCollision;
+    }
   }
 }
 

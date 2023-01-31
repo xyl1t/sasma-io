@@ -71,6 +71,12 @@ async function setupWorldParameters() {
       return world.placeholderAsset;
     }
   }
+  world.debug = {
+    showIds: false,
+    showVelocity: false,
+    showCollision: false,
+
+  };
 }
 
 async function loadPlaceholderAsset() {
