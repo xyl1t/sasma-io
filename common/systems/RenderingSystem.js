@@ -15,6 +15,7 @@ const spriteQuery = defineQuery([Position, Sprite]);
 const playerQuery = defineQuery([Player, Position, Velocity]);
 const entities = defineQuery([Position]);
 const meQuery = defineQuery([Me]);
+const renderableQuery = defineQuery([Position]);
 
 export const renderingSystem = defineSystem((world) => {
   const { canvas, ctx, assetIdMap, getAsset } = world;
@@ -24,37 +25,23 @@ export const renderingSystem = defineSystem((world) => {
   ctx.fillStyle = "lightgray";
   ctx.fillRect(0, 0, canvas.width, canvas.height);
 
+  // center screen
   ctx.translate(world.windowWidth / 2, world.windowHeight / 2);
 
+  // move to current player
   const meId = meQuery(world)[0];
   ctx.translate(-Position.x[meId], -Position.y[meId]);
 
-  // Draw players
-  const playerEnts = playerQuery(world);
-  for (const id of playerEnts) {
-    drawPlayer(world, id);
-  }
-
-  // Draw basic sprites
-  const sprites = spriteQuery(world);
-  for (const id of sprites) {
-    const img = getAsset([Sprite.texture[id]]);
-    ctx.save();
-    ctx.translate(
-      Position.x[id],
-      Position.y[id]
-    );
-    if (hasComponent(world, Rotation, id)) {
-      ctx.rotate(Rotation.angle[id] + Math.PI / 2);
+  const renderables = renderableQuery(world);
+  for (const id of renderables) {
+    if (hasComponent(world, Player, id)) {
+      drawPlayer(world, id);
+    } else if (hasComponent(world, Sprite, id)) {
+      drawSprite(world, id);
     }
-    ctx.translate(
-      -img.width / 2,
-      -img.height / 2
-    );
-    ctx.drawImage(img, 0, 0);
-    ctx.restore();
   }
 
+  // // ids
   // const allDrawAbles = entities(world);
   // for (const id of allDrawAbles) {
   //   ctx.save();
@@ -71,6 +58,7 @@ export const renderingSystem = defineSystem((world) => {
   //   ctx.restore();
   // }
 
+  // draw circlular border
   ctx.strokeStyle = "black";
   ctx.beginPath();
   ctx.arc(0, 0, 400, 0, 2 * Math.PI);
@@ -124,5 +112,19 @@ function drawPlayer(world, id) {
   ctx.stroke(); // Render the path
   ctx.restore();
 
+  ctx.restore();
+}
+
+function drawSprite(world, id) {
+  const { canvas, ctx, assetIdMap, getAsset } = world;
+
+  const img = getAsset([Sprite.texture[id]]);
+  ctx.save();
+  ctx.translate(Position.x[id], Position.y[id]);
+  if (hasComponent(world, Rotation, id)) {
+    ctx.rotate(Rotation.angle[id] + Math.PI / 2);
+  }
+  ctx.translate(-img.width / 2, -img.height / 2);
+  ctx.drawImage(img, 0, 0);
   ctx.restore();
 }
