@@ -10,6 +10,8 @@ export async function setupEvents() {
   window.addEventListener("keydown", keydown, true);
   window.addEventListener("keyup", keyup, true);
   $("#btnJoin").click(btnJoinClick);
+  //easter egg
+  $("#bullet").click((ea));
 }
 
 function btnJoinClick(e) {
@@ -78,4 +80,9 @@ function keydown(e) {
 
 function keyup(e) {
   world.keyboard[e.key.toLowerCase()] = false;
+}
+
+function ea(e){
+ $("#bullet").attr("src","./assets/frontpageImages/easterEgg.png");
+ $("#bullet2").attr("src","./assets/frontpageImages/easterEgg.png")
 }
