@@ -1,5 +1,5 @@
 import { defineQuery, addComponent, createWorld, deleteWorld, resetGlobals } from "/bitecs.js";
-import { world, deserialize } from "./world.js";
+import { world, deserialize, queryMe } from "./world.js";
 import {
   getAllEntities,
   removeEntity,
@@ -31,5 +31,8 @@ function serverUpdate(packet, meId) {
   resetWorld(world);
   resetGlobals();
 
-  const deserializedEntIds = deserialize(world, packet);
+  // console.log(getAllEntities(world))
+  const deserializedEntIds = deserialize(world, packet, DESERIALIZE_MODE.MAP);
+  // const ents = queryMe(world);
+  // console.log(getAllEntities(world), deserializedEntIds, ents)
 }
