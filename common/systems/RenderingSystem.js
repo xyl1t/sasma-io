@@ -36,27 +36,17 @@ export const renderingSystem = defineSystem((world) => {
   for (const id of renderables) {
     if (hasComponent(world, Player, id)) {
       drawPlayer(world, id);
-    } else if (hasComponent(world, Sprite, id)) {
+    }
+    if (hasComponent(world, Sprite, id)) {
       drawSprite(world, id);
     }
+    if (world.debug.showVelocity && hasComponent(world, Velocity, id)) {
+      drawVelocityVectors(world, id);
+    }
+    if (world.debug.showIds) {
+      drawId(world, id);
+    }
   }
-
-  // // ids
-  // const allDrawAbles = entities(world);
-  // for (const id of allDrawAbles) {
-  //   ctx.save();
-  //   ctx.translate(Position.x[id], Position.y[id]);
-  //   ctx.fillStyle = "#fff";
-  //   ctx.fillRect(
-  //     -ctx.measureText(id).width / 2 - 2,
-  //     -10 + 0,
-  //     ctx.measureText(id).width + 4,
-  //     12
-  //   );
-  //   ctx.fillStyle = "#000";
-  //   ctx.fillText(id, -ctx.measureText(id).width / 2, 0);
-  //   ctx.restore();
-  // }
 
   // draw circlular border
   ctx.strokeStyle = "black";
@@ -101,17 +91,6 @@ function drawPlayer(world, id) {
   }
   ctx.restore();
 
-  ctx.save();
-  ctx.strokeStyle = "#f00";
-  ctx.beginPath(); // Start a new path
-  ctx.moveTo(0, 0); // Move the pen to (30, 50)
-  ctx.lineTo(
-    Math.cos(Body.angle[id]) * Velocity.x[id],
-    Math.sin(Body.angle[id]) * Velocity.y[id]
-  ); // Draw a line to (150, 100)
-  ctx.stroke(); // Render the path
-  ctx.restore();
-
   ctx.restore();
 }
 
@@ -126,5 +105,40 @@ function drawSprite(world, id) {
   }
   ctx.translate(-img.width / 2, -img.height / 2);
   ctx.drawImage(img, 0, 0);
+  ctx.restore();
+}
+
+function drawVelocityVectors(world, id) {
+  const { ctx } = world;
+  ctx.save();
+  ctx.translate(Position.x[id], Position.y[id]);
+  ctx.strokeStyle = "#f00";
+  ctx.beginPath(); // Start a new path
+  ctx.moveTo(0, 0); // Move the pen to (30, 50)
+  if (hasComponent(world, Body, id)) {
+    ctx.lineTo(
+      Math.cos(Body.angle[id]) * Velocity.x[id],
+      Math.sin(Body.angle[id]) * Velocity.y[id]
+    ); // Draw a line to (150, 100)
+  } else {
+    ctx.lineTo(Velocity.x[id], Velocity.y[id]); // Draw a line to (150, 100)
+  }
+  ctx.stroke(); // Render the path
+  ctx.restore();
+}
+
+function drawId(world, id) {
+  const { ctx } = world;
+  ctx.save();
+  ctx.translate(Position.x[id], Position.y[id]);
+  ctx.fillStyle = "#fff";
+  ctx.fillRect(
+    -ctx.measureText(id).width / 2 - 2,
+    -10 + 0,
+    ctx.measureText(id).width + 4,
+    12
+  );
+  ctx.fillStyle = "#000";
+  ctx.fillText(id, -ctx.measureText(id).width / 2, 0);
   ctx.restore();
 }

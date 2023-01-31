@@ -71,8 +71,18 @@ function wheel(e) {
 
 function keydown(e) {
   world.keyboard[e.key.toLowerCase()] = true;
-  if (world.keyboard["r"]) {
 
+  // debug
+  if ((world.keyboard["alt"] || world.keyboard["meta"])&& world.keyboard["control"]) {
+    if(world.keyboard["i"]) { // ids
+      world.debug.showIds = !world.debug.showIds;
+    }
+    if(world.keyboard["v"]) { // velocity
+      world.debug.showVelocity = !world.debug.showVelocity;
+    }
+    if(world.keyboard["c"]) { // collision
+      world.debug.showCollision = !world.debug.showCollision;
+    }
   }
 }
 
