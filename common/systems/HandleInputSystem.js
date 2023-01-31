@@ -7,21 +7,30 @@ import { Velocity } from "../components/Velocity.js";
 import { Player } from "../components/Player.js";
 import { Input } from "../components/Input.js";
 import { Me } from "../components/Me.js";
+import { Body } from "../components/Body.js";
+import { Gun } from "../components/Gun.js";
 
-const query = defineQuery([Player, Input, Position, Velocity]);
+const query = defineQuery([Player, Input, Position, Velocity, Body, Gun]);
 
 export const handleInputSystem = defineSystem((world) => {
   const entities = query(world);
 
   for (const id of entities) {
+    const inputX = Math.max(-1, Math.min(1, Input.inputX[id]));
+    const inputY = Math.max(-1, Math.min(1, Input.inputY[id]));
+    const angle = Input.angle[id];
+    const shooting = Input.shooting[id];
 
-    const inputVec = new Vector(Input.inputX[id], Input.inputY[id]);
-    inputVec.normalize();
+    Body.movingDirection[id] = 0;
+    if (inputX) {
+      Body.angle[id] += Body.rotationSpeed[id] * world.dt * inputX;
+    }
+    if (inputY) {
+      Body.movingDirection[id] = inputY;
+    }
 
-    Velocity.x[id] = 200 * inputVec.x;
-    Velocity.y[id] = 200 * inputVec.y;
-
-    Rotation.angle[id] = Input.angle[id];
+    Gun.angle[id] = angle;
+    Gun.shooting[id] = shooting;
   }
 
   return world;

@@ -7,7 +7,6 @@ $(async () => {
 });
 
 import { world, serialize, deserialize, queryMe } from "./world.js";
-import { inputSystem } from "/systems/InputSystem.js";
 import { DESERIALIZE_MODE } from "/bitecs.js";
 
 let oldTime = 0;
@@ -43,8 +42,8 @@ function getInput() {
   const { mouse, keyboard } = world;
   const inputPayload = { ...oldInput };
 
-  inputPayload.inputY = (keyboard["w"] ? -1 : 0)
-  inputPayload.inputY += (keyboard["s"] ? 1 : 0)
+  inputPayload.inputY = (keyboard["w"] ? 1 : 0)
+  inputPayload.inputY += (keyboard["s"] ? -1 : 0)
   inputPayload.inputX = (keyboard["a"] ? -1 : 0)
   inputPayload.inputX += (keyboard["d"] ? 1 : 0)
 
