@@ -1,5 +1,5 @@
 import { defineQuery, defineSystem } from "../bitecs.js";
-import { Vector } from "../util.js"
+import { Vector } from "../util.js";
 
 import { Rotation } from "../components/Rotation.js";
 import { Position } from "../components/Position.js";

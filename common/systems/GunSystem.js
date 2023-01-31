@@ -15,7 +15,8 @@ import { Rotation } from "../components/Rotation.js";
 import { Bot } from "../components/Bot.js";
 import { Player } from "../components/Player.js";
 
-const query = defineQuery([Gun, Position, Not(Bot)]);
+// const query = defineQuery([Gun, Position, Not(Bot)]);
+const query = defineQuery([Gun, Position]);
 
 export const gunSystem = defineSystem((world) => {
   const entities = query(world);
@@ -43,7 +44,10 @@ export const gunSystem = defineSystem((world) => {
       let spriteId = world.assetIdMap.bullet_dark_1;
       let sourceId = Gun.source[id];
       if (hasComponent(world, Player, sourceId)) {
-        spriteId = world.assetIdMap["bullet_"+world.colorMap[Player.color[sourceId]]+"_1"];
+        spriteId =
+          world.assetIdMap[
+            "bullet_" + world.colorMap[Player.color[sourceId]] + "_1"
+          ];
       }
       Sprite.texture[bulletId] = spriteId;
 
