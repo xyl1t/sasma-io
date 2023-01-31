@@ -37,7 +37,7 @@ export const gunSystem = defineSystem((world) => {
       Velocity.y[bulletId] = Math.sin(Gun.angle[id]) * 2000;
 
       addComponent(world, Rotation, bulletId);
-      Rotation.angle[bulletId] = Gun.angle[id]; // TODO: add `bulletSpeed` field to gun
+      Rotation.angle[bulletId] = Gun.angle[id];
 
       addComponent(world, Sprite, bulletId);
       let spriteId = world.assetIdMap.bullet_dark_1;
