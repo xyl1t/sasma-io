@@ -32,7 +32,8 @@ canvas {
 }
 
 #gameContainer {
-  filter: brightness(50%);
+  filter: brightness(30%);
+  position: fixed;
 }
 
 #startPageContainer {
