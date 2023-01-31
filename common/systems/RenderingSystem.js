@@ -20,9 +20,9 @@ export const renderingSystem = defineSystem((world) => {
   ctx.save();
   // ctx.clearRect(0, 0, canvas.width, canvas.height);
   ctx.fillStyle = "lightgray";
-  ctx.beginPath();
-  ctx.arc(0, 75, 400, 0, 2 * Math.PI);
-  ctx.stroke(); 
+  //NOTE: clear screen
+  ctx.fillRect(0, 0, canvas.width, canvas.height);
+  
   ctx.translate(world.windowWidth / 2, world.windowHeight / 2);
 
   const meId = meQuery(world)[0];
@@ -59,7 +59,8 @@ export const renderingSystem = defineSystem((world) => {
 
   ctx.strokeStyle = "black";
   ctx.beginPath();
-  ctx.arc(0, 75, 400, 0, 2 * Math.PI);
+  ctx.arc(0, 0, 400, 0, 2 * Math.PI);
+  //ctx.arc(canvas.width / 2, canvas.height / 2, 400, 0, 2 * Math.PI);
   ctx.stroke(); 
 
   ctx.restore();
