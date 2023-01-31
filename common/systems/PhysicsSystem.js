@@ -22,7 +22,6 @@ export const physicsSystem = defineSystem((world) => {
     // TODO: make this value a component `Friction`
     Velocity.x[id] *= 0.9;
     Velocity.y[id] *= 0.9;
-
   }
 
   const physicsEntities = physicsQuery(world);

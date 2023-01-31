@@ -3,6 +3,7 @@ import { Body } from "../components/Body.js";
 import { Bot } from "../components/Bot.js";
 import { Gun } from "../components/Gun.js";
 
+import { Rotation } from "../components/Rotation.js";
 import { Input } from "../components/Input.js";
 import { Player } from "../components/Player.js";
 import { Position } from "../components/Position.js";
@@ -18,50 +19,63 @@ const meQuery = defineQuery([Me]);
 export const renderingSystem = defineSystem((world) => {
   const { canvas, ctx, assetIdMap, getAsset } = world;
   ctx.save();
-  // ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+  // clear screen
   ctx.fillStyle = "lightgray";
-  //NOTE: clear screen
   ctx.fillRect(0, 0, canvas.width, canvas.height);
-  
+
   ctx.translate(world.windowWidth / 2, world.windowHeight / 2);
 
   const meId = meQuery(world)[0];
   ctx.translate(-Position.x[meId], -Position.y[meId]);
 
-  // NOTE: Draw players
+  // Draw players
   const playerEnts = playerQuery(world);
   for (const id of playerEnts) {
     drawPlayer(world, id);
   }
 
-  // NOTE: Draw basic sprites
+  // Draw basic sprites
   const sprites = spriteQuery(world);
   for (const id of sprites) {
     const img = getAsset([Sprite.texture[id]]);
-    ctx.drawImage(img, Position.x[id] - img.width / 2, Position.y[id] - img.height /2);
-  }
-
-  const allDrawAbles = entities(world);
-  for (const id of allDrawAbles) {
     ctx.save();
-    ctx.translate(Position.x[id], Position.y[id]);
-    ctx.fillStyle = "#fff";
-    ctx.fillRect(
-      -ctx.measureText(id).width / 2 - 2,
-      -10 + 0,
-      ctx.measureText(id).width + 4,
-      12
+    ctx.translate(
+      Position.x[id],
+      Position.y[id]
     );
-    ctx.fillStyle = "#000";
-    ctx.fillText(id, -ctx.measureText(id).width / 2, 0);
+    if (hasComponent(world, Rotation, id)) {
+      ctx.rotate(Rotation.angle[id] + Math.PI / 2);
+    }
+    ctx.translate(
+      -img.width / 2,
+      -img.height / 2
+    );
+    ctx.drawImage(img, 0, 0);
     ctx.restore();
   }
+
+  // const allDrawAbles = entities(world);
+  // for (const id of allDrawAbles) {
+  //   ctx.save();
+  //   ctx.translate(Position.x[id], Position.y[id]);
+  //   ctx.fillStyle = "#fff";
+  //   ctx.fillRect(
+  //     -ctx.measureText(id).width / 2 - 2,
+  //     -10 + 0,
+  //     ctx.measureText(id).width + 4,
+  //     12
+  //   );
+  //   ctx.fillStyle = "#000";
+  //   ctx.fillText(id, -ctx.measureText(id).width / 2, 0);
+  //   ctx.restore();
+  // }
 
   ctx.strokeStyle = "black";
   ctx.beginPath();
   ctx.arc(0, 0, 400, 0, 2 * Math.PI);
   //ctx.arc(canvas.width / 2, canvas.height / 2, 400, 0, 2 * Math.PI);
-  ctx.stroke(); 
+  ctx.stroke();
 
   ctx.restore();
 

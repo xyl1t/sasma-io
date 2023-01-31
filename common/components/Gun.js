@@ -5,4 +5,5 @@ export const Gun = defineComponent({
   shooting: Types.ui8,
   rateOfFire: Types.f32,
   lastTimeFired: Types.ui32,
+  source: Types.eid,
 });
