@@ -17,8 +17,6 @@ const entities = defineQuery([Position]);
 const meQuery = defineQuery([Me]);
 const renderableQuery = defineQuery([Position]);
 
-const colorMap = ["blue", "dark", "green", "red", "sand"];
-
 export const renderingSystem = defineSystem((world) => {
   const { canvas, ctx, assetIdMap, getAsset } = world;
   ctx.save();
@@ -67,7 +65,7 @@ function drawPlayer(world, id) {
   ctx.save();
   ctx.translate(Position.x[id], Position.y[id]);
 
-  const color = colorMap[Player.color[id]];
+  const color = world.colorMap[Player.color[id]];
 
   // Body
   const tankBody = getAsset(assetIdMap["tank_body_" + color]);

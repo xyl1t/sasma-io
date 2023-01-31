@@ -23,10 +23,11 @@ export function setupIOEvents() {
   world.socket.on("serverUpdate", serverUpdate);
 }
 
-async function welcome(assetIdMap, assetPathMap) {
+async function welcome(assetIdMap, assetPathMap, colorMap) {
   console.log("I was welcomed");
   world.assetIdMap = assetIdMap;
   world.assetPathMap = assetPathMap;
+  world.colorMap = colorMap;
   for (const path of Object.values(world.assetPathMap)) {
     console.log(path)
     const img = new Image();

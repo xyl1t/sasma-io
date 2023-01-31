@@ -55,6 +55,7 @@ async function setupWorldParameters() {
       return world.placeholderAsset;
     }
   }
+  world.colorMap = []; // eg 0 -> blue, 1 -> green, etc
   world.debug = {
     showIds: false,
     showVelocity: false,
