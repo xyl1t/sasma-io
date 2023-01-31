@@ -10,7 +10,7 @@ import { setupEvents } from "./setup-events.js";
 export async function setup() {
   // NOTE: order is important!
   await setupWorldParameters();
-  await loadImages();
+  await loadPlaceholderAsset();
   await setupCanvas();
   await setupEvents();
   await setupConnection();
@@ -61,24 +61,23 @@ async function setupWorldParameters() {
     world.windowWidth = window.innerWidth;
     world.windowHeight = window.innerHeight;
   };
+  world.assets = []; // the actual images
+  world.assetIdMap = {}; // eg `assetIdMap[tank_blue]` gives you `4`
+  world.assetPathMap = {}; // eg `assetIdMap[tank_blue]` gives you /assets/tank_blue.png
+  world.getAsset = (assetId) => {
+    if (world.assets[assetId]) {
+      return world.assets[assetId];
+    } else {
+      return world.placeholderAsset;
+    }
+  }
 }
 
-async function loadImages() {
-  const images = [];
-  const imagesMap = {};
-
-  const getFileName = (path) => path.split("/").pop().split(".")[0];
-  
-
-  for (const imgPath of world.imagePaths) {
-    const img = new Image();
-    img.src = imgPath;
-    await img.decode(); // wait till image is actually loaded
-    images.push(img);
-    imagesMap[getFileName(imgPath)] = img; // ehhh, not the best option
-  }
-  world.images = images;
-  world.imagesMap = imagesMap;
+async function loadPlaceholderAsset() {
+  const placeholder = new Image();
+  placeholder.src = "/assets/placeholder.png";
+  await placeholder.decode();
+  world.placeholderAsset = placeholder;
 }
 
 async function setupCanvas() {
