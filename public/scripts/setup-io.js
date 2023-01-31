@@ -32,7 +32,6 @@ async function welcome(assetIdMap, assetPathMap) {
     img.src = path;
     await img.decode();
     world.assets.push(img);
-    console.log(path)
   }
 }
 
