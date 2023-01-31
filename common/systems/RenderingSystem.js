@@ -10,8 +10,9 @@ import { Sprite } from "../components/Sprite.js";
 import { Velocity } from "../components/Velocity.js";
 import { Me } from "/components/Me.js";
 
-const spriteQuery = defineQuery([Not(Player), Position, Sprite]);
+const spriteQuery = defineQuery([Position, Sprite]);
 const playerQuery = defineQuery([Player, Position, Velocity]);
+const entities = defineQuery([Position]);
 const meQuery = defineQuery([Me]);
 
 export const renderingSystem = defineSystem((world) => {
@@ -32,9 +33,26 @@ export const renderingSystem = defineSystem((world) => {
   }
 
   // NOTE: Draw basic sprites
-  const renderAbleEntities = spriteQuery(world);
-  for (const id of renderAbleEntities) {
-    ctx.drawImage(images[Sprite.texture[id]], Position.x[id], Position.y[id]);
+  const sprites = spriteQuery(world);
+  for (const id of sprites) {
+    const img = images[Sprite.texture[id]];
+    ctx.drawImage(img, Position.x[id] - img.width / 2, Position.y[id] - img.height /2);
+  }
+
+  const allDrawAbles = entities(world);
+  for (const id of allDrawAbles) {
+    ctx.save();
+    ctx.translate(Position.x[id], Position.y[id]);
+    ctx.fillStyle = "#fff";
+    ctx.fillRect(
+      -ctx.measureText(id).width / 2 - 2,
+      -10 + 0,
+      ctx.measureText(id).width + 4,
+      12
+    );
+    ctx.fillStyle = "#000";
+    ctx.fillText(id, -ctx.measureText(id).width / 2, 0);
+    ctx.restore();
   }
 
   ctx.strokeStyle = "black";
@@ -85,18 +103,6 @@ function drawPlayer(world, id) {
     Math.sin(Body.angle[id]) * Velocity.y[id]
   ); // Draw a line to (150, 100)
   ctx.stroke(); // Render the path
-  ctx.restore();
-
-  ctx.save();
-  ctx.fillStyle = "#fff";
-  ctx.fillRect(
-    -ctx.measureText(id).width / 2 - 2,
-    -10 + 32,
-    ctx.measureText(id).width + 4,
-    12
-  );
-  ctx.fillStyle = "#000";
-  ctx.fillText(id, -ctx.measureText(id).width / 2, 32);
   ctx.restore();
 
   ctx.restore();
