@@ -51,16 +51,6 @@ canvas {
   gap: 10px;
 }
 
-#startPageContainer > div {
-  /* background-color: rgba(255, 255, 255, 0.8); */
-  padding: 20px 0;
-  /* display: flex; */
-  /* justify-content: center; */
-  /* align-items: center; */
-  text-align: center;
-
-  /* place-self: center; */
-}
 
 #titleItem input, button{
   font-size: 1em;

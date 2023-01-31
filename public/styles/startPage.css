@@ -78,8 +78,6 @@
 }
 
 #aboutPage{
-    border-top-left-radius: 2%;
-    border-top-right-radius: 2%;
     position: absolute;
     top: 100vh;
     height: 100vh;
@@ -96,15 +94,17 @@
   grid-template-rows: 50% 50%;
   text-align: center;
   color: whitesmoke;
+  margin: 0;
+  padding: 0;
 }
 
 #aboutPage div{
   border-radius: 20px;
   margin: 0px;
   margin-right: 0;
+  margin-bottom: 5px;
+  margin-top: 5px;
 }
-
-
 
 #aboutImg{
   grid-column-start: 2;
@@ -125,13 +125,11 @@
   z-index: 2;
   text-align: center;
   overflow:auto;
- 
 }
 
 #about h1{
   color: orange;
   font-size: 3vw;
-  margin-bottom: 5%;
 }
 
 #about h2{
@@ -146,13 +144,11 @@
   grid-row: 2;
   text-align: center;
   overflow:auto;
-  
 }
 
 #credits h1{
   color: orange;
   font-size: 3vw;
-  margin-bottom: 5%;
 }
 
 #credits h2{
