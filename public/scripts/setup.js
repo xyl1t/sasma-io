@@ -10,7 +10,7 @@ import { setupEvents } from "./setup-events.js";
 export async function setup() {
   // NOTE: order is important!
   await setupWorldParameters();
-  await loadImages();
+  await loadPlaceholderAsset();
   await setupCanvas();
   await setupEvents();
   await setupConnection();
@@ -61,25 +61,23 @@ async function setupWorldParameters() {
     world.windowWidth = window.innerWidth;
     world.windowHeight = window.innerHeight;
   };
-}
-
-async function loadImages() {
-  const placeholder = new Image();
-  placeholder.src = "/assets/placeholder.png";
-  await placeholder.decode();
-  world.placeholder = placeholder;
-
+  world.assets = []; // the actual images
+  world.assetIdMap = {}; // eg `assetIdMap[tank_blue]` gives you `4`
+  world.assetPathMap = {}; // eg `assetIdMap[tank_blue]` gives you /assets/tank_blue.png
   world.getAsset = (assetId) => {
     if (world.assets[assetId]) {
       return world.assets[assetId];
     } else {
-      return world.placeholder;
+      return world.placeholderAsset;
     }
   }
+}
 
-  world.assets = [];
-  world.assetIdMap = {};
-  world.assetPathMap = {};
+async function loadPlaceholderAsset() {
+  const placeholder = new Image();
+  placeholder.src = "/assets/placeholder.png";
+  await placeholder.decode();
+  world.placeholderAsset = placeholder;
 }
 
 async function setupCanvas() {
