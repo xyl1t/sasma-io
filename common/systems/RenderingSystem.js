@@ -17,6 +17,8 @@ const entities = defineQuery([Position]);
 const meQuery = defineQuery([Me]);
 const renderableQuery = defineQuery([Position]);
 
+const colorMap = ["blue", "dark", "green", "red", "sand"];
+
 export const renderingSystem = defineSystem((world) => {
   const { canvas, ctx, assetIdMap, getAsset } = world;
   ctx.save();
@@ -64,31 +66,26 @@ function drawPlayer(world, id) {
   const { canvas, ctx, assetIdMap, getAsset } = world;
   ctx.save();
   ctx.translate(Position.x[id], Position.y[id]);
+
+  const color = colorMap[Player.color[id]];
+
+  // Body
+  const tankBody = getAsset(assetIdMap["tank_body_" + color]);
   ctx.save();
   ctx.rotate(Body.angle[id] - Math.PI / 2);
-  ctx.translate(
-    -getAsset(assetIdMap.tankBody_blue_outline).width / 2,
-    -getAsset(assetIdMap.tankBody_blue_outline).height / 2
-  );
-  if (hasComponent(world, Bot, id)) {
-    ctx.drawImage(getAsset(assetIdMap.tankBody_red_outline), 0, 0);
-  } else {
-    ctx.drawImage(getAsset(assetIdMap.tankBody_blue_outline), 0, 0);
-  }
+  ctx.translate(-tankBody.width / 2, -tankBody.height / 2);
+  ctx.drawImage(tankBody, 0, 0);
   ctx.restore();
 
+  // Barrel
+  const tankBarrel = getAsset(assetIdMap["tank_barrel_" + color + "_2"]);
   ctx.save();
   ctx.rotate(Gun.angle[id] - Math.PI / 2);
   ctx.translate(
-    -getAsset(assetIdMap.tankBlue_barrel2_outline).width / 2,
-    -getAsset(assetIdMap.tankBlue_barrel2_outline).height / 2 +
-      getAsset(assetIdMap.tankBody_blue_outline).height / 4
+    -tankBarrel.width / 2,
+    -tankBarrel.height / 2 + tankBody.height / 4
   );
-  if (hasComponent(world, Bot, id)) {
-    ctx.drawImage(getAsset(assetIdMap.tankRed_barrel2_outline), 0, 0);
-  } else {
-    ctx.drawImage(getAsset(assetIdMap.tankBlue_barrel2_outline), 0, 0);
-  }
+  ctx.drawImage(tankBarrel, 0, 0);
   ctx.restore();
 
   ctx.restore();

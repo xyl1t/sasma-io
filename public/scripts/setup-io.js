@@ -28,6 +28,7 @@ async function welcome(assetIdMap, assetPathMap) {
   world.assetIdMap = assetIdMap;
   world.assetPathMap = assetPathMap;
   for (const path of Object.values(world.assetPathMap)) {
+    console.log(path)
     const img = new Image();
     img.src = path;
     await img.decode();
