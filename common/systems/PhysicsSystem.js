@@ -20,8 +20,8 @@ export const physicsSystem = defineSystem((world) => {
     Position.y[id] += Math.sin(Body.angle[id]) * Velocity.y[id] * world.dt;
 
     // TODO: make this value a component `Friction`
-    Velocity.x[id] *= 0.9;
-    Velocity.y[id] *= 0.9;
+    Velocity.x[id] += Velocity.x[id] * -3 * world.dt;
+    Velocity.y[id] += Velocity.y[id] * -3 * world.dt;
   }
 
   const physicsEntities = physicsQuery(world);
@@ -30,8 +30,8 @@ export const physicsSystem = defineSystem((world) => {
     Position.y[id] += Velocity.y[id] * world.dt;
 
     // TODO: make this value a component `Friction`
-    Velocity.x[id] *= 0.9;
-    Velocity.y[id] *= 0.9;
+    Velocity.x[id] += Velocity.x[id] * -3 * world.dt;
+    Velocity.y[id] += Velocity.y[id] * -3 * world.dt;
   }
   return world;
 });
