@@ -29,21 +29,13 @@ export const renderingSystem = defineSystem((world) => {
   // center screen
   ctx.translate(world.windowWidth / 2, world.windowHeight / 2);
   ctx.scale(world.renderScaleWidth, world.renderScaleHeight);
-  
-  let widthToShow = world.renderScaleWidth >= 1 ? 800 * world.renderScaleWidth : world.windowWidth;
-  let heightToShow = world.renderScaleHeight >= 1 ? 800 * world.renderScaleHeight : world.windowHeight;
 
   // move to current player
   const meId = meQuery(world)[0];
+  ctx.rotate(-Body.angle[meId] - Math.PI/2); // <----- HERE BENJAMIN
   ctx.translate(-Position.x[meId], -Position.y[meId]);
-  const map = getAsset(assetIdMap["MAP"])
-  ctx.drawImage(
-    map,
-    -map.width / 2,
-    -map.height / 2,
-    map.width,
-    map.height
-  );
+  const map = getAsset(assetIdMap["MAP"]);
+  ctx.drawImage(map, -map.width / 2, -map.height / 2, map.width, map.height);
 
   const renderables = renderableQuery(world);
   for (const id of renderables) {
@@ -53,8 +45,10 @@ export const renderingSystem = defineSystem((world) => {
     if (hasComponent(world, Sprite, id)) {
       drawSprite(world, id);
     }
-    if (world.debug.showVelocity && (hasComponent(world, Body, id) || hasComponent(world, Velocity, id))) {
-      drawVelocityVectors(world, id);
+    if (world.debug.showVelocity) {
+      if (hasComponent(world, Body, id) || hasComponent(world, Velocity, id)) {
+        drawVelocityVectors(world, id);
+      }
     }
     if (world.debug.showIds) {
       drawId(world, id);
@@ -127,7 +121,10 @@ function drawVelocityVectors(world, id) {
     ctx.lineTo(Velocity.x[id], Velocity.y[id]);
   }
   if (hasComponent(world, Body, id)) {
-    ctx.lineTo(Math.cos(Body.angle[id]) * Body.velocity[id], Math.sin(Body.angle[id]) * Body.velocity[id]);
+    ctx.lineTo(
+      Math.cos(Body.angle[id]) * Body.velocity[id],
+      Math.sin(Body.angle[id]) * Body.velocity[id]
+    );
   }
   ctx.stroke();
   ctx.restore();
