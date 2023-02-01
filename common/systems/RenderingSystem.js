@@ -10,6 +10,7 @@ import { Position } from "../components/Position.js";
 import { Sprite } from "../components/Sprite.js";
 import { Velocity } from "../components/Velocity.js";
 import { Me } from "/components/Me.js";
+import { CircleCollider } from "/components/CircleCollider.js";
 
 const spriteQuery = defineQuery([Position, Sprite]);
 const playerQuery = defineQuery([Player, Position, Velocity]);
@@ -34,15 +35,18 @@ export const renderingSystem = defineSystem((world) => {
   const meId = meQuery(world)[0];
   const map = getAsset(assetIdMap["MAP"]);
 
-
-  if(world.dynamicCamera){
-    ctx.rotate(-Body.angle[meId] - Math.PI/2);
+  if (world.dynamicCamera) {
+    ctx.rotate(-Body.angle[meId] - Math.PI / 2);
   }
 
   ctx.drawImage(
     map,
-    Position.x[meId] + map.width / 2 - world.windowWidth / world.renderScaleWidth / 2,
-    Position.y[meId] + map.height / 2 - world.windowHeight  / world.renderScaleWidth/ 2,
+    Position.x[meId] +
+      map.width / 2 -
+      world.windowWidth / world.renderScaleWidth / 2,
+    Position.y[meId] +
+      map.height / 2 -
+      world.windowHeight / world.renderScaleWidth / 2,
     world.windowWidth / world.renderScaleWidth,
     world.windowHeight / world.renderScaleWidth,
 
@@ -51,9 +55,7 @@ export const renderingSystem = defineSystem((world) => {
     world.windowWidth / world.renderScaleWidth,
     world.windowHeight / world.renderScaleWidth
   );
-
   ctx.translate(-Position.x[meId], -Position.y[meId]);
-  
 
   const renderables = renderableQuery(world);
   for (const id of renderables) {
@@ -71,13 +73,15 @@ export const renderingSystem = defineSystem((world) => {
     if (world.debug.showIds) {
       drawId(world, id);
     }
+    if (world.debug.showColliders) {
+      drawColliders(world, id);
+    }
   }
 
   // draw circlular border
   ctx.strokeStyle = "black";
   ctx.beginPath();
   ctx.arc(0, 0, 1000, 0, 2 * Math.PI);
-  //ctx.arc(canvas.width / 2, canvas.height / 2, 400, 0, 2 * Math.PI);
   ctx.stroke();
 
   ctx.restore();
@@ -103,7 +107,10 @@ function drawPlayer(world, id, meId) {
   // Barrel
   const tankBarrel = getAsset(assetIdMap["tank_barrel_" + color + "_2"]);
   ctx.save();
-  ctx.rotate(Gun.angle[id] - (world.dynamicCamera&&id==meId? -Body.angle[meId] : Math.PI / 2)); //dynamic camera --> add Body.angle instead of subtracting Math.PI / 2;
+  ctx.rotate(
+    Gun.angle[id] -
+      (world.dynamicCamera && id == meId ? -Body.angle[meId] : Math.PI / 2)
+  ); //dynamic camera --> add Body.angle instead of subtracting Math.PI / 2;
   ctx.translate(
     -tankBarrel.width / 2,
     -tankBarrel.height / 2 + tankBody.height / 4
@@ -122,6 +129,9 @@ function drawSprite(world, id) {
   ctx.translate(Position.x[id], Position.y[id]);
   if (hasComponent(world, Rotation, id)) {
     ctx.rotate(Rotation.angle[id] + Math.PI / 2);
+  }
+  if (hasComponent(world, Velocity, id)) {
+    ctx.rotate(Math.atan2(Velocity.y[id], Velocity.x[id]) + Math.PI / 2);
   }
   ctx.globalAlpha = 1 - Sprite.translucency[id];
   ctx.translate(-img.width / 2, -img.height / 2);
@@ -162,5 +172,18 @@ function drawId(world, id) {
   );
   ctx.fillStyle = "#000";
   ctx.fillText(id, -ctx.measureText(id).width / 2, 0);
+  ctx.restore();
+}
+
+function drawColliders(world, id) {
+  const { ctx } = world;
+  ctx.save();
+  ctx.translate(Position.x[id], Position.y[id]);
+  ctx.strokeStyle = "#f0f";
+  if (hasComponent(world, CircleCollider, id)) {
+    ctx.beginPath();
+    ctx.arc(0, 0, CircleCollider.radius[id], 0, 2 * Math.PI);
+    ctx.stroke();
+  }
   ctx.restore();
 }
