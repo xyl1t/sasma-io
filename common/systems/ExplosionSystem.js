@@ -20,9 +20,8 @@ export const explosionSystem = defineSystem((world) => {
     
     const bulletEntities = bulletQuery(world);
     for (const id of bulletEntities) {
-        let velX = Velocity.x[id] < 0 ? -Velocity.x[id] : Velocity.x[id];
-        let velY = Velocity.y[id] < 0 ? -Velocity.y[id] : Velocity.y[id];
-        if (velX < 100 && velY < 100){
+        let length = Math.sqrt(Math.pow(Velocity.x[id], 2) + Math.pow(Velocity.y[id], 2));
+        if (length < 200){
             removeEntity(world, id);
             const explosionId = addEntity(world);
             addComponent(world, Position, explosionId);
