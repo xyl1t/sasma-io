@@ -37,24 +37,42 @@ export const renderingSystem = defineSystem((world) => {
 
   if (world.dynamicCamera) {
     ctx.rotate(-Body.angle[meId] - Math.PI / 2);
+    const max = Math.max(world.windowWidth, world.windowHeight);
+    const diagnoal = Math.sqrt(2) * max;
+    ctx.drawImage(
+      map,
+      Position.x[meId] +
+        map.width / 2 -
+        diagnoal / world.renderScaleWidth / 2,
+      Position.y[meId] +
+        map.height / 2 -
+        diagnoal / world.renderScaleWidth / 2,
+      diagnoal / world.renderScaleWidth,
+      diagnoal / world.renderScaleWidth,
+
+      -diagnoal / 2 / world.renderScaleWidth,
+      -diagnoal / 2 / world.renderScaleWidth,
+      diagnoal / world.renderScaleWidth,
+      diagnoal / world.renderScaleWidth
+    );
+  } else {
+    ctx.drawImage(
+      map,
+      Position.x[meId] +
+        map.width / 2 -
+        world.windowWidth / world.renderScaleWidth / 2,
+      Position.y[meId] +
+        map.height / 2 -
+        world.windowHeight / world.renderScaleWidth / 2,
+      world.windowWidth / world.renderScaleWidth,
+      world.windowHeight / world.renderScaleWidth,
+
+      -world.windowWidth / 2 / world.renderScaleWidth,
+      -world.windowHeight / 2 / world.renderScaleWidth,
+      world.windowWidth / world.renderScaleWidth,
+      world.windowHeight / world.renderScaleWidth
+    );
   }
-
-  ctx.drawImage(
-    map,
-    Position.x[meId] +
-      map.width / 2 -
-      world.windowWidth / world.renderScaleWidth / 2,
-    Position.y[meId] +
-      map.height / 2 -
-      world.windowHeight / world.renderScaleWidth / 2,
-    world.windowWidth / world.renderScaleWidth,
-    world.windowHeight / world.renderScaleWidth,
-
-    -world.windowWidth / 2 / world.renderScaleWidth,
-    -world.windowHeight / 2 / world.renderScaleWidth,
-    world.windowWidth / world.renderScaleWidth,
-    world.windowHeight / world.renderScaleWidth
-  );
   ctx.translate(-Position.x[meId], -Position.y[meId]);
 
   const renderables = renderableQuery(world);
