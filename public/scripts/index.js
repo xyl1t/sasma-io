@@ -49,16 +49,22 @@ function getInput() {
 
 
 
-  inputPayload.inputX = joy["joyMove"].x;
-  inputPayload.inputY = joy["joyMove"].y; 
+  
 
   inputPayload.shooting = (mouse.leftDown || mouse.rightDown)
 
-  inputPayload.shooting = joy["joyAngle"].bounds;
-
   inputPayload.angle = Math.round(mouse.angle*100)/100;
 
-  inputPayload.angle = joy["joyAngle"].angle;
+  if(joy.joyAngle.x||joy.joyAngle.y){
+    inputPayload.angle = joy["joyAngle"].angle;
+    inputPayload.shooting = joy["joyAngle"].bounds;
+  }
+
+  if(joy.joyMove.x||joy.joyMove.y){
+    inputPayload.inputX = joy["joyMove"].x;
+    inputPayload.inputY = joy["joyMove"].y; 
+  }
+
 
   const gotInput =
     oldInput.inputY != inputPayload.inputY ||

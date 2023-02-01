@@ -37,6 +37,10 @@ function btnJoinClick(e) {
   console.log("join clicked");
   $("#startPageContainer").css("display", "none");
   $("#gameContainer").css("filter", "none");
+
+  if(e.originalEvent.pointerType.toLowerCase() == 'touch')
+    $('#joyCtrl').css("visibility", "visible")
+
   world.socket.emit("join" /*, name, x, y, z*/);
 }
 

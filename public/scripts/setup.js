@@ -45,7 +45,8 @@ async function setupWorldParameters() {
     joyAngle: {
       x: 0,
       y: 0,
-      angle: 0
+      angle: 0,
+      bounds: false
     } 
   };
   world.windowWidth = -1;

@@ -78,6 +78,9 @@ canvas {
   grid-area: footer;
 }
 
+#joyCtrl{
+  visibility:hidden;
+}
 
 .joyDiv{
   display: grid;
