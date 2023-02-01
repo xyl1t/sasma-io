@@ -3,6 +3,7 @@ import {
   addEntity,
   defineQuery,
   defineSystem,
+  hasComponent,
   Not,
 } from "../bitecs.js";
 import { Bullet } from "../components/Bullet.js";
@@ -12,8 +13,10 @@ import { Sprite } from "../components/Sprite.js";
 import { Velocity } from "../components/Velocity.js";
 import { Rotation } from "../components/Rotation.js";
 import { Bot } from "../components/Bot.js";
+import { Player } from "../components/Player.js";
 
-const query = defineQuery([Gun, Position, Not(Bot)]);
+// const query = defineQuery([Gun, Position, Not(Bot)]);
+const query = defineQuery([Gun, Position]);
 
 export const gunSystem = defineSystem((world) => {
   const entities = query(world);
@@ -35,10 +38,18 @@ export const gunSystem = defineSystem((world) => {
       Velocity.y[bulletId] = Math.sin(Gun.angle[id]) * 2000;
 
       addComponent(world, Rotation, bulletId);
-      Rotation.angle[bulletId] = Gun.angle[id]; // TODO: add `bulletSpeed` field to gun
+      Rotation.angle[bulletId] = Gun.angle[id];
 
       addComponent(world, Sprite, bulletId);
-      Sprite.texture[bulletId] = world.assetIdMap.bulletDark1_outline;
+      let spriteId = world.assetIdMap.bullet_dark_1;
+      let sourceId = Gun.source[id];
+      if (hasComponent(world, Player, sourceId)) {
+        spriteId =
+          world.assetIdMap[
+            "bullet_" + world.colorMap[Player.color[sourceId]] + "_1"
+          ];
+      }
+      Sprite.texture[bulletId] = spriteId;
 
       addComponent(world, Bullet, bulletId);
       Bullet.source[bulletId] = id;
