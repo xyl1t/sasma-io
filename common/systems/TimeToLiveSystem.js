@@ -13,8 +13,7 @@ import { TimeToLive } from "../components/TimeToLive.js";
 
 const removeSpritesQuery = defineQuery([TimeToLive]);
 
-// TODO: rename to cleanEntitySystem
-export const cleanComponentsSystem = defineSystem((world) => {
+export const timeToLiveSystem = defineSystem((world) => {
   const spritesToRemove = removeSpritesQuery(world);
   for (const id of spritesToRemove) {
     if (TimeToLive.timeToLive[id] <= TimeToLive.fadeTime[id]){

@@ -63,7 +63,7 @@ export const renderingSystem = defineSystem((world) => {
   // draw circlular border
   ctx.strokeStyle = "black";
   ctx.beginPath();
-  ctx.arc(0, 0, 400, 0, 2 * Math.PI);
+  ctx.arc(0, 0, 1000, 0, 2 * Math.PI);
   //ctx.arc(canvas.width / 2, canvas.height / 2, 400, 0, 2 * Math.PI);
   ctx.stroke();
 
