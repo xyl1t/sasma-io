@@ -10,6 +10,7 @@ import { Position } from "../components/Position.js";
 import { Sprite } from "../components/Sprite.js";
 import { Velocity } from "../components/Velocity.js";
 import { Me } from "/components/Me.js";
+import { CircleCollider } from "/components/CircleCollider.js";
 
 const spriteQuery = defineQuery([Position, Sprite]);
 const playerQuery = defineQuery([Player, Position, Velocity]);
@@ -29,21 +30,23 @@ export const renderingSystem = defineSystem((world) => {
   // center screen
   ctx.translate(world.windowWidth / 2, world.windowHeight / 2);
   ctx.scale(world.renderScaleWidth, world.renderScaleHeight);
-  
-  let widthToShow = world.renderScaleWidth >= 1 ? 800 * world.renderScaleWidth : world.windowWidth;
-  let heightToShow = world.renderScaleHeight >= 1 ? 800 * world.renderScaleHeight : world.windowHeight;
 
   // move to current player
   const meId = meQuery(world)[0];
-  ctx.translate(-Position.x[meId], -Position.y[meId]);
-  const map = getAsset(assetIdMap["MAP"])
+  const map = getAsset(assetIdMap["MAP"]);
   ctx.drawImage(
     map,
-    -map.width / 2,
-    -map.height / 2,
-    map.width,
-    map.height
+    Position.x[meId] + map.width / 2 - world.windowWidth / world.renderScaleWidth / 2,
+    Position.y[meId] + map.height / 2 - world.windowHeight  / world.renderScaleWidth/ 2,
+    world.windowWidth / world.renderScaleWidth,
+    world.windowHeight / world.renderScaleWidth,
+
+    -world.windowWidth / 2 / world.renderScaleWidth,
+    -world.windowHeight / 2 / world.renderScaleWidth,
+    world.windowWidth / world.renderScaleWidth,
+    world.windowHeight / world.renderScaleWidth
   );
+  ctx.translate(-Position.x[meId], -Position.y[meId]);
 
   const renderables = renderableQuery(world);
   for (const id of renderables) {
@@ -53,11 +56,17 @@ export const renderingSystem = defineSystem((world) => {
     if (hasComponent(world, Sprite, id)) {
       drawSprite(world, id);
     }
-    if (world.debug.showVelocity && (hasComponent(world, Body, id) || hasComponent(world, Velocity, id))) {
+    if (
+      world.debug.showVelocity &&
+      (hasComponent(world, Body, id) || hasComponent(world, Velocity, id))
+    ) {
       drawVelocityVectors(world, id);
     }
     if (world.debug.showIds) {
       drawId(world, id);
+    }
+    if (world.debug.showColliders) {
+      drawColliders(world, id);
     }
   }
 
@@ -65,7 +74,6 @@ export const renderingSystem = defineSystem((world) => {
   ctx.strokeStyle = "black";
   ctx.beginPath();
   ctx.arc(0, 0, 1000, 0, 2 * Math.PI);
-  //ctx.arc(canvas.width / 2, canvas.height / 2, 400, 0, 2 * Math.PI);
   ctx.stroke();
 
   ctx.restore();
@@ -111,6 +119,9 @@ function drawSprite(world, id) {
   if (hasComponent(world, Rotation, id)) {
     ctx.rotate(Rotation.angle[id] + Math.PI / 2);
   }
+  if (hasComponent(world, Velocity, id)) {
+    ctx.rotate(Math.atan2(Velocity.y[id], Velocity.x[id]) + Math.PI / 2);
+  }
   ctx.globalAlpha = 1 - Sprite.translucency[id];
   ctx.translate(-img.width / 2, -img.height / 2);
   ctx.drawImage(img, 0, 0);
@@ -128,7 +139,10 @@ function drawVelocityVectors(world, id) {
     ctx.lineTo(Velocity.x[id], Velocity.y[id]);
   }
   if (hasComponent(world, Body, id)) {
-    ctx.lineTo(Math.cos(Body.angle[id]) * Body.velocity[id], Math.sin(Body.angle[id]) * Body.velocity[id]);
+    ctx.lineTo(
+      Math.cos(Body.angle[id]) * Body.velocity[id],
+      Math.sin(Body.angle[id]) * Body.velocity[id]
+    );
   }
   ctx.stroke();
   ctx.restore();
@@ -147,5 +161,18 @@ function drawId(world, id) {
   );
   ctx.fillStyle = "#000";
   ctx.fillText(id, -ctx.measureText(id).width / 2, 0);
+  ctx.restore();
+}
+
+function drawColliders(world, id) {
+  const { ctx } = world;
+  ctx.save();
+  ctx.translate(Position.x[id], Position.y[id]);
+  ctx.strokeStyle = "#f0f";
+  if (hasComponent(world, CircleCollider, id)) {
+    ctx.beginPath();
+    ctx.arc(0, 0, CircleCollider.radius[id], 0, 2 * Math.PI);
+    ctx.stroke();
+  }
   ctx.restore();
 }
