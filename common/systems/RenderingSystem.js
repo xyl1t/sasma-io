@@ -23,14 +23,27 @@ export const renderingSystem = defineSystem((world) => {
 
   // clear screen
   ctx.fillStyle = "lightgray";
+  
   ctx.fillRect(0, 0, canvas.width, canvas.height);
+  
 
   // center screen
   ctx.translate(world.windowWidth / 2, world.windowHeight / 2);
 
+  
+
   // move to current player
   const meId = meQuery(world)[0];
   ctx.translate(-Position.x[meId], -Position.y[meId]);
+  ctx.drawImage(getAsset(assetIdMap["MAP"]),
+                2500 - world.windowWidth / 2 + Position.x[meId],
+                2500 - world.windowHeight / 2 + Position.y[meId],
+                world.windowWidth, 
+                world.windowHeight, 
+                - world.windowWidth / 2 + Position.x[meId],
+                - world.windowHeight / 2 + Position.y[meId],
+                world.windowWidth, 
+                world.windowHeight);
 
   const renderables = renderableQuery(world);
   for (const id of renderables) {
