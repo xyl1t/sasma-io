@@ -51,6 +51,12 @@ async function setupWorldParameters() {
   };
   world.windowWidth = -1;
   world.windowHeight = -1;
+
+  world.constWidht = 800;
+  world.constHeight = 800;
+  world.renderScaleWidth = 1;
+  world.renderScaleHeight = 1;
+
   world.resize = () => {
     world.canvas.width = window.innerWidth;
     world.canvas.height = window.innerHeight;
@@ -58,6 +64,19 @@ async function setupWorldParameters() {
     world.canvas.style.height = window.innerHieght + "px";
     world.windowWidth = window.innerWidth;
     world.windowHeight = window.innerHeight;
+
+    if (window.innerWidth > window.innerHeight) {
+      let ratio = window.innerHeight / world.constHeight;
+      // ratio = Math.max(0.7, ratio);
+      world.renderScaleWidth = ratio;
+      world.renderScaleHeight = ratio;
+    }
+    else {
+      let ratio = window.innerWidth / world.constWidth;
+      // ratio = Math.max(0.7, ratio);
+      world.renderScaleWidth = ratio;
+      world.renderScaleHeight = ratio;
+    }
   };
   world.assets = []; // the actual images
   world.assetIdMap = {}; // eg `assetIdMap[tank_blue]` gives you `4`
