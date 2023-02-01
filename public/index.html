@@ -27,6 +27,9 @@
       rel="stylesheet"
     />
     <link rel="stylesheet" href="./styles/main.css" />
+    <link rel="stylesheet" href="./styles/startPage.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.4.1/dist/css/bootstrap.min.css" integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" crossorigin="anonymous">
+
 
     <script src="/socket.io/socket.io.js" defer></script>
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.1/jquery.min.js"></script>
@@ -39,11 +42,64 @@
       </div>
 
       <div id="startPageContainer">
-        <div id="titleItem">
-          <h1>Sasma.io</h1>
-          <input type="text" name="playerName" id="input" />
-          <button type="button" id="btnJoin">Join</button>
+        
+        <div id="mainMenu">
+
+          <div id="animatedName">
+              <span>S</span>
+              <span>a</span>
+              <span>s</span>
+              <span>m</span>
+              <span>a</span>
+              <span>.</span>
+              <span>i</span>
+              <span>o</span>
+          </div>
+            <input id="username" type="text" placeholder="Username" aria-label="Username" aria-describedby="basic-addon1" value="" autofocus>
+            <br>
+            <button id="btnJoin" type="button" class="btn btn-primary">Join</button>
+            <br>
+            <img id="aboutImage" src="./assets/frontpageImages/aboutImage.png">
+  
+  
         </div>
+      
+      <div id="aboutPage">
+      
+          <div id="about">
+              <h1 class="bigFont">ABOUT</h1>
+          
+              <h2>Sasma.io was built as a school project to show off
+                  what we do at our school and to motivate potential 
+                  new students to join our school.</h2>
+          
+          </div>
+
+          <div id="credits">
+              <h1 class="bigFont">CREDITS</h1>
+              <table id="tableCredits">
+                  <tbody>
+                      <tr><td><h2>Thomas Fischer</h2></td><td><h2>Game designer and programmer</h2></td></tr>
+                      <tr><td><h2>Paul Trattnig</h2></td><td><h2>Art director</h2></td></tr>
+                      <tr><td><h2>Justus Arndt</h2></td><td><h2>Programmer</h2></td></tr>
+                      <tr><td><h2>Benjamin Terbul</h2></td><td><h2>Programmer</h2></td></tr>
+                      <tr><td><h2>Marat Isaw</h2></td><td><h2>iChef and programmer</h2></td></tr>
+                  </tbody>
+              </table>
+
+            </table>
+              
+          
+          
+          </div>
+          <img id="greenTank" src="./assets/frontpageImages/greenTank.png">
+          <img id="bullet" src="./assets/frontpageImages/bullet.png">
+          <img id="bullet2" src="./assets/frontpageImages/bullet.png">
+          <img id="redTank" src="./assets/frontpageImages/redTank.png">
+              
+      </div>
+
+
       </div>
     </div>
   </body>
