@@ -18,7 +18,7 @@ export async function setup() {
 }
 
 async function setupWorldParameters() {
-  world.tickRate = 30;
+  world.tickRate = 60;
   world.dt = 1 / world.tickRate;
   world.currentTick = 0;
   world.gotInput = false;
@@ -78,8 +78,7 @@ async function setupWorldParameters() {
   world.debug = {
     showIds: false,
     showVelocity: false,
-    showCollision: false,
-
+    showColliders: false,
   };
 }
 

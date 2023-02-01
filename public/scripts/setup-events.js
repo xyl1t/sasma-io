@@ -88,8 +88,8 @@ function keydown(e) {
       world.debug.showVelocity = !world.debug.showVelocity;
     }
     // collision
-    if (world.keyboard["c"]) {
-      world.debug.showCollision = !world.debug.showCollision;
+    if (world.keyboard["p"]) {
+      world.debug.showColliders = !world.debug.showColliders;
     }
   }
 }

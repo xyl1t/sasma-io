@@ -14,6 +14,9 @@ import { Velocity } from "../components/Velocity.js";
 import { Rotation } from "../components/Rotation.js";
 import { Bot } from "../components/Bot.js";
 import { Player } from "../components/Player.js";
+import { Acceleration } from "../components/Acceleration.js";
+import { Force } from "../components/Force.js";
+import { Mass } from "../components/Mass.js";
 
 // const query = defineQuery([Gun, Position, Not(Bot)]);
 const query = defineQuery([Gun, Position]);
@@ -34,11 +37,12 @@ export const gunSystem = defineSystem((world) => {
       Position.y[bulletId] = Position.y[id];
 
       addComponent(world, Velocity, bulletId);
-      Velocity.x[bulletId] = Math.cos(Gun.angle[id]) * 2000; // TODO: add `bulletSpeed` field to gun
-      Velocity.y[bulletId] = Math.sin(Gun.angle[id]) * 2000;
-
-      addComponent(world, Rotation, bulletId);
-      Rotation.angle[bulletId] = Gun.angle[id];
+      addComponent(world, Acceleration, bulletId);
+      addComponent(world, Force, bulletId);
+      addComponent(world, Mass, bulletId);
+      Mass.value[bulletId] = 1; // TODO: add `bulletSpeed` field to gun
+      Force.x[bulletId] = Math.cos(Gun.angle[id]) * 70000; // TODO: add `bulletSpeed` field to gun
+      Force.y[bulletId] = Math.sin(Gun.angle[id]) * 70000;
 
       addComponent(world, Sprite, bulletId);
       let spriteId = world.assetIdMap.bullet_dark_1;
