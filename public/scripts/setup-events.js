@@ -10,13 +10,6 @@ export async function setupEvents() {
   window.addEventListener("keydown", keydown, true);
   window.addEventListener("keyup", keyup, true);
   
-  
-  
-  // moveBase = document.getElementById('joyMoveBase');
-  // moveBtn = document.getElementById('joyMoveBtn');
-  // angleBase = document.getElementById('joyAngleBase');
-  // angleBtn = document.getElementById('joyAngleBtn');
-  // moveInput = document.getElementById('moveInput');
 
   $('#joyMoveBase').on('touchstart',onJoyMove);
   $('#joyMoveBase').on('touchmove',onJoyMove);
