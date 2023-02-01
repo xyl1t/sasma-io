@@ -17,6 +17,7 @@ import { Player } from "../components/Player.js";
 import { Acceleration } from "../components/Acceleration.js";
 import { Force } from "../components/Force.js";
 import { Mass } from "../components/Mass.js";
+import { CircleCollider } from "../components/CircleCollider.js";
 
 // const query = defineQuery([Gun, Position, Not(Bot)]);
 const query = defineQuery([Gun, Position]);
@@ -33,16 +34,19 @@ export const gunSystem = defineSystem((world) => {
       const bulletId = addEntity(world);
 
       addComponent(world, Position, bulletId);
-      Position.x[bulletId] = Position.x[id];
-      Position.y[bulletId] = Position.y[id];
+      Position.x[bulletId] = Position.x[id] + Math.cos(Gun.angle[id]) * 10;
+      Position.y[bulletId] = Position.y[id] + Math.sin(Gun.angle[id]) * 10;
 
       addComponent(world, Velocity, bulletId);
       addComponent(world, Acceleration, bulletId);
       addComponent(world, Force, bulletId);
       addComponent(world, Mass, bulletId);
       Mass.value[bulletId] = 1; // TODO: add `bulletSpeed` field to gun
-      Force.x[bulletId] = Math.cos(Gun.angle[id]) * 70000; // TODO: add `bulletSpeed` field to gun
-      Force.y[bulletId] = Math.sin(Gun.angle[id]) * 70000;
+      Force.x[bulletId] = Math.cos(Gun.angle[id]) * 100000; // TODO: add `bulletSpeed` field to gun
+      Force.y[bulletId] = Math.sin(Gun.angle[id]) * 100000;
+
+      addComponent(world, CircleCollider, bulletId);
+      CircleCollider.radius[bulletId] = 5;
 
       addComponent(world, Sprite, bulletId);
       let spriteId = world.assetIdMap.bullet_dark_1;
