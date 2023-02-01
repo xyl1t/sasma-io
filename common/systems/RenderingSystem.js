@@ -32,15 +32,28 @@ export const renderingSystem = defineSystem((world) => {
 
   // move to current player
   const meId = meQuery(world)[0];
+  const map = getAsset(assetIdMap["MAP"]);
+
 
   if(world.dynamicCamera){
     ctx.rotate(-Body.angle[meId] - Math.PI/2);
   }
-    
-  
+
+  ctx.drawImage(
+    map,
+    Position.x[meId] + map.width / 2 - world.windowWidth / world.renderScaleWidth / 2,
+    Position.y[meId] + map.height / 2 - world.windowHeight  / world.renderScaleWidth/ 2,
+    world.windowWidth / world.renderScaleWidth,
+    world.windowHeight / world.renderScaleWidth,
+
+    -world.windowWidth / 2 / world.renderScaleWidth,
+    -world.windowHeight / 2 / world.renderScaleWidth,
+    world.windowWidth / world.renderScaleWidth,
+    world.windowHeight / world.renderScaleWidth
+  );
+
   ctx.translate(-Position.x[meId], -Position.y[meId]);
-  const map = getAsset(assetIdMap["MAP"]);
-  ctx.drawImage(map, -map.width / 2, -map.height / 2, map.width, map.height);
+  
 
   const renderables = renderableQuery(world);
   for (const id of renderables) {
