@@ -5,7 +5,9 @@ export const Body = defineComponent({
   rotationSpeed: Types.f32,
   power: Types.f32,
   angle: Types.f32,
+  angleVelocity: Types.f32,
   force: Types.f32,
   acceleration: Types.f32,
   velocity: Types.f32,
+  lastTrackDistance: Types.f32,
 });

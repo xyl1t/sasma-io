@@ -1,4 +1,4 @@
-import { defineQuery, defineSystem } from "../bitecs.js";
+import { addEntity, addComponent, defineQuery, defineSystem } from "../bitecs.js";
 import { Vector } from "../util.js";
 
 import { Rotation } from "../components/Rotation.js";
@@ -12,6 +12,7 @@ import { Gun } from "../components/Gun.js";
 import { Acceleration } from "../components/Acceleration.js";
 import { Force } from "../components/Force.js";
 import { Mass } from "../components/Mass.js";
+import { Sprite } from "../components/Sprite.js";
 
 const query = defineQuery([Player, Input, Position, Velocity, Body, Gun, Acceleration, Force, Mass]);
 
@@ -25,9 +26,10 @@ export const handleInputSystem = defineSystem((world) => {
     const shooting = Input.shooting[id];
 
     Body.movingDirection[id] = 0;
+    Body.angleVelocity[id] = 0;
     Body.force[id] = 0;
     if (inputX) {
-      Body.angle[id] += Body.rotationSpeed[id] * world.dt * inputX;
+      Body.angleVelocity[id] = Body.rotationSpeed[id] * inputX;
     }
     if (inputY) {
       Body.movingDirection[id] = inputY;

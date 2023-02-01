@@ -76,7 +76,7 @@ export const renderingSystem = defineSystem((world) => {
   // draw circlular border
   ctx.strokeStyle = "black";
   ctx.beginPath();
-  ctx.arc(0, 0, 400, 0, 2 * Math.PI);
+  ctx.arc(0, 0, 1000, 0, 2 * Math.PI);
   //ctx.arc(canvas.width / 2, canvas.height / 2, 400, 0, 2 * Math.PI);
   ctx.stroke();
 
@@ -123,6 +123,7 @@ function drawSprite(world, id) {
   if (hasComponent(world, Rotation, id)) {
     ctx.rotate(Rotation.angle[id] + Math.PI / 2);
   }
+  ctx.globalAlpha = 1 - Sprite.translucency[id];
   ctx.translate(-img.width / 2, -img.height / 2);
   ctx.drawImage(img, 0, 0);
   ctx.restore();
