@@ -25,9 +25,11 @@ export async function setupEvents() {
   $('#joyAngleBase').on('touchstart',onJoyMove);
   $('#joyAngleBase').on('touchmove',onJoyMove);
   $('#joyAngleBase').on('touchend',onJoyRelease);
-  
-  
-  
+
+  window.addEventListener("touchstart", () => {
+    world.isMobile = true;
+  })
+   
   $("#btnJoin").click(btnJoinClick);
   //easter egg
   $("#bullet").click((ea));
@@ -38,7 +40,8 @@ function btnJoinClick(e) {
   $("#startPageContainer").css("display", "none");
   $("#gameContainer").css("filter", "none");
 
-  if(e.originalEvent.pointerType.toLowerCase() == 'touch')
+  //activate mobile controls
+  if (world.isMobile)
     $('#joyCtrl').css("visibility", "visible")
 
   world.socket.emit("join" /*, name, x, y, z*/);
@@ -210,3 +213,4 @@ function ea(e){
  $("#bullet").attr("src","./assets/frontpageImages/easterEgg.png");
  $("#bullet2").attr("src","./assets/frontpageImages/easterEgg.png")
 }
+

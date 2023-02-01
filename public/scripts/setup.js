@@ -76,6 +76,7 @@ async function setupWorldParameters() {
     showCollision: false,
 
   };
+  world.isMobile = false
 }
 
 async function loadPlaceholderAsset() {
