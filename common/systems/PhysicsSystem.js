@@ -4,6 +4,7 @@ import { Body } from "../components/Body.js";
 import { Rotation } from "../components/Rotation.js";
 import { Position } from "../components/Position.js";
 import { Velocity } from "../components/Velocity.js";
+import { explosionSystem } from "./ExplosionSystem.js";
 
 // QUERIES // Selects all entities that have the following components
 const physicsQuery = defineQuery([Not(Body), Position, Velocity]);
