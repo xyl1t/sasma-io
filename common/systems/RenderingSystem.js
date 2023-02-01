@@ -23,9 +23,8 @@ export const renderingSystem = defineSystem((world) => {
 
   // clear screen
   ctx.fillStyle = "lightgray";
-  
+
   ctx.fillRect(0, 0, canvas.width, canvas.height);
-  
 
   // center screen
   ctx.translate(world.windowWidth / 2, world.windowHeight / 2);
@@ -58,7 +57,7 @@ export const renderingSystem = defineSystem((world) => {
     if (hasComponent(world, Sprite, id)) {
       drawSprite(world, id);
     }
-    if (world.debug.showVelocity && hasComponent(world, Velocity, id)) {
+    if (world.debug.showVelocity && (hasComponent(world, Body, id) || hasComponent(world, Velocity, id))) {
       drawVelocityVectors(world, id);
     }
     if (world.debug.showIds) {
@@ -126,17 +125,15 @@ function drawVelocityVectors(world, id) {
   ctx.save();
   ctx.translate(Position.x[id], Position.y[id]);
   ctx.strokeStyle = "#f00";
-  ctx.beginPath(); // Start a new path
-  ctx.moveTo(0, 0); // Move the pen to (30, 50)
-  if (hasComponent(world, Body, id)) {
-    ctx.lineTo(
-      Math.cos(Body.angle[id]) * Velocity.x[id],
-      Math.sin(Body.angle[id]) * Velocity.y[id]
-    ); // Draw a line to (150, 100)
-  } else {
-    ctx.lineTo(Velocity.x[id], Velocity.y[id]); // Draw a line to (150, 100)
+  ctx.beginPath();
+  ctx.moveTo(0, 0);
+  if (hasComponent(world, Velocity, id)) {
+    ctx.lineTo(Velocity.x[id], Velocity.y[id]);
   }
-  ctx.stroke(); // Render the path
+  if (hasComponent(world, Body, id)) {
+    ctx.lineTo(Math.cos(Body.angle[id]) * Body.velocity[id], Math.sin(Body.angle[id]) * Body.velocity[id]);
+  }
+  ctx.stroke();
   ctx.restore();
 }
 
