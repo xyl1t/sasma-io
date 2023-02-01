@@ -2,6 +2,16 @@
   font-family: "Roboto", sans-serif, "Arial";
 }
 
+*::-webkit-scrollbar {
+  display: none;
+}
+
+/* Hide scrollbar for IE, Edge and Firefox */
+* {
+  -ms-overflow-style: none;  /* IE and Edge */
+  scrollbar-width: none;  /* Firefox */
+}
+
 body {
   padding: 0px;
   margin: 0px;
@@ -22,7 +32,8 @@ canvas {
 }
 
 #gameContainer {
-  filter: brightness(50%);
+  filter: brightness(30%);
+  position: fixed;
 }
 
 #startPageContainer {
@@ -40,16 +51,6 @@ canvas {
   gap: 10px;
 }
 
-#startPageContainer > div {
-  /* background-color: rgba(255, 255, 255, 0.8); */
-  padding: 20px 0;
-  /* display: flex; */
-  /* justify-content: center; */
-  /* align-items: center; */
-  text-align: center;
-
-  /* place-self: center; */
-}
 
 #titleItem input, button{
   font-size: 1em;
