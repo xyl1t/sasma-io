@@ -51,7 +51,7 @@ export const renderingSystem = defineSystem((world) => {
   const renderables = renderableQuery(world);
   for (const id of renderables) {
     if (hasComponent(world, Player, id)) {
-      drawPlayer(world, id);
+      drawPlayer(world, id, meId);
     }
     if (hasComponent(world, Sprite, id)) {
       drawSprite(world, id);
@@ -81,7 +81,7 @@ export const renderingSystem = defineSystem((world) => {
   return world;
 });
 
-function drawPlayer(world, id) {
+function drawPlayer(world, id, meId) {
   const { canvas, ctx, assetIdMap, getAsset } = world;
   ctx.save();
   ctx.translate(Position.x[id], Position.y[id]);
@@ -106,6 +106,35 @@ function drawPlayer(world, id) {
   );
   ctx.drawImage(tankBarrel, 0, 0);
   ctx.restore();
+
+  if(id == meId){
+    drawPath(world,id);
+  }
+
+  ctx.restore();
+}
+
+function drawPath(world,id){
+  const { canvas, ctx, assetIdMap, getAsset } = world;
+  const arrow = getAsset(assetIdMap["directionArrow"]);
+  
+  const space = Input.inputY[id]*20; 
+  const rotationStep = Input.inputX[id]*2/4;
+  ctx.save();
+
+  console.log(space)
+
+  ctx.rotate(Body.angle[id]+Math.PI/2);
+
+  ctx.translate(0,-40);
+
+  for(let i=0;i<4;i++){
+    ctx.drawImage(arrow,-arrow.width/2,0,25,8);
+    ctx.rotate(rotationStep);
+    ctx.translate(0,-space);
+  }
+
+
 
   ctx.restore();
 }
