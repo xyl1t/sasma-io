@@ -32,7 +32,12 @@ export const renderingSystem = defineSystem((world) => {
 
   // move to current player
   const meId = meQuery(world)[0];
-  ctx.rotate(-Body.angle[meId] - Math.PI/2); // <----- HERE BENJAMIN
+
+  if(world.dynamicCamera){
+    ctx.rotate(-Body.angle[meId] - Math.PI/2);
+  }
+    
+  
   ctx.translate(-Position.x[meId], -Position.y[meId]);
   const map = getAsset(assetIdMap["MAP"]);
   ctx.drawImage(map, -map.width / 2, -map.height / 2, map.width, map.height);
@@ -40,7 +45,7 @@ export const renderingSystem = defineSystem((world) => {
   const renderables = renderableQuery(world);
   for (const id of renderables) {
     if (hasComponent(world, Player, id)) {
-      drawPlayer(world, id);
+      drawPlayer(world, id, meId);
     }
     if (hasComponent(world, Sprite, id)) {
       drawSprite(world, id);
@@ -67,7 +72,7 @@ export const renderingSystem = defineSystem((world) => {
   return world;
 });
 
-function drawPlayer(world, id) {
+function drawPlayer(world, id, meId) {
   const { canvas, ctx, assetIdMap, getAsset } = world;
   ctx.save();
   ctx.translate(Position.x[id], Position.y[id]);
@@ -85,7 +90,7 @@ function drawPlayer(world, id) {
   // Barrel
   const tankBarrel = getAsset(assetIdMap["tank_barrel_" + color + "_2"]);
   ctx.save();
-  ctx.rotate(Gun.angle[id] - Math.PI / 2);
+  ctx.rotate(Gun.angle[id] - (world.dynamicCamera&&id==meId? -Body.angle[id] : Math.PI / 2)); //dynamic camera --> add Body.angle instead of subtracting Math.PI / 2;
   ctx.translate(
     -tankBarrel.width / 2,
     -tankBarrel.height / 2 + tankBody.height / 4

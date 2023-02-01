@@ -24,6 +24,7 @@ export async function setupEvents() {
   })
    
   $("#btnJoin").click(btnJoinClick);
+  $("#btnView").click(btnViewClick);
   //easter egg
   $("#bullet").click((ea));
 }
@@ -38,6 +39,10 @@ function btnJoinClick(e) {
     $('#joyCtrl').css("visibility", "visible")
 
   world.socket.emit("join" /*, name, x, y, z*/);
+}
+
+function btnViewClick(e){
+  world.dynamicCamera = !world.dynamicCamera;
 }
 
 function mousedown(e) {

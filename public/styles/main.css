@@ -78,6 +78,23 @@ canvas {
   grid-area: footer;
 }
 
+#btnView{
+  position: absolute;
+  top: 5%;
+  right: 5%;
+  width: 4vw;
+  height: 4vw;
+  background: none;
+  border-radius: 30%;
+  border: thin solid black;
+  outline: 0;
+}
+
+#btnView img{
+  height: 100%;
+  width: 100%;
+}
+
 #joyCtrl{
   visibility:hidden;
 }
@@ -139,6 +156,15 @@ canvas {
   position: absolute;
   bottom:10%;
   right:8%;
+}
+
+@media only screen and (max-width: 900px) {
+
+  #btnView{
+    width: 40px;
+    height: 40px;
+  }
+
 }
 
 @media only screen and (max-width: 600px) {
