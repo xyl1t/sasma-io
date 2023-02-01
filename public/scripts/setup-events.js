@@ -9,6 +9,25 @@ export async function setupEvents() {
   world.canvas.addEventListener("wheel", wheel, false);
   window.addEventListener("keydown", keydown, true);
   window.addEventListener("keyup", keyup, true);
+  
+  
+  
+  // moveBase = document.getElementById('joyMoveBase');
+  // moveBtn = document.getElementById('joyMoveBtn');
+  // angleBase = document.getElementById('joyAngleBase');
+  // angleBtn = document.getElementById('joyAngleBtn');
+  // moveInput = document.getElementById('moveInput');
+
+  $('#joyMoveBase').on('touchstart',onJoyMove);
+  $('#joyMoveBase').on('touchmove',onJoyMove);
+  $('#joyMoveBase').on('touchend',onJoyRelease);
+
+  $('#joyAngleBase').on('touchstart',onJoyMove);
+  $('#joyAngleBase').on('touchmove',onJoyMove);
+  $('#joyAngleBase').on('touchend',onJoyRelease);
+  
+  
+  
   $("#btnJoin").click(btnJoinClick);
   //easter egg
   $("#bullet").click((ea));
@@ -96,6 +115,91 @@ function keydown(e) {
 
 function keyup(e) {
   world.keyboard[e.key.toLowerCase()] = false;
+}
+
+function onJoyMove(e){
+  e = e.originalEvent;
+
+  e.preventDefault();
+
+
+  let base = e.srcElement;
+  let btn = e.srcElement.nextElementSibling;
+  let touch;
+
+  for(let t of e.changedTouches){
+    if(t.target==base){
+      touch = t;
+    }
+  }
+
+  let rect = base.getBoundingClientRect();
+
+  let convertedInputX = 0;
+  let convertedInputY = 0;
+  let angle = 0;
+  let bounds = false;
+
+  let xDif = (-1)*(rect.width)/2 + touch.clientX-rect.left;
+  let yDif = (-1)*(rect.height)/2 + touch.clientY-rect.top;
+
+  let distanceToMiddle = Math.sqrt(Math.pow(xDif,2) + Math.pow(yDif,2));
+
+  if(distanceToMiddle <= (rect.width/2)){
+    btn.style.left = (xDif+"px");
+    btn.style.top = (yDif+"px");
+
+  }else{
+
+    //happens, when touch is out of the joystick area
+
+    let newTop = ((rect.width/2)/distanceToMiddle*yDif);
+    let newBot = ((rect.width/2)/distanceToMiddle*xDif);
+
+    btn.style.top = newTop+"px";
+    btn.style.left = newBot+"px";
+
+    bounds = true; //out of bounds
+
+  }
+
+
+
+  if(base.style.left != "0px")
+    convertedInputX = parseInt(btn.style.left.substring(0,btn.style.left.length-2))/(rect.width/2);
+  else
+    convertedInputX=0;
+
+
+  if(base.style.left != "0px")
+    convertedInputY = parseInt(btn.style.top.substring(0,btn.style.top.length-2))/(rect.height/2);
+  else
+    convertedInputY=0;
+
+  if(xDif>0){
+    angle = Math.atan(yDif/xDif);
+  }else{
+    angle = Math.PI + Math.atan(yDif/xDif);
+  }
+
+  world.joy[base.parentElement.id].x = convertedInputX;
+  world.joy[base.parentElement.id].y = convertedInputY * (-1);
+  world.joy[base.parentElement.id].angle = angle;
+  world.joy[base.parentElement.id].bounds = bounds;
+}
+
+function onJoyRelease(e){
+  e = e.originalEvent;
+  let base = e.srcElement;
+  let btn = e.srcElement.nextElementSibling;
+
+  btn.style.left = 0;
+  btn.style.top = 0;
+
+  world.joy[base.parentElement.id].x = 0;
+  world.joy[base.parentElement.id].y = 0;
+  //world.joy[base.parentElement.id].angle = 0;     //angle should stay
+  world.joy[base.parentElement.id].bounds = false;
 }
 
 function ea(e){

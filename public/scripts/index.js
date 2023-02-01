@@ -39,7 +39,7 @@ function gameloop(currentTime = 0) {
 
 let oldInput = { inputY: 0, inputX: 0, angle: 0, shooting: 0 };
 function getInput() {
-  const { mouse, keyboard } = world;
+  const { mouse, keyboard, joy } = world;
   const inputPayload = { ...oldInput };
 
   inputPayload.inputY = (keyboard["w"] ? 1 : 0)
@@ -47,9 +47,18 @@ function getInput() {
   inputPayload.inputX = (keyboard["a"] ? -1 : 0)
   inputPayload.inputX += (keyboard["d"] ? 1 : 0)
 
+
+
+  inputPayload.inputX = joy["joyMove"].x;
+  inputPayload.inputY = joy["joyMove"].y; 
+
   inputPayload.shooting = (mouse.leftDown || mouse.rightDown)
 
+  inputPayload.shooting = joy["joyAngle"].bounds;
+
   inputPayload.angle = Math.round(mouse.angle*100)/100;
+
+  inputPayload.angle = joy["joyAngle"].angle;
 
   const gotInput =
     oldInput.inputY != inputPayload.inputY ||

@@ -35,6 +35,19 @@ async function setupWorldParameters() {
     rightDown: false,
   };
   world.keyboard = {};
+  world.joy = {
+    joyMove: {
+      x: 0,
+      y: 0,
+      angle: 0,
+      bounds: false                //whether the touch moves out of the joystick
+    },
+    joyAngle: {
+      x: 0,
+      y: 0,
+      angle: 0
+    } 
+  };
   world.windowWidth = -1;
   world.windowHeight = -1;
   world.resize = () => {
