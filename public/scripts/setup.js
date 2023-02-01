@@ -38,7 +38,7 @@ async function setupWorldParameters() {
   world.windowWidth = -1;
   world.windowHeight = -1;
 
-  world.constWidht = 800;
+  world.constWidth = 800;
   world.constHeight = 800;
   world.renderScaleWidth = 1;
   world.renderScaleHeight = 1;
@@ -53,13 +53,13 @@ async function setupWorldParameters() {
 
     if (window.innerWidth > window.innerHeight) {
       let ratio = window.innerHeight / world.constHeight;
-      // ratio = Math.max(0.7, ratio);
+      ratio = Math.max(0.7, ratio);
       world.renderScaleWidth = ratio;
       world.renderScaleHeight = ratio;
     }
     else {
       let ratio = window.innerWidth / world.constWidth;
-      // ratio = Math.max(0.7, ratio);
+      ratio = Math.max(0.7, ratio);
       world.renderScaleWidth = ratio;
       world.renderScaleHeight = ratio;
     }

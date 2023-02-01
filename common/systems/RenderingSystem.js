@@ -31,20 +31,22 @@ export const renderingSystem = defineSystem((world) => {
   ctx.translate(world.windowWidth / 2, world.windowHeight / 2);
   ctx.scale(world.renderScaleWidth, world.renderScaleHeight);
 
-  let widthToShow =
-    world.renderScaleWidth >= 1
-      ? 800 * world.renderScaleWidth
-      : world.windowWidth;
-  let heightToShow =
-    world.renderScaleHeight >= 1
-      ? 800 * world.renderScaleHeight
-      : world.windowHeight;
-
   // move to current player
   const meId = meQuery(world)[0];
-  ctx.translate(-Position.x[meId], -Position.y[meId]);
   const map = getAsset(assetIdMap["MAP"]);
-  ctx.drawImage(map, -map.width / 2, -map.height / 2, map.width, map.height);
+  ctx.drawImage(
+    map,
+    Position.x[meId] + map.width / 2 - world.windowWidth / world.renderScaleWidth / 2,
+    Position.y[meId] + map.height / 2 - world.windowHeight  / world.renderScaleWidth/ 2,
+    world.windowWidth / world.renderScaleWidth,
+    world.windowHeight / world.renderScaleWidth,
+
+    -world.windowWidth / 2 / world.renderScaleWidth,
+    -world.windowHeight / 2 / world.renderScaleWidth,
+    world.windowWidth / world.renderScaleWidth,
+    world.windowHeight / world.renderScaleWidth
+  );
+  ctx.translate(-Position.x[meId], -Position.y[meId]);
 
   const renderables = renderableQuery(world);
   for (const id of renderables) {
