@@ -17,18 +17,18 @@ const friction = 3;
 
 // SYSTEMS // a function that runs through some entities and modifies their components
 export const physicsSystem = defineSystem((world) => {
-  // const tankBodies = tankBodyQuery(world);
-  // for (const id of tankBodies) {
-  //   Velocity.x[id] += Body.power[id] * Body.movingDirection[id] * world.dt;
-  //   Velocity.y[id] += Body.power[id] * Body.movingDirection[id] * world.dt;
-  //
-  //   Position.x[id] += Math.cos(Body.angle[id]) * Velocity.x[id] * world.dt;
-  //   Position.y[id] += Math.sin(Body.angle[id]) * Velocity.y[id] * world.dt;
-  //
-  //   // TODO: make this value a component `Friction`
-  //   Velocity.x[id] += Velocity.x[id] * -3 * world.dt;
-  //   Velocity.y[id] += Velocity.y[id] * -3 * world.dt;
-  // }
+  const tankBodies = tankBodyQuery(world);
+  for (const id of tankBodies) {
+    Velocity.x[id] += Body.power[id] * Body.movingDirection[id] * world.dt;
+    Velocity.y[id] += Body.power[id] * Body.movingDirection[id] * world.dt;
+
+    Position.x[id] += Math.cos(Body.angle[id]) * Velocity.x[id] * world.dt;
+    Position.y[id] += Math.sin(Body.angle[id]) * Velocity.y[id] * world.dt;
+
+    // TODO: make this value a component `Friction`
+    Velocity.x[id] += Velocity.x[id] * -3 * world.dt;
+    Velocity.y[id] += Velocity.y[id] * -3 * world.dt;
+  }
 
   const physicsEntities = physicsQuery(world);
   for (const id of physicsEntities) {
@@ -49,6 +49,21 @@ export const physicsSystem = defineSystem((world) => {
       Position.x[id] += Math.cos(Body.angle[id]) * Body.velocity[id] * world.dt;
       Position.y[id] += Math.sin(Body.angle[id]) * Body.velocity[id] * world.dt;
       Body.velocity[id] += Body.velocity[id] * -friction * world.dt;
+
+      Body.lastTrackDistance[id] += Body.velocity[id] * world.dt;
+
+      if (Body.lastTrackDistance[id] > 10){
+        Body.lastTrackDistance[id] = 0;
+        addComponent(world, Position, trackId);
+        Position.x[trackId] = Position.x[id];
+        Position.y[trackId] = Position.y[id];
+  
+        addComponent(world, Rotation, trackId);
+        Rotation.angle[trackId] = Body.angle[id];
+  
+        addComponent(world, Sprite, trackId);
+        Sprite.texture[trackId] = world.assetIdMap['tracksDouble'];
+      }
     }
 
     Position.x[id] += Velocity.x[id] * world.dt;

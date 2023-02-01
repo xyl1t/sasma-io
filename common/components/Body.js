@@ -8,4 +8,5 @@ export const Body = defineComponent({
   force: Types.f32,
   acceleration: Types.f32,
   velocity: Types.f32,
+  lastTrackDistance: Types.f32
 });
