@@ -9,10 +9,12 @@ import { Rotation } from "./Rotation.js";
 import { Body } from "./Body.js";
 import { Gun } from "./Gun.js";
 import { Bot } from "./Bot.js";
+import { Bullet } from "./Bullet.js";
 
 // necessary config for serialization and deserialization
 export const serializationConfig = [
   Body,
+  Bullet,
   Bot,
   Gun,
   Input,

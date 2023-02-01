@@ -21,22 +21,6 @@ async function setupWorldParameters() {
   world.tickRate = 30;
   world.dt = 1 / world.tickRate;
   world.currentTick = 0;
-  world.imagePaths = [
-    "../assets/tank_blue.png",
-    "../assets/tank_green.png",
-    "../assets/tank_red.png",
-    "../assets/tankBlue_barrel2_outline.png",
-    "../assets/tankBody_blue_outline.png",
-    "../assets/tankBody_dark_outline.png",
-    "../assets/tankBody_green_outline.png",
-    "../assets/tankBody_red_outline.png",
-    "../assets/tankBody_sand_outline.png",
-    "../assets/tankDark_barrel2_outline.png",
-    "../assets/tankGreen_barrel2_outline.png",
-    "../assets/tankRed_barrel2_outline.png",
-    "../assets/tankSand_barrel2_outline.png",
-    "../assets/treeGreen_large.png",
-  ];
   world.gotInput = false;
   world.mouse = {
     oldX: 0,
@@ -71,6 +55,13 @@ async function setupWorldParameters() {
       return world.placeholderAsset;
     }
   }
+  world.colorMap = []; // eg 0 -> blue, 1 -> green, etc
+  world.debug = {
+    showIds: false,
+    showVelocity: false,
+    showCollision: false,
+
+  };
 }
 
 async function loadPlaceholderAsset() {
