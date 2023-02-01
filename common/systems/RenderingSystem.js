@@ -28,14 +28,10 @@ export const renderingSystem = defineSystem((world) => {
 
   // center screen
   ctx.translate(world.windowWidth / 2, world.windowHeight / 2);
-  console.log('render scale width: ', world.renderScaleWidth)
-  console.log('render scale height: ', world.renderScaleHeight)
   ctx.scale(world.renderScaleWidth, world.renderScaleHeight);
   
   let widthToShow = world.renderScaleWidth >= 1 ? 800 * world.renderScaleWidth : world.windowWidth;
   let heightToShow = world.renderScaleHeight >= 1 ? 800 * world.renderScaleHeight : world.windowHeight;
-
-  ctx.scale(world.renderScaleWidth, world.renderScaleHeight);
 
   // move to current player
   const meId = meQuery(world)[0];
