@@ -91,6 +91,11 @@ function wheel(e) {
 }
 
 function keydown(e) {
+
+  if(e.key == "Enter"){     //join on enter
+    $('#btnJoin').click();
+  }
+
   world.keyboard[e.key.toLowerCase()] = true;
 
   // debug
