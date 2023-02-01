@@ -25,18 +25,20 @@ export const explosionSystem = defineSystem((world) => {
 
     if (length < 200) { // TODO: export to some constant or to bullet/gun comoponent
       removeEntity(world, id);
-      const explosionId = addEntity(world);
-      addComponent(world, Position, explosionId);
-      Position.x[explosionId] = Position.x[id];
-      Position.y[explosionId] = Position.y[id];
+      for (let idx=0; idx < 5; idx++){
+        const explosionId = addEntity(world);
+        addComponent(world, Position, explosionId);
+        Position.x[explosionId] = Position.x[id];
+        Position.y[explosionId] = Position.y[id];
+  
+        addComponent(world, Sprite, explosionId);
+        Sprite.texture[explosionId] = world.assetIdMap['explosionSmoke' + idx];
 
-      addComponent(world, Sprite, explosionId);
-      Sprite.texture[explosionId] = world.assetIdMap.oilSpill_large;
-
-      addComponent(world, TimeToLive, explosionId);
-      TimeToLive.timeToLive[explosionId] = 20;
-      TimeToLive.fadeTime[explosionId] = 1;
-
+        addComponent(world, TimeToLive, explosionId);
+        TimeToLive.timeToLive[explosionId] = 0.5;
+        TimeToLive.fadeTime[explosionId] = 0.5;
+      }
+      
     }
   }
 });
