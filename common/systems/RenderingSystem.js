@@ -110,6 +110,7 @@ function drawSprite(world, id) {
   if (hasComponent(world, Rotation, id)) {
     ctx.rotate(Rotation.angle[id] + Math.PI / 2);
   }
+  ctx.globalAlpha = 1 - Sprite.translucency[id];
   ctx.translate(-img.width / 2, -img.height / 2);
   ctx.drawImage(img, 0, 0);
   ctx.restore();

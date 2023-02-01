@@ -1,4 +1,4 @@
-import { defineQuery, defineSystem, hasComponent, Not } from "../bitecs.js";
+import { addComponent, addEntity, defineQuery, defineSystem, hasComponent, Not } from "../bitecs.js";
 
 import { Body } from "../components/Body.js";
 import { Rotation } from "../components/Rotation.js";
@@ -8,6 +8,8 @@ import { explosionSystem } from "./ExplosionSystem.js";
 import { Acceleration } from "../components/Acceleration.js";
 import { Force } from "../components/Force.js";
 import { Mass } from "../components/Mass.js";
+import { Sprite } from "../components/Sprite.js";
+import { TimeToLive } from "../components/TimeToLive.js";
 
 // QUERIES // Selects all entities that have the following components
 const physicsQuery = defineQuery([Position, Velocity]);
@@ -17,18 +19,6 @@ const friction = 3;
 
 // SYSTEMS // a function that runs through some entities and modifies their components
 export const physicsSystem = defineSystem((world) => {
-  const tankBodies = tankBodyQuery(world);
-  for (const id of tankBodies) {
-    Velocity.x[id] += Body.power[id] * Body.movingDirection[id] * world.dt;
-    Velocity.y[id] += Body.power[id] * Body.movingDirection[id] * world.dt;
-
-    Position.x[id] += Math.cos(Body.angle[id]) * Velocity.x[id] * world.dt;
-    Position.y[id] += Math.sin(Body.angle[id]) * Velocity.y[id] * world.dt;
-
-    // TODO: make this value a component `Friction`
-    Velocity.x[id] += Velocity.x[id] * -3 * world.dt;
-    Velocity.y[id] += Velocity.y[id] * -3 * world.dt;
-  }
 
   const physicsEntities = physicsQuery(world);
   for (const id of physicsEntities) {
@@ -50,10 +40,15 @@ export const physicsSystem = defineSystem((world) => {
       Position.y[id] += Math.sin(Body.angle[id]) * Body.velocity[id] * world.dt;
       Body.velocity[id] += Body.velocity[id] * -friction * world.dt;
 
-      Body.lastTrackDistance[id] += Body.velocity[id] * world.dt;
-
-      if (Body.lastTrackDistance[id] > 10){
+      Body.angle[id] += Body.angleVelocity[id] * world.dt;
+      Body.lastTrackDistance[id] += Math.abs(Body.angleVelocity[id] * world.dt * 32);
+      Body.lastTrackDistance[id] += Math.abs(Body.velocity[id] * world.dt);
+      
+ 
+      if (Body.lastTrackDistance[id] > 14){
         Body.lastTrackDistance[id] = 0;
+        const trackId = addEntity(world);
+
         addComponent(world, Position, trackId);
         Position.x[trackId] = Position.x[id];
         Position.y[trackId] = Position.y[id];
@@ -63,6 +58,10 @@ export const physicsSystem = defineSystem((world) => {
   
         addComponent(world, Sprite, trackId);
         Sprite.texture[trackId] = world.assetIdMap['tracksDouble'];
+
+        addComponent(world, TimeToLive, trackId);
+        TimeToLive.timeToLive[trackId] = 3;
+        TimeToLive.fadeTime[trackId] = 3;
       }
     }
 
