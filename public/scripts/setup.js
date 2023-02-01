@@ -52,7 +52,7 @@ async function setupWorldParameters() {
   world.windowWidth = -1;
   world.windowHeight = -1;
 
-  world.constWidht = 800;
+  world.constWidth = 800;
   world.constHeight = 800;
   world.renderScaleWidth = 1;
   world.renderScaleHeight = 1;
