@@ -44,6 +44,14 @@ async function setupWorldParameters() {
     world.canvas.style.height = window.innerHieght + "px";
     world.windowWidth = window.innerWidth;
     world.windowHeight = window.innerHeight;
+    if (world.windowWidth > world.windowHeight) {
+      world.renderScaleWidth = world.windowWidth / 800;
+      world.renderScaleHeight = world.windowHeight / 800;
+    }
+    else {
+      world.renderScaleWidth = world.windowWidth / 800;
+      world.renderScaleHeight = world.windowHeight / 800;
+    }
   };
   world.assets = []; // the actual images
   world.assetIdMap = {}; // eg `assetIdMap[tank_blue]` gives you `4`

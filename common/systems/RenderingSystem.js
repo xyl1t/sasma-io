@@ -29,8 +29,12 @@ export const renderingSystem = defineSystem((world) => {
 
   // center screen
   ctx.translate(world.windowWidth / 2, world.windowHeight / 2);
-
+  console.log('render scale width: ', world.renderScaleWidth)
+  console.log('render scale height: ', world.renderScaleHeight)
+  ctx.scale(world.renderScaleWidth, world.renderScaleHeight);
   
+  let widthToShow = world.renderScaleWidth >= 1 ? 800 * world.renderScaleWidth : world.windowWidth;
+  let heightToShow = world.renderScaleHeight >= 1 ? 800 * world.renderScaleHeight : world.windowHeight;
 
   // move to current player
   const meId = meQuery(world)[0];
@@ -38,12 +42,12 @@ export const renderingSystem = defineSystem((world) => {
   ctx.drawImage(getAsset(assetIdMap["MAP"]),
                 2500 - world.windowWidth / 2 + Position.x[meId],
                 2500 - world.windowHeight / 2 + Position.y[meId],
-                world.windowWidth, 
-                world.windowHeight, 
+                widthToShow, 
+                heightToShow, 
                 - world.windowWidth / 2 + Position.x[meId],
                 - world.windowHeight / 2 + Position.y[meId],
-                world.windowWidth, 
-                world.windowHeight);
+                widthToShow, 
+                heightToShow);
 
   const renderables = renderableQuery(world);
   for (const id of renderables) {
