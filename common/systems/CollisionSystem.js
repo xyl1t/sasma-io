@@ -12,9 +12,9 @@ export const collisionSystem = defineSystem((world) => {
     let posY = Position.y[id];
     // hypotenuse = distance from center of circle to player
     let hypotenuse = Math.sqrt(Math.pow(posX, 2) + Math.pow(posY, 2));
-    if (hypotenuse >= 400 || hypotenuse <= -400) {
-      Position.x[id] = (posX * 400) / hypotenuse;
-      Position.y[id] = (posY * 400) / hypotenuse;
+    if (hypotenuse >= 1000 || hypotenuse <= -1000) {
+      Position.x[id] = (posX * 1000) / hypotenuse;
+      Position.y[id] = (posY * 1000) / hypotenuse;
     }
   }
   return world;

@@ -13,6 +13,7 @@ import { Bullet } from "./Bullet.js";
 import { Acceleration } from "./Acceleration.js";
 import { Force } from "./Force.js";
 import { Mass } from "./Mass.js";
+import { TimeToLive } from "./TimeToLive.js";
 
 // necessary config for serialization and deserialization
 export const serializationConfig = [
@@ -30,5 +31,6 @@ export const serializationConfig = [
   Position,
   Rotation,
   Sprite,
+  TimeToLive,
   Velocity,
 ];

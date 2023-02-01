@@ -12,6 +12,7 @@ import { Rotation } from "../components/Rotation.js";
 import { Position } from "../components/Position.js";
 import { Velocity } from "../components/Velocity.js";
 import { Sprite } from "../components/Sprite.js";
+import { TimeToLive } from "../components/TimeToLive.js";
 
 const bulletQuery = defineQuery([Not(Body), Position, Velocity]);
 const explosionQuery = defineQuery([Not(Body), Position, Not(Velocity)]);
@@ -31,6 +32,11 @@ export const explosionSystem = defineSystem((world) => {
 
       addComponent(world, Sprite, explosionId);
       Sprite.texture[explosionId] = world.assetIdMap.oilSpill_large;
+
+      addComponent(world, TimeToLive, explosionId);
+      TimeToLive.timeToLive[explosionId] = 20;
+      TimeToLive.fadeTime[explosionId] = 1;
+
     }
   }
 });
