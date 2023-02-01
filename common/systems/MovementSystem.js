@@ -128,44 +128,50 @@ function resolveStaticCollision(entities) {
 
 function resolveDynamicCollision(collidingPairs) {
   for (const pair of collidingPairs) {
-    // const id1 = pair[0];
-    // const id2 = pair[1];
-    //
-    // const x1 = Position.x[id1];
-    // const y1 = Position.y[id1];
-    // const r1 = CircleCollider.radius[id1];
-    // const x2 = Position.x[id2];
-    // const y2 = Position.y[id2];
-    // const r2 = CircleCollider.radius[id2];
-    //
-    // // Distance between balls
-    // const fDistance = sqrtf((b1->px - b2->px)*(b1->px - b2->px) + (b1->py - b2->py)*(b1->py - b2->py));
-    //
-    // // Normal
-    // const nx = (b2->px - b1->px) / fDistance;
-    // const ny = (b2->py - b1->py) / fDistance;
-    //
-    // // Tangent
-    // const tx = -ny;
-    // const ty = nx;
-    //
-    // // Dot Product Tangent
-    // const dpTan1 = b1->vx * tx + b1->vy * ty;
-    // const dpTan2 = b2->vx * tx + b2->vy * ty;
-    //
-    // // Dot Product Normal
-    // const dpNorm1 = b1->vx * nx + b1->vy * ny;
-    // const dpNorm2 = b2->vx * nx + b2->vy * ny;
-    //
-    // // Conservation of momentum in 1D
-    // const m1 = (dpNorm1 * (b1->mass - b2->mass) + 2.0f * b2->mass * dpNorm2) / (b1->mass + b2->mass);
-    // const m2 = (dpNorm2 * (b2->mass - b1->mass) + 2.0f * b1->mass * dpNorm1) / (b1->mass + b2->mass);
-    //
-    // // Update ball velocities
-    // b1->vx = tx * dpTan1 + nx * m1;
-    // b1->vy = ty * dpTan1 + ny * m1;
-    // b2->vx = tx * dpTan2 + nx * m2;
-    // b2->vy = ty * dpTan2 + ny * m2;
+    const id1 = pair[0];
+    const id2 = pair[1];
+
+    const x1 = Position.x[id1];
+    const y1 = Position.y[id1];
+    const vx1 = Velocity.x[id1];
+    const vy1 = Velocity.y[id1];
+    const r1 = CircleCollider.radius[id1];
+    const mass1 = Mass.value[id1];
+    const x2 = Position.x[id2];
+    const y2 = Position.y[id2];
+    const vx2 = Velocity.x[id2];
+    const vy2 = Velocity.y[id2];
+    const r2 = CircleCollider.radius[id2];
+    const mass2 = Mass.value[id2];
+
+    // Distance between balls
+    const dist = Math.sqrt((x2 - x1) ** 2 + (y2 - y1) ** 2);
+
+    // Normal
+    const nx = (x2 - x1) / dist;
+    const ny = (y2 - y1) / dist;
+
+    // Tangent
+    const tx = -ny;
+    const ty = nx;
+
+    // Dot Product Tangent
+    const dpTan1 = vx1 * tx + vy1 * ty;
+    const dpTan2 = vx2 * tx + vy2 * ty;
+
+    // Dot Product Normal
+    const dpNorm1 = vx1 * nx + vy1 * ny;
+    const dpNorm2 = vx2 * nx + vy2 * ny;
+
+    // Conservation of momentum in 1D
+    const m1 = (dpNorm1 * (mass1 - mass2) + 2.0 * mass2 * dpNorm2) / (mass1 + mass2);
+    const m2 = (dpNorm2 * (mass2 - mass1) + 2.0 * mass1 * dpNorm1) / (mass1 + mass2);
+
+    // Update ball velocities
+    Velocity.x[id1] = tx * dpTan1 + nx * m1;
+    Velocity.y[id1] = ty * dpTan1 + ny * m1;
+    Velocity.x[id2] = tx * dpTan2 + nx * m2;
+    Velocity.y[id2] = ty * dpTan2 + ny * m2;
   }
 }
 
