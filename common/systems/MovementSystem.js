@@ -75,26 +75,30 @@ export const movementSystem = defineSystem((world) => {
     Position.x[id] += Velocity.x[id] * world.dt;
     Position.y[id] += Velocity.y[id] * world.dt;
 
-    Velocity.x[id] += Velocity.x[id] * -friction * world.dt;
-    Velocity.y[id] += Velocity.y[id] * -friction * world.dt;
+    Velocity.x[id] += Velocity.x[id] * -friction * 1 * world.dt;
+    Velocity.y[id] += Velocity.y[id] * -friction * 1 * world.dt;
 
     Force.x[id] = 0;
     Force.y[id] = 0;
   }
 
-  handleCollision(movingEntities, circleColliderQuery(world));
+  const collidingPairs = resolveStaticCollision(circleColliderQuery(world));
+  resolveDynamicCollision(collidingPairs);
 
   return world;
 });
 
-function handleCollision(world, entities) {
+
+function resolveStaticCollision(entities) {
+  const collidingPairs = [];
+
   // Static collisions, i.e. overlap
   for (const id of entities) {
     for (const targetId of entities) {
       if (id == targetId) continue;
       if (!areCirclesOverlapping(id, targetId)) continue;
       // Collision has occured
-      // vecCollidingPairs.push_back({ &id, &targetId });
+      collidingPairs.push([ id, targetId ]);
 
       const x1 = Position.x[id];
       const y1 = Position.y[id];
@@ -117,6 +121,51 @@ function handleCollision(world, entities) {
       Position.x[targetId] += (overlap * (x1 - x2)) / dist;
       Position.y[targetId] += (overlap * (y1 - y2)) / dist;
     }
+  }
+  
+  return collidingPairs;
+}
+
+function resolveDynamicCollision(collidingPairs) {
+  for (const pair of collidingPairs) {
+    // const id1 = pair[0];
+    // const id2 = pair[1];
+    //
+    // const x1 = Position.x[id1];
+    // const y1 = Position.y[id1];
+    // const r1 = CircleCollider.radius[id1];
+    // const x2 = Position.x[id2];
+    // const y2 = Position.y[id2];
+    // const r2 = CircleCollider.radius[id2];
+    //
+    // // Distance between balls
+    // const fDistance = sqrtf((b1->px - b2->px)*(b1->px - b2->px) + (b1->py - b2->py)*(b1->py - b2->py));
+    //
+    // // Normal
+    // const nx = (b2->px - b1->px) / fDistance;
+    // const ny = (b2->py - b1->py) / fDistance;
+    //
+    // // Tangent
+    // const tx = -ny;
+    // const ty = nx;
+    //
+    // // Dot Product Tangent
+    // const dpTan1 = b1->vx * tx + b1->vy * ty;
+    // const dpTan2 = b2->vx * tx + b2->vy * ty;
+    //
+    // // Dot Product Normal
+    // const dpNorm1 = b1->vx * nx + b1->vy * ny;
+    // const dpNorm2 = b2->vx * nx + b2->vy * ny;
+    //
+    // // Conservation of momentum in 1D
+    // const m1 = (dpNorm1 * (b1->mass - b2->mass) + 2.0f * b2->mass * dpNorm2) / (b1->mass + b2->mass);
+    // const m2 = (dpNorm2 * (b2->mass - b1->mass) + 2.0f * b1->mass * dpNorm1) / (b1->mass + b2->mass);
+    //
+    // // Update ball velocities
+    // b1->vx = tx * dpTan1 + nx * m1;
+    // b1->vy = ty * dpTan1 + ny * m1;
+    // b2->vx = tx * dpTan2 + nx * m2;
+    // b2->vy = ty * dpTan2 + ny * m2;
   }
 }
 
