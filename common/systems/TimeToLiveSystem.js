@@ -1,4 +1,4 @@
-import { defineQuery, defineSystem, hasComponent, Not, removeEntity } from "../bitecs.js";
+import { addComponent, defineQuery, defineSystem, hasComponent, Not, removeEntity } from "../bitecs.js";
 import { Body } from "../components/Body.js";
 import { Bot } from "../components/Bot.js";
 import { Gun } from "../components/Gun.js";
@@ -10,8 +10,10 @@ import { Position } from "../components/Position.js";
 import { Sprite } from "../components/Sprite.js";
 import { Velocity } from "../components/Velocity.js";
 import { TimeToLive } from "../components/TimeToLive.js";
+import { Animation } from "../components/Animation.js";
 
-const removeSpritesQuery = defineQuery([TimeToLive]);
+const removeSpritesQuery = defineQuery([Not(Animation), TimeToLive]);
+const AnimationSpritesQuery = defineQuery([Animation]);
 
 export const timeToLiveSystem = defineSystem((world) => {
   const spritesToRemove = removeSpritesQuery(world);
