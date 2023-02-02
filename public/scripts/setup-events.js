@@ -181,11 +181,7 @@ function onJoyMove(e) {
       (rect.height / 2);
   else convertedInputY = 0;
 
-  if (xDif > 0) {
-    angle = Math.atan(yDif / xDif);
-  } else {
-    angle = Math.PI + Math.atan(yDif / xDif);
-  }
+  angle = Math.atan2(yDif, xDif);
 
   world.joy[base.parentElement.id].x = convertedInputX;
   world.joy[base.parentElement.id].y = convertedInputY * -1;

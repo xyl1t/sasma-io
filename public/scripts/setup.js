@@ -40,14 +40,14 @@ async function setupWorldParameters() {
       x: 0,
       y: 0,
       angle: 0,
-      bounds: false                //whether the touch moves out of the joystick
+      bounds: false, //whether the touch moves out of the joystick
     },
     joyAngle: {
       x: 0,
       y: 0,
       angle: 0,
-      bounds: false
-    } 
+      bounds: false,
+    },
   };
   world.windowWidth = -1;
   world.windowHeight = -1;
@@ -65,13 +65,15 @@ async function setupWorldParameters() {
     world.windowWidth = document.documentElement.clientWidth;
     world.windowHeight = document.documentElement.clientHeight;
 
-    if (document.documentElement.clientWidth > document.documentElement.clientHeight) {
+    if (
+      document.documentElement.clientWidth >
+      document.documentElement.clientHeight
+    ) {
       let ratio = document.documentElement.clientHeight / world.constHeight;
       ratio = Math.max(0.7, ratio);
       world.renderScaleWidth = ratio;
       world.renderScaleHeight = ratio;
-    }
-    else {
+    } else {
       let ratio = document.documentElement.clientWidth / world.constWidth;
       ratio = Math.max(0.7, ratio);
       world.renderScaleWidth = ratio;
@@ -87,15 +89,14 @@ async function setupWorldParameters() {
     } else {
       return world.placeholderAsset;
     }
-  }
+  };
   world.colorMap = []; // eg 0 -> blue, 1 -> green, etc
   world.debug = {
     showIds: false,
     showVelocity: false,
     showColliders: false,
   };
-  world.isMobile = false,
-  world.dynamicCamera = false
+  (world.isMobile = false), (world.dynamicCamera = false);
 }
 
 async function loadPlaceholderAsset() {

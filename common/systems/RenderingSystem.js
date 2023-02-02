@@ -132,8 +132,8 @@ function drawPlayer(world, id, meId) {
   const tankBarrel = getAsset(assetIdMap["tank_barrel_" + color + "_2"]);
   ctx.save();
   ctx.rotate(
-    Gun.angle[id] -
-      (world.dynamicCamera && id == meId ? -Body.angle[meId] : Math.PI / 2)
+    Gun.angle[id] - Math.PI/2
+      // - (world.dynamicCamera && id == meId ? -Body.angle[meId] : Math.PI / 2)
   ); //dynamic camera --> add Body.angle instead of subtracting Math.PI / 2;
   ctx.translate(
     -tankBarrel.width / 2,

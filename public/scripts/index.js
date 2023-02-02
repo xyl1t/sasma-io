@@ -1,5 +1,7 @@
 import { renderingSystem } from "/systems/RenderingSystem.js";
 import { setup } from "./setup.js";
+import { hasComponent } from "/bitecs.js";
+import { Body } from "/components/Body.js"
 
 $(async () => {
   await setup();
@@ -42,29 +44,34 @@ function getInput() {
   const { mouse, keyboard, joy } = world;
   const inputPayload = { ...oldInput };
 
-  inputPayload.inputY = (keyboard["w"] ? 1 : 0)
-  inputPayload.inputY += (keyboard["s"] ? -1 : 0)
-  inputPayload.inputX = (keyboard["a"] ? -1 : 0)
-  inputPayload.inputX += (keyboard["d"] ? 1 : 0)
+  inputPayload.inputY = keyboard["w"] ? 1 : 0;
+  inputPayload.inputY += keyboard["s"] ? -1 : 0;
+  inputPayload.inputX = keyboard["a"] ? -1 : 0;
+  inputPayload.inputX += keyboard["d"] ? 1 : 0;
 
+  inputPayload.shooting = mouse.leftDown || mouse.rightDown;
 
+  const meId = queryMe(world)[0];
 
-  
+  inputPayload.angle = Math.round(mouse.angle * 100) / 100;
 
-  inputPayload.shooting = (mouse.leftDown || mouse.rightDown)
-
-  inputPayload.angle = Math.round(mouse.angle*100)/100;
-
-  if(joy.joyAngle.x||joy.joyAngle.y){
+  if (joy.joyAngle.x || joy.joyAngle.y) {
     inputPayload.angle = joy["joyAngle"].angle;
     inputPayload.shooting = joy["joyAngle"].bounds;
   }
 
-  if(joy.joyMove.x||joy.joyMove.y){
+  if (joy.joyMove.x || joy.joyMove.y) {
     inputPayload.inputX = joy["joyMove"].x;
-    inputPayload.inputY = joy["joyMove"].y; 
+    inputPayload.inputY = joy["joyMove"].y;
   }
 
+  if (inputPayload.inputY < 0) {
+    inputPayload.inputX *= -1;
+  }
+
+  if (world.dynamicCamera && hasComponent(world, Body, meId)) {
+    inputPayload.angle += Body.angle[meId] + Math.PI/2;
+  }
 
   const gotInput =
     oldInput.inputY != inputPayload.inputY ||
