@@ -9,6 +9,7 @@ import {
   DESERIALIZE_MODE,
 } from "/bitecs.js";
 import { Me } from "/components/Me.js";
+import { died } from './setup-events.js';
 
 export function setupConnection() {
   world.socket = io({
@@ -21,6 +22,7 @@ export function setupConnection() {
 export function setupIOEvents() {
   world.socket.on("welcome", welcome);
   world.socket.on("serverUpdate", serverUpdate);
+  world.socket.on('died', died);
 }
 
 async function welcome(assetIdMap, assetPathMap, colorMap) {

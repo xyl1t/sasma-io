@@ -41,6 +41,12 @@ function btnJoinClick(e) {
   world.socket.emit("join" /*, name, x, y, z*/);
 }
 
+export async function died() {
+  console.log('died');
+  $("#startPageContainer").css("display", "block");
+  $("#gameContainer").css("filter", "brightness(30%)");
+}
+
 function btnViewClick(e) {
   world.dynamicCamera = !world.dynamicCamera;
 }

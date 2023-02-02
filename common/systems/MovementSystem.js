@@ -26,11 +26,14 @@ import { Me } from "../components/Me.js";
 // QUERIES // Selects all entities that have the following components
 const movementQuery = defineQuery([Position, Velocity]);
 const circleColliderQuery = defineQuery([Position, Velocity, CircleCollider]);
+const meQuery = defineQuery([Me]);
 
 const friction = 3;
 
+
 // SYSTEMS // a function that runs through some entities and modifies their components
 export const movementSystem = defineSystem((world) => {
+  const meId = meQuery(world)[0];
   const movingEntities = movementQuery(world);
   for (const id of movingEntities) {
     if (hasComponent(world, Force, id) && hasComponent(world, Mass, id)) {
@@ -83,16 +86,23 @@ export const movementSystem = defineSystem((world) => {
 
     Force.x[id] = 0;
     Force.y[id] = 0;
+
+    Player.health[id] -= 1;
+    if (Player.health[id] == 0){
+      console.log('before dying')
+      world.socket.emit("died")
+      removeEntity(world, id);
+    }
   }
 
-  const collidingPairs = resolveStaticCollision(world, circleColliderQuery(world));
-  resolveDynamicCollision(collidingPairs);
+  const collidingPairs = resolveStaticCollision(world, circleColliderQuery(world), meId);
+  resolveDynamicCollision(world, collidingPairs);
 
   return world;
 });
 
 
-function resolveStaticCollision(world, entities) {
+function resolveStaticCollision(world, entities, meId) {
   const collidingPairs = [];
 
   // Static collisions, i.e. overlap
@@ -124,17 +134,13 @@ function resolveStaticCollision(world, entities) {
       Position.x[targetId] += (overlap * (x1 - x2)) / dist;
       Position.y[targetId] += (overlap * (y1 - y2)) / dist;
 
-      Player.health[id] -= 1;
-      if (Player.health[id] == 0){
-        removeEntity(world, id);
-      }
     }
   }
   
   return collidingPairs;
 }
 
-function resolveDynamicCollision(collidingPairs) {
+function resolveDynamicCollision(world, collidingPairs) {
   for (const pair of collidingPairs) {
     const id1 = pair[0];
     const id2 = pair[1];
