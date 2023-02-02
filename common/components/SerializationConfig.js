@@ -13,6 +13,7 @@ import { Bullet } from "./Bullet.js";
 import { Acceleration } from "./Acceleration.js";
 import { Force } from "./Force.js";
 import { Mass } from "./Mass.js";
+import { CircleCollider } from "./CircleCollider.js";
 import { TimeToLive } from "./TimeToLive.js";
 import { Animation } from "./Animation.js";
 
@@ -35,4 +36,5 @@ export const serializationConfig = [
   Sprite,
   TimeToLive,
   Velocity,
+  CircleCollider,
 ];
