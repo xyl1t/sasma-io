@@ -117,22 +117,57 @@ function drawPlayer(world, id, meId) {
 function drawPath(world,id){
   const { canvas, ctx, assetIdMap, getAsset } = world;
   const arrow = getAsset(assetIdMap["directionArrow"]);
-  
-  const space = Input.inputY[id]*20; 
+  let inputY = Input.inputY[id];
+  let inputX = Input.inputX[id];
+
+  let moving = false;
+  const space = Math.sqrt(Math.pow(inputY*20,2)); 
   const rotationStep = Input.inputX[id]*2/4;
   ctx.save();
 
-  console.log(space)
+  if(inputY>=0.5){
+    ctx.rotate(Body.angle[id]+Math.PI/2);
+    ctx.translate(0,-40);
+    moving = true;
+  }else{
+    if(inputY<=-0.5){
+      ctx.rotate(Body.angle[id]-Math.PI/2);
+      ctx.translate(0,-40);
+      moving = true;
+    } 
+  }
 
-  ctx.rotate(Body.angle[id]+Math.PI/2);
-
-  ctx.translate(0,-40);
-
+if(moving){
   for(let i=0;i<4;i++){
     ctx.drawImage(arrow,-arrow.width/2,0,25,8);
     ctx.rotate(rotationStep);
     ctx.translate(0,-space);
   }
+}else{
+  if(inputX!=0){
+    let rotationFactor = 0;
+    if(inputX>0){
+      rotationFactor = 1; 
+    }else{
+      rotationFactor = -1;
+    }
+
+    ctx.save();
+    ctx.rotate(Body.angle[id]+Math.PI/2);
+    ctx.translate(-30*rotationFactor,-10);
+    ctx.drawImage(arrow,-arrow.width/2,-arrow.height/2,20,8);
+    ctx.translate(0,20);
+    ctx.drawImage(arrow,-arrow.width/2,-arrow.height/2,20,8);
+    ctx.restore();
+    ctx.rotate(Body.angle[id]-Math.PI/2);
+    ctx.translate(-30*rotationFactor,-10);
+    ctx.drawImage(arrow,-arrow.width/2,-arrow.height/2,20,8);
+    ctx.translate(0,20);
+    ctx.drawImage(arrow,-arrow.width/2,-arrow.height/2,20,8);
+  }
+  
+}
+
 
 
 
