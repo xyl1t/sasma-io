@@ -33,6 +33,12 @@ export const renderingSystem = defineSystem((world) => {
 
   // move to current player
   const meId = meQuery(world)[0];
+  let meX = 0;
+  let meY = 0;
+  if (hasComponent(world, Position, meId)) {
+    meX = Position.x[meId];
+    meY = Position.y[meId];
+  }
   const map = getAsset(assetIdMap["MAP"]);
 
   if (world.dynamicCamera) {
@@ -41,10 +47,10 @@ export const renderingSystem = defineSystem((world) => {
     const diagnoal = Math.sqrt(2) * max;
     ctx.drawImage(
       map,
-      Position.x[meId] +
+      meX +
         map.width / 2 -
         diagnoal / world.renderScaleWidth / 2,
-      Position.y[meId] +
+      meY +
         map.height / 2 -
         diagnoal / world.renderScaleWidth / 2,
       diagnoal / world.renderScaleWidth,
@@ -58,10 +64,10 @@ export const renderingSystem = defineSystem((world) => {
   } else {
     ctx.drawImage(
       map,
-      Position.x[meId] +
+      meX +
         map.width / 2 -
         world.windowWidth / world.renderScaleWidth / 2,
-      Position.y[meId] +
+      meY +
         map.height / 2 -
         world.windowHeight / world.renderScaleWidth / 2,
       world.windowWidth / world.renderScaleWidth,
@@ -73,7 +79,7 @@ export const renderingSystem = defineSystem((world) => {
       world.windowHeight / world.renderScaleWidth
     );
   }
-  ctx.translate(-Position.x[meId], -Position.y[meId]);
+  ctx.translate(-meX, -meY);
 
   const renderables = renderableQuery(world);
   for (const id of renderables) {
