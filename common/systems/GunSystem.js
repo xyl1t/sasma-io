@@ -18,6 +18,7 @@ import { Acceleration } from "../components/Acceleration.js";
 import { Force } from "../components/Force.js";
 import { Mass } from "../components/Mass.js";
 import { CircleCollider } from "../components/CircleCollider.js";
+import { TimeToLive } from "../components/TimeToLive.js";
 
 // const query = defineQuery([Gun, Position, Not(Bot)]);
 const query = defineQuery([Gun, Position]);
@@ -31,6 +32,24 @@ export const gunSystem = defineSystem((world) => {
       Gun.lastTimeFired[id] + Gun.rateOfFire[id] < world.timeSinceStart
     ) {
       Gun.lastTimeFired[id] = world.timeSinceStart;
+
+      const tankExplosionId = addEntity(world);
+      addComponent(world, TimeToLive, tankExplosionId);
+      TimeToLive.timeToLive[tankExplosionId] = 2;
+      TimeToLive.fadeTime[tankExplosionId] = 2;
+
+      addComponent(world, Rotation, tankExplosionId);
+      Rotation.angle[tankExplosionId] = Gun.angle[id];
+
+      addComponent(world, Position, tankExplosionId);
+      Position.x[tankExplosionId] = Position.x[id];
+      Position.y[tankExplosionId] = Position.y[id];
+
+      addComponent(world, Sprite, tankExplosionId);
+      Sprite.texture[tankExplosionId] = world.assetIdMap.shotLarge;
+
+      
+
       const bulletId = addEntity(world);
 
       addComponent(world, Position, bulletId);
