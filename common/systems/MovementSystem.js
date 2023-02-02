@@ -87,12 +87,6 @@ export const movementSystem = defineSystem((world) => {
     Force.x[id] = 0;
     Force.y[id] = 0;
 
-    Player.health[id] -= 1;
-    if (Player.health[id] == 0){
-      console.log('before dying')
-      world.socket.emit("died")
-      removeEntity(world, id);
-    }
   }
 
   const collidingPairs = resolveStaticCollision(world, circleColliderQuery(world), meId);
@@ -133,7 +127,10 @@ function resolveStaticCollision(world, entities, meId) {
       // Displace Target Ball away from collision
       Position.x[targetId] += (overlap * (x1 - x2)) / dist;
       Position.y[targetId] += (overlap * (y1 - y2)) / dist;
-
+      Player.health[id] -= 1;
+      if (Player.health[id] == 0){
+        removeEntity(world, id);
+      }
     }
   }
   
