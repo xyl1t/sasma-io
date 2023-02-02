@@ -108,21 +108,27 @@ export const renderingSystem = defineSystem((world) => {
       drawColliders(world, id);
     }
   }
-  let innerZoneId;
-  // draw circlular borders (zones)
-  // for(let zId of zoneEntitys){
-  //   if(Zone.collider[zId]==0){
-  //     innerZoneId = zId;
-  //   }
-  // }
 
-  
+
+  drawZones(world,zoneEntitys);
+
+  ctx.restore();
+
+  return world;
+});
+
+function drawZones(world,zoneEntitys){
+  const { canvas, ctx, assetIdMap, getAsset } = world;
+  ctx.save();
+  ctx.globalAlpha = 0.5;
+  let innerZoneId;
   for(let zId of zoneEntitys){
     ctx.strokeStyle = "black";
     ctx.beginPath();
     if(Zone.collision[zId]==1){
       ctx.arc(0, 0, Zone.size[zId], 0, 2 * Math.PI,false);
       ctx.arc(0, 0, Zone.size[innerZoneId], 0, 2 * Math.PI,true);
+      ctx.fillStyle = "#7016b5";
       ctx.fill()
     }else{
       innerZoneId = zId;
@@ -130,12 +136,8 @@ export const renderingSystem = defineSystem((world) => {
     }
     ctx.stroke();
   }
-
-
   ctx.restore();
-
-  return world;
-});
+}
 
 function drawPlayer(world, id, meId) {
   const { canvas, ctx, assetIdMap, getAsset } = world;
