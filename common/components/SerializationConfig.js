@@ -17,6 +17,7 @@ import { CircleCollider } from "./CircleCollider.js";
 import { TimeToLive } from "./TimeToLive.js";
 import { Animation } from "./Animation.js";
 import { Track } from "./Track.js";
+import { Zone } from "./Zone.js";
 
 // necessary config for serialization and deserialization
 export const serializationConfig = [
@@ -39,4 +40,5 @@ export const serializationConfig = [
   Track,
   Velocity,
   CircleCollider,
+  Zone
 ];

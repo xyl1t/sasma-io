@@ -13,12 +13,14 @@ import { Velocity } from "../components/Velocity.js";
 import { Me } from "../components/Me.js";
 import { CircleCollider } from "../components/CircleCollider.js";
 import { Track } from "../components/Track.js";
+import { Zone } from "../components/Zone.js";
 
 const spriteQuery = defineQuery([Position, Sprite]);
 const playerQuery = defineQuery([Player, Position, Velocity]);
 const entities = defineQuery([Position]);
 const meQuery = defineQuery([Me]);
 const renderableQuery = defineQuery([Position]);
+const zoneQuery = defineQuery([Zone]);
 
 export const renderingSystem = defineSystem((world) => {
   const { canvas, ctx, assetIdMap, getAsset } = world;
@@ -32,6 +34,8 @@ export const renderingSystem = defineSystem((world) => {
   // center screen
   ctx.translate(world.windowWidth / 2, world.windowHeight / 2);
   ctx.scale(world.renderScaleWidth, world.renderScaleHeight);
+
+  const zoneEntity = zoneQuery(world)[0];
 
   // move to current player
   const meId = meQuery(world)[0];
@@ -102,7 +106,7 @@ export const renderingSystem = defineSystem((world) => {
   // draw circlular border
   ctx.strokeStyle = "black";
   ctx.beginPath();
-  ctx.arc(0, 0, 1000, 0, 2 * Math.PI);
+  ctx.arc(0, 0, Zone.size[zoneEntity], 0, 2 * Math.PI);
   ctx.stroke();
 
   ctx.restore();
@@ -212,7 +216,6 @@ function drawSprite(world, id) {
 
   const img = getAsset([Sprite.texture[id]]);
   ctx.save();
-  console.log()
   ctx.translate(Position.x[id], Position.y[id]);
 
   if (hasComponent(world, Track, id)){
