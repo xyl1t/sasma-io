@@ -5,7 +5,7 @@ import {
   hasComponent,
   removeEntity,
 } from "../bitecs.js";
-import { Animation } from "../components/Animation.js";
+import { AnimatedSprite } from "../components/AnimatedSprite.js";
 import { Bullet } from "../components/Bullet.js";
 import { Player } from "../components/Player.js";
 import { Position } from "../components/Position.js";
@@ -33,16 +33,16 @@ function handleBulletPlayerHit(world, bulletId, playerId) {
   addComponent(world, Position, explosionId);
   Position.x[explosionId] = Position.x[bulletId];
   Position.y[explosionId] = Position.y[bulletId];
-  addComponent(world, Animation, explosionId);
+  addComponent(world, AnimatedSprite, explosionId);
   let spriteIdxs = [];
   for (let idx = 1; idx <= 5; idx++) {
     spriteIdxs.push(world.assetIdMap["explosionSmoke" + idx]);
   }
-  Animation.numberOfSprites[explosionId] = spriteIdxs.length;
-  Animation.sprites[explosionId].set(spriteIdxs);
-  Animation.interval[explosionId] = 0.05;
-  Animation.lastTime[explosionId] = 0;
-  Animation.current[explosionId] = 0;
+  AnimatedSprite.numberOfSprites[explosionId] = spriteIdxs.length;
+  AnimatedSprite.sprites[explosionId].set(spriteIdxs);
+  AnimatedSprite.interval[explosionId] = 0.05;
+  AnimatedSprite.lastTime[explosionId] = 0;
+  AnimatedSprite.current[explosionId] = 0;
 
   removeEntity(world, bulletId);
 }
