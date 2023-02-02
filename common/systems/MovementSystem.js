@@ -54,6 +54,22 @@ export const movementSystem = defineSystem((world) => {
 
       if (Body.lastTrackDistance[id] > 14) {
         Body.lastTrackDistance[id] = 0;
+        const smokeId = addEntity(world);
+
+        addComponent(world, Position, smokeId);
+        Position.x[smokeId] = Position.x[id];
+        Position.y[smokeId] = Position.y[id];
+
+        addComponent(world, Rotation, smokeId);
+        Rotation.angle[smokeId] = Body.angle[id];
+
+        addComponent(world, Sprite, smokeId);
+        Sprite.texture[smokeId] = world.assetIdMap.gas_cloud_1;
+
+        addComponent(world, TimeToLive, smokeId);
+        TimeToLive.timeToLive[smokeId] = 3;
+        TimeToLive.fadeTime[smokeId] = 3;
+
         const trackId = addEntity(world);
 
         addComponent(world, Position, trackId);
