@@ -18,6 +18,8 @@ import { Acceleration } from "../components/Acceleration.js";
 import { Force } from "../components/Force.js";
 import { Mass } from "../components/Mass.js";
 import { CircleCollider } from "../components/CircleCollider.js";
+import { TimeToLive } from "../components/TimeToLive.js";
+import { Track } from "../components/Track.js";
 
 // const query = defineQuery([Gun, Position, Not(Bot)]);
 const query = defineQuery([Gun, Position]);
@@ -31,6 +33,25 @@ export const gunSystem = defineSystem((world) => {
       Gun.lastTimeFired[id] + Gun.rateOfFire[id] < world.timeSinceStart
     ) {
       Gun.lastTimeFired[id] = world.timeSinceStart;
+
+      const barrelExplosionId = addEntity(world);
+      addComponent(world, TimeToLive, barrelExplosionId);
+      TimeToLive.timeToLive[barrelExplosionId] = 0.1;
+      TimeToLive.fadeTime[barrelExplosionId] = 0.1;
+
+      addComponent(world, Rotation, barrelExplosionId);
+      Rotation.angle[barrelExplosionId] = Gun.angle[id] + Math.PI;
+
+      addComponent(world, Position, barrelExplosionId);
+      Position.x[barrelExplosionId] = Math.cos(Gun.angle[id]) * 40;
+      Position.y[barrelExplosionId] = Math.sin(Gun.angle[id]) * 40;
+
+      addComponent(world, Sprite, barrelExplosionId);
+      Sprite.texture[barrelExplosionId] = world.assetIdMap.shotLarge;
+
+      addComponent(world, Track, barrelExplosionId);
+      Track.source[barrelExplosionId] = id;
+
       const bulletId = addEntity(world);
 
       addComponent(world, Position, bulletId);
