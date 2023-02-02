@@ -34,8 +34,6 @@ export const renderingSystem = defineSystem((world) => {
   ctx.translate(world.windowWidth / 2, world.windowHeight / 2);
   ctx.scale(world.renderScaleWidth, world.renderScaleHeight);
 
-  ctx.scale(world.renderScaleWidth, world.renderScaleHeight);
-
   // move to current player
   const meId = meQuery(world)[0];
   let meX = 0;
