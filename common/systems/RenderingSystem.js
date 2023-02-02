@@ -35,7 +35,7 @@ export const renderingSystem = defineSystem((world) => {
   ctx.translate(world.windowWidth / 2, world.windowHeight / 2);
   ctx.scale(world.renderScaleWidth, world.renderScaleHeight);
 
-  const zoneEntity = zoneQuery(world)[0];
+  const zoneEntitys = zoneQuery(world);
 
   // move to current player
   const meId = meQuery(world)[0];
@@ -108,12 +108,29 @@ export const renderingSystem = defineSystem((world) => {
       drawColliders(world, id);
     }
   }
+  let innerZoneId;
+  // draw circlular borders (zones)
+  // for(let zId of zoneEntitys){
+  //   if(Zone.collider[zId]==0){
+  //     innerZoneId = zId;
+  //   }
+  // }
 
-  // draw circlular border
-  ctx.strokeStyle = "black";
-  ctx.beginPath();
-  ctx.arc(0, 0, Zone.size[zoneEntity], 0, 2 * Math.PI);
-  ctx.stroke();
+  
+  for(let zId of zoneEntitys){
+    ctx.strokeStyle = "black";
+    ctx.beginPath();
+    if(Zone.collision[zId]==1){
+      ctx.arc(0, 0, Zone.size[zId], 0, 2 * Math.PI,false);
+      ctx.arc(0, 0, Zone.size[innerZoneId], 0, 2 * Math.PI,true);
+      ctx.fill()
+    }else{
+      innerZoneId = zId;
+      ctx.arc(0, 0, Zone.size[zId], 0, 2 * Math.PI);
+    }
+    ctx.stroke();
+  }
+
 
   ctx.restore();
 
