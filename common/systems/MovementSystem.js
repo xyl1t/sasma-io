@@ -5,9 +5,11 @@ import {
   defineSystem,
   hasComponent,
   Not,
+  removeEntity,
 } from "../bitecs.js";
 
 import { Body } from "../components/Body.js";
+import { Player } from "../components/Player.js";
 import { Rotation } from "../components/Rotation.js";
 import { Position } from "../components/Position.js";
 import { Velocity } from "../components/Velocity.js";
@@ -19,6 +21,7 @@ import { Sprite } from "../components/Sprite.js";
 import { TimeToLive } from "../components/TimeToLive.js";
 import { Bullet } from "../components/Bullet.js";
 import { CircleCollider } from "../components/CircleCollider.js";
+import { Me } from "../components/Me.js";
 
 // QUERIES // Selects all entities that have the following components
 const movementQuery = defineQuery([Position, Velocity]);
@@ -82,14 +85,14 @@ export const movementSystem = defineSystem((world) => {
     Force.y[id] = 0;
   }
 
-  const collidingPairs = resolveStaticCollision(circleColliderQuery(world));
+  const collidingPairs = resolveStaticCollision(world, circleColliderQuery(world));
   resolveDynamicCollision(collidingPairs);
 
   return world;
 });
 
 
-function resolveStaticCollision(entities) {
+function resolveStaticCollision(world, entities) {
   const collidingPairs = [];
 
   // Static collisions, i.e. overlap
@@ -120,6 +123,11 @@ function resolveStaticCollision(entities) {
       // Displace Target Ball away from collision
       Position.x[targetId] += (overlap * (x1 - x2)) / dist;
       Position.y[targetId] += (overlap * (y1 - y2)) / dist;
+
+      Player.health[id] -= 1;
+      if (Player.health[id] == 0){
+        removeEntity(world, id);
+      }
     }
   }
   

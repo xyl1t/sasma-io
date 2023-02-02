@@ -143,6 +143,14 @@ function drawPlayer(world, id, meId) {
     drawPath(world, id);
   }
 
+  //healthbar
+  const width = 100;
+  const height = 10;
+  ctx.fillStyle = "#0f0";
+  ctx.fillRect(-width / 2, -40, (width * Player.health[id]) / 100, height);
+  ctx.strokeStyle = "#000";
+  ctx.strokeRect(-width / 2, -40, width, height);
+
   ctx.restore();
 }
 
@@ -212,7 +220,6 @@ function drawSprite(world, id) {
 
   const img = getAsset([Sprite.texture[id]]);
   ctx.save();
-  console.log()
   ctx.translate(Position.x[id], Position.y[id]);
 
   if (hasComponent(world, Track, id)){
