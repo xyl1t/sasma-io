@@ -45,7 +45,7 @@ export const explosionSystem = defineSystem((world) => {
       }
       Animation.numberOfSprites[explosionId] = spriteIdxs.length;
       Animation.sprites[explosionId].set(spriteIdxs)
-      Animation.interval[explosionId] = 0.1;
+      Animation.interval[explosionId] = 0.05;
       Animation.lastTime[explosionId] = 0;
       Animation.current[explosionId] = 0;
     }
