@@ -50,4 +50,6 @@ export const explosionSystem = defineSystem((world) => {
       Animation.current[explosionId] = 0;
     }
   }
+
+  return world;
 });

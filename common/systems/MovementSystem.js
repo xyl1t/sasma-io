@@ -95,57 +95,25 @@ export const movementSystem = defineSystem((world) => {
     Force.y[id] = 0;
   }
 
-  const collidingPairs = resolveStaticCollision(
+  world.collidingPairs = []
+  resolveStaticCollision(
     world,
     circleColliderWithoutFakeQuery(world),
     capsuleColliderQuery(world)
   );
-  resolveDynamicCollision(world, collidingPairs, circleColliderQuery(world));
+  resolveDynamicCollision(world, circleColliderQuery(world));
   for (const id of fakeQuery(world)) {
     removeEntity(world, id);
   }
 
-  for (let [id1, id2] of collidingPairs) {
-    if (
-      (hasComponent(world, Bullet, id1) && hasComponent(world, Player, id2)) ||
-      (hasComponent(world, Bullet, id2) && hasComponent(world, Player, id1))
-    ) {
-      if (hasComponent(world, Bullet, id2)) {
-        [id1, id2] = [id2, id1];
-      }
-      handleBulletPlayerHit(world, id1, id2);
-    }
-  }
-
   return world;
 });
-
-function handleBulletPlayerHit(world, bulletId, playerId) {
-  // TODO: export to some constant or to bullet/gun comoponent
-  const explosionId = addEntity(world);
-  addComponent(world, Position, explosionId);
-  Position.x[explosionId] = Position.x[bulletId];
-  Position.y[explosionId] = Position.y[bulletId];
-  addComponent(world, Animation, explosionId);
-  let spriteIdxs = [];
-  for (let idx = 1; idx <= 5; idx++) {
-    spriteIdxs.push(world.assetIdMap["explosionSmoke" + idx]);
-  }
-  Animation.numberOfSprites[explosionId] = spriteIdxs.length;
-  Animation.sprites[explosionId].set(spriteIdxs);
-  Animation.interval[explosionId] = 0.05;
-  Animation.lastTime[explosionId] = 0;
-  Animation.current[explosionId] = 0;
-
-  removeEntity(world, bulletId);
-}
 
 function resolveStaticCollision(
   world,
   circleCollidersWithoutFake,
   capsuleColliders
 ) {
-  const collidingPairs = [];
 
   // Static collisions, i.e. overlap
   for (const id of circleCollidersWithoutFake) {
@@ -215,7 +183,7 @@ function resolveStaticCollision(
             CircleCollider.radius[id];
 
           // Add collision to vector of collisions for dynamic resolution
-          collidingPairs.push([id, fakeCircleColliderId]);
+          world.collidingPairs.push([id, fakeCircleColliderId]);
 
           // Calculate displacement required
           const fOverlap = 1.0 * (fDistance - r - r1);
@@ -231,8 +199,11 @@ function resolveStaticCollision(
       if (id == targetId) continue;
       if (!areCirclesOverlapping(id, targetId)) continue;
       // Collision has occured
-      collidingPairs.push([id, targetId]);
+      world.collidingPairs.push([id, targetId]);
 
+      const x1 = Position.x[id];
+      const y1 = Position.y[id];
+      const r1 = CircleCollider.radius[id];
       const x2 = Position.x[targetId];
       const y2 = Position.y[targetId];
       const r2 = CircleCollider.radius[targetId];
@@ -241,7 +212,7 @@ function resolveStaticCollision(
       const dist = Math.sqrt((x2 - x1) ** 2 + (y2 - y1) ** 2);
 
       // Calculate displacement required
-      const overlap = 0.5 * (dist - r1 - r2);
+      const overlap = 0.7 * (dist - r1 - r2);
 
       // Displace Current ball away from collision
       Position.x[id] -= (overlap * (x1 - x2)) / dist; // TODO: optimize
@@ -252,12 +223,10 @@ function resolveStaticCollision(
       Position.y[targetId] += (overlap * (y1 - y2)) / dist;
     }
   }
-
-  return collidingPairs;
 }
 
-function resolveDynamicCollision(world, collidingPairs) {
-  for (const pair of collidingPairs) {
+function resolveDynamicCollision(world) {
+  for (const pair of world.collidingPairs) {
     const id1 = pair[0];
     const id2 = pair[1];
 
