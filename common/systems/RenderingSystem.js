@@ -213,10 +213,9 @@ function drawSprite(world, id) {
 
   const img = getAsset([Sprite.texture[id]]);
   ctx.save();
-  console.log()
   ctx.translate(Position.x[id], Position.y[id]);
 
-  if (hasComponent(world, Track, id)){
+  if (hasComponent(world, Track, id)) {
     const offsetX = Position.x[Track.source[id]];
     const offsetY = Position.y[Track.source[id]];
     ctx.translate(offsetX, offsetY);
@@ -237,17 +236,15 @@ function drawAnimation(world, id) {
   const { canvas, ctx, assetIdMap, getAsset } = world;
 
   //console.log(getAsset('explosionSmoke1'))
-    const img = getAsset(Animation.sprites[id][Animation.current[id]]);
-    ctx.save();
-    ctx.translate(Position.x[id], Position.y[id]);
-    if (hasComponent(world, Rotation, id)) {
-      ctx.rotate(Rotation.angle[id] + Math.PI / 2);
-    }
-    ctx.translate(-img.width / 2, -img.height / 2);
-    ctx.drawImage(img, 0, 0);
-    ctx.restore();
-
-  
+  const img = getAsset(Animation.sprites[id][Animation.current[id]]);
+  ctx.save();
+  ctx.translate(Position.x[id], Position.y[id]);
+  if (hasComponent(world, Rotation, id)) {
+    ctx.rotate(Rotation.angle[id] + Math.PI / 2);
+  }
+  ctx.translate(-img.width / 2, -img.height / 2);
+  ctx.drawImage(img, 0, 0);
+  ctx.restore();
 }
 
 function drawVelocityVectors(world, id) {
@@ -297,33 +294,39 @@ function drawColliders(world, id) {
     ctx.stroke();
   }
   if (hasComponent(world, CapsuleCollider, id)) {
-    const sx = CapsuleCollider.sx[id];
-    const sy = CapsuleCollider.sy[id];
-    const ex = CapsuleCollider.ex[id];
-    const ey = CapsuleCollider.ey[id];
-    const r = CapsuleCollider.radius[id];
+    for (
+      let i_cap = 0;
+      i_cap < CapsuleCollider.capsuleCount[id];
+      i_cap++
+    ) {
+      const sx = CapsuleCollider.sx[id][i_cap];
+      const sy = CapsuleCollider.sy[id][i_cap];
+      const ex = CapsuleCollider.ex[id][i_cap];
+      const ey = CapsuleCollider.ey[id][i_cap];
+      const r = CapsuleCollider.radius[id];
 
-    let nx = -(ey - sy);
-    let ny = ex - sx;
-    let d = Math.sqrt(nx * nx + ny * ny);
-    nx /= d;
-    ny /= d;
+      let nx = -(ey - sy);
+      let ny = ex - sx;
+      let d = Math.sqrt(nx * nx + ny * ny);
+      nx /= d;
+      ny /= d;
 
-    ctx.beginPath();
-    ctx.arc(sx, sy, r, 0, 2 * Math.PI);
-    ctx.stroke();
+      ctx.beginPath();
+      ctx.arc(sx, sy, r, 0, 2 * Math.PI);
+      ctx.stroke();
 
-    ctx.beginPath();
-    ctx.arc(ex, ey, r, 0, 2 * Math.PI);
-    ctx.stroke();
+      ctx.beginPath();
+      ctx.arc(ex, ey, r, 0, 2 * Math.PI);
+      ctx.stroke();
 
-    ctx.beginPath();
-    ctx.moveTo(sx + nx * r, sy + ny * r);
-    ctx.lineTo(ex + nx * r, ey + ny * r);
+      ctx.beginPath();
+      ctx.moveTo(sx + nx * r, sy + ny * r);
+      ctx.lineTo(ex + nx * r, ey + ny * r);
 
-    ctx.moveTo(sx - nx * r, sy - ny * r);
-    ctx.lineTo(ex - nx * r, ey - ny * r);
-    ctx.stroke();
+      ctx.moveTo(sx - nx * r, sy - ny * r);
+      ctx.lineTo(ex - nx * r, ey - ny * r);
+      ctx.stroke();
+    }
   }
   ctx.restore();
 }
