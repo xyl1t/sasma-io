@@ -19,6 +19,7 @@ import { Force } from "../components/Force.js";
 import { Mass } from "../components/Mass.js";
 import { CircleCollider } from "../components/CircleCollider.js";
 import { TimeToLive } from "../components/TimeToLive.js";
+import { Track } from "../components/Track.js";
 
 // const query = defineQuery([Gun, Position, Not(Bot)]);
 const query = defineQuery([Gun, Position]);
@@ -33,22 +34,23 @@ export const gunSystem = defineSystem((world) => {
     ) {
       Gun.lastTimeFired[id] = world.timeSinceStart;
 
-      const tankExplosionId = addEntity(world);
-      addComponent(world, TimeToLive, tankExplosionId);
-      TimeToLive.timeToLive[tankExplosionId] = 2;
-      TimeToLive.fadeTime[tankExplosionId] = 2;
+      const barrelExplosionId = addEntity(world);
+      addComponent(world, TimeToLive, barrelExplosionId);
+      TimeToLive.timeToLive[barrelExplosionId] = 0.1;
+      TimeToLive.fadeTime[barrelExplosionId] = 0.1;
 
-      addComponent(world, Rotation, tankExplosionId);
-      Rotation.angle[tankExplosionId] = Gun.angle[id];
+      addComponent(world, Rotation, barrelExplosionId);
+      Rotation.angle[barrelExplosionId] = Gun.angle[id] + Math.PI;
 
-      addComponent(world, Position, tankExplosionId);
-      Position.x[tankExplosionId] = Position.x[id];
-      Position.y[tankExplosionId] = Position.y[id];
+      addComponent(world, Position, barrelExplosionId);
+      Position.x[barrelExplosionId] = Math.cos(Gun.angle[id]) * 40;
+      Position.y[barrelExplosionId] = Math.sin(Gun.angle[id]) * 40;
 
-      addComponent(world, Sprite, tankExplosionId);
-      Sprite.texture[tankExplosionId] = world.assetIdMap.shotLarge;
+      addComponent(world, Sprite, barrelExplosionId);
+      Sprite.texture[barrelExplosionId] = world.assetIdMap.shotLarge;
 
-      
+      addComponent(world, Track, barrelExplosionId);
+      Track.source[barrelExplosionId] = id;
 
       const bulletId = addEntity(world);
 

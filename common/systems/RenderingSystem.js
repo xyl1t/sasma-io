@@ -10,8 +10,9 @@ import { Position } from "../components/Position.js";
 import { Sprite } from "../components/Sprite.js";
 import { Animation } from "../components/Animation.js";
 import { Velocity } from "../components/Velocity.js";
-import { Me } from "/components/Me.js";
-import { CircleCollider } from "/components/CircleCollider.js";
+import { Me } from "../components/Me.js";
+import { CircleCollider } from "../components/CircleCollider.js";
+import { Track } from "../components/Track.js";
 
 const spriteQuery = defineQuery([Position, Sprite]);
 const playerQuery = defineQuery([Player, Position, Velocity]);
@@ -154,7 +155,14 @@ function drawSprite(world, id) {
 
   const img = getAsset([Sprite.texture[id]]);
   ctx.save();
+  console.log()
   ctx.translate(Position.x[id], Position.y[id]);
+
+  if (hasComponent(world, Track, id)){
+    const offsetX = Position.x[Track.source[id]];
+    const offsetY = Position.y[Track.source[id]];
+    ctx.translate(offsetX, offsetY);
+  }
   if (hasComponent(world, Rotation, id)) {
     ctx.rotate(Rotation.angle[id] + Math.PI / 2);
   }
