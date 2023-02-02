@@ -17,19 +17,20 @@ import { CircleCollider } from "./CircleCollider.js";
 import { TimeToLive } from "./TimeToLive.js";
 import { Visible } from "./Visible.js";
 import { CapsuleCollider } from "./CapsuleCollider.js";
-import { Animation } from "./Animation.js";
+import { AnimatedSprite } from "./AnimatedSprite.js";
 import { Track } from "./Track.js";
+import { Layer } from "./Layer.js";
 
 // necessary config for serialization and deserialization
 export const serializationConfig = [
   // Acceleration,
-  Animation,
+  AnimatedSprite,
   Body,
   // Bot,
   Bullet,
   // Force,
   Gun,
-  // Input,
+  Input,
   // Map,
   // Mass,
   Me,
@@ -42,4 +43,5 @@ export const serializationConfig = [
   Velocity,
   CircleCollider,
   CapsuleCollider,
+  Layer,
 ];

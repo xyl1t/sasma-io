@@ -8,18 +8,17 @@ import { Input } from "../components/Input.js";
 import { Player } from "../components/Player.js";
 import { Position } from "../components/Position.js";
 import { Sprite } from "../components/Sprite.js";
-import { Animation } from "../components/Animation.js";
+import { AnimatedSprite } from "../components/AnimatedSprite.js";
 import { Velocity } from "../components/Velocity.js";
 import { CapsuleCollider } from "../components/CapsuleCollider.js";
 import { Me } from "../components/Me.js";
 import { CircleCollider } from "../components/CircleCollider.js";
 import { Track } from "../components/Track.js";
+import { Layer } from "../components/Layer.js";
 
-const spriteQuery = defineQuery([Position, Sprite]);
-const playerQuery = defineQuery([Player, Position, Velocity]);
-const entities = defineQuery([Position]);
 const meQuery = defineQuery([Me]);
-const renderableQuery = defineQuery([Position]);
+const noLayerQuery = defineQuery([Position, Not(Layer)]);
+const layerQuery = defineQuery([Position, Layer]);
 
 export const renderingSystem = defineSystem((world) => {
   const { canvas, ctx, assetIdMap, getAsset } = world;
@@ -76,7 +75,13 @@ export const renderingSystem = defineSystem((world) => {
   }
   ctx.translate(-meX, -meY);
 
-  const renderables = renderableQuery(world);
+  let layerIds = layerQuery(world);
+  let noLayerIds = noLayerQuery(world);
+  layerIds = layerIds.sort((a, b)=>{
+    return Layer.layer[a] > Layer.layer[b];
+  });
+  const renderables = [...noLayerIds, ...layerIds];
+  
   for (const id of renderables) {
     if (hasComponent(world, Player, id)) {
       drawPlayer(world, id, meId);
@@ -84,7 +89,7 @@ export const renderingSystem = defineSystem((world) => {
     if (hasComponent(world, Sprite, id)) {
       drawSprite(world, id);
     }
-    if (hasComponent(world, Animation, id)) {
+    if (hasComponent(world, AnimatedSprite, id)) {
       drawAnimation(world, id);
     }
     if (world.debug.showVelocity) {
@@ -256,8 +261,7 @@ function drawSprite(world, id) {
 function drawAnimation(world, id) {
   const { canvas, ctx, assetIdMap, getAsset } = world;
 
-  //console.log(getAsset('explosionSmoke1'))
-  const img = getAsset(Animation.sprites[id][Animation.current[id]]);
+  const img = getAsset(AnimatedSprite.sprites[id][AnimatedSprite.current[id]]);
   ctx.save();
   ctx.translate(Position.x[id], Position.y[id]);
   if (hasComponent(world, Rotation, id)) {

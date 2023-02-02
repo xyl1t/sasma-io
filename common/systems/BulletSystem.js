@@ -13,12 +13,13 @@ import { Position } from "../components/Position.js";
 import { Velocity } from "../components/Velocity.js";
 import { Sprite } from "../components/Sprite.js";
 import { TimeToLive } from "../components/TimeToLive.js";
-import { Animation } from "../components/Animation.js";
+import { AnimatedSprite } from "../components/AnimatedSprite.js";
 import { Bullet } from "../components/Bullet.js";
+import { Layer } from "../components/Layer.js";
 
 const bulletQuery = defineQuery([Position, Velocity, Bullet]);
 
-export const explosionSystem = defineSystem((world) => {
+export const bulletSystem = defineSystem((world) => {
   const bulletEntities = bulletQuery(world);
   for (const id of bulletEntities) {
     const length = Math.sqrt(Velocity.x[id] ** 2 + Velocity.y[id] ** 2);
@@ -26,28 +27,34 @@ export const explosionSystem = defineSystem((world) => {
     if (length < 200) {
       // TODO: export to some constant or to bullet/gun comoponent
       removeEntity(world, id);
+      const craterId = addEntity(world);
+      addComponent(world, Position, craterId);
+      Position.x[craterId] = Position.x[id];
+      Position.y[craterId] = Position.y[id];
+      addComponent(world, Sprite, craterId);
+      Sprite.texture[craterId] = world.assetIdMap.oilSpill_large;
+      addComponent(world, TimeToLive, craterId);
+      TimeToLive.timeToLive[craterId] = 20;
+      TimeToLive.fadeTime[craterId] = 1;
+      addComponent(world, Layer, craterId);
+      Layer.layer[craterId] = 8;
+
       const explosionId = addEntity(world);
       addComponent(world, Position, explosionId);
       Position.x[explosionId] = Position.x[id];
       Position.y[explosionId] = Position.y[id];
-
-      addComponent(world, Sprite, explosionId);
-      Sprite.texture[explosionId] = world.assetIdMap.oilSpill_large;
-
-      addComponent(world, TimeToLive, explosionId);
-      TimeToLive.timeToLive[explosionId] = 20;
-      TimeToLive.fadeTime[explosionId] = 20;
-
-      addComponent(world, Animation, explosionId);
+      addComponent(world, AnimatedSprite, explosionId);
       let spriteIdxs = [];
       for (let idx = 1; idx <= 5; idx++) {
         spriteIdxs.push(world.assetIdMap["explosionSmoke" + idx]);
       }
-      Animation.numberOfSprites[explosionId] = spriteIdxs.length;
-      Animation.sprites[explosionId].set(spriteIdxs);
-      Animation.interval[explosionId] = 0.05;
-      Animation.lastTime[explosionId] = 0;
-      Animation.current[explosionId] = 0;
+      AnimatedSprite.numberOfSprites[explosionId] = spriteIdxs.length;
+      AnimatedSprite.sprites[explosionId].set(spriteIdxs);
+      AnimatedSprite.interval[explosionId] = 0.05;
+      AnimatedSprite.lastTime[explosionId] = 0;
+      AnimatedSprite.current[explosionId] = 0;
+      addComponent(world, Layer, explosionId);
+      Layer.layer[explosionId] = 12;
     }
   }
 

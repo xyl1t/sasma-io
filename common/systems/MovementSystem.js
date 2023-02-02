@@ -12,19 +12,15 @@ import { Body } from "../components/Body.js";
 import { Rotation } from "../components/Rotation.js";
 import { Position } from "../components/Position.js";
 import { Velocity } from "../components/Velocity.js";
-import { explosionSystem } from "./ExplosionSystem.js";
 import { Acceleration } from "../components/Acceleration.js";
 import { Force } from "../components/Force.js";
 import { Mass } from "../components/Mass.js";
 import { Sprite } from "../components/Sprite.js";
 import { TimeToLive } from "../components/TimeToLive.js";
-import { Bullet } from "../components/Bullet.js";
 import { CircleCollider } from "../components/CircleCollider.js";
 import { CapsuleCollider } from "../components/CapsuleCollider.js";
 import { Fake } from "../components/Fake.js";
-import { Vector } from "../util.js";
-import { Player } from "../components/Player.js";
-import { Animation } from "../components/Animation.js";
+import { Layer } from "../components/Layer.js";
 
 // QUERIES // Selects all entities that have the following components
 const movementQuery = defineQuery([Position, Velocity]);
@@ -82,6 +78,9 @@ export const movementSystem = defineSystem((world) => {
         addComponent(world, TimeToLive, trackId);
         TimeToLive.timeToLive[trackId] = 3;
         TimeToLive.fadeTime[trackId] = 3;
+
+        addComponent(world, Layer, trackId);
+        Layer.layer[trackId] = 9;
       }
     }
 
