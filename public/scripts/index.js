@@ -1,7 +1,7 @@
 import { renderingSystem } from "/systems/RenderingSystem.js";
 import { setup } from "./setup.js";
 import { hasComponent } from "/bitecs.js";
-import { Body } from "/components/Body.js"
+import { Body } from "/components/Body.js";
 
 $(async () => {
   await setup();
@@ -55,7 +55,7 @@ function getInput() {
 
   inputPayload.angle = Math.round(mouse.angle * 100) / 100;
 
-  if (joy.joyAngle.x || joy.joyAngle.y) {
+  if (joy.joyAngle.angle) {
     inputPayload.angle = joy["joyAngle"].angle;
     inputPayload.shooting = joy["joyAngle"].bounds;
   }
@@ -65,12 +65,12 @@ function getInput() {
     inputPayload.inputY = joy["joyMove"].y;
   }
 
-  if (inputPayload.inputY < 0) {
+  if (inputPayload.inputY < -0.3) {
     inputPayload.inputX *= -1;
   }
 
   if (world.dynamicCamera && hasComponent(world, Body, meId)) {
-    inputPayload.angle += Body.angle[meId] + Math.PI/2;
+    inputPayload.angle += Body.angle[meId] + Math.PI / 2;
   }
 
   const gotInput =
