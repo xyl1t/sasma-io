@@ -23,7 +23,7 @@ import { Track } from "./Track.js";
 // necessary config for serialization and deserialization
 export const serializationConfig = [
   // Acceleration,
-  // Animation,
+  Animation,
   Body,
   // Bot,
   Bullet,
@@ -40,6 +40,6 @@ export const serializationConfig = [
   // TimeToLive,
   Track,
   Velocity,
-  // CircleCollider,
-  // CapsuleCollider,
+  CircleCollider,
+  CapsuleCollider,
 ];
