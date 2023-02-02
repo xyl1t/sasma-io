@@ -34,10 +34,16 @@ export const renderingSystem = defineSystem((world) => {
   // move to current player
   const meId = meQuery(world)[0];
   const map = getAsset(assetIdMap["MAP"]);
+  let meX = 0;
+  let meY = 0;
+  if (hasComponent(world, Position, meId)) {
+    meX = Position.x[meId];
+    meY = Position.y[meId];
+  }
   ctx.drawImage(
     map,
-    Position.x[meId] + map.width / 2 - world.windowWidth / world.renderScaleWidth / 2,
-    Position.y[meId] + map.height / 2 - world.windowHeight  / world.renderScaleWidth/ 2,
+    meX + map.width / 2 - world.windowWidth / world.renderScaleWidth / 2,
+    meY + map.height / 2 - world.windowHeight  / world.renderScaleWidth/ 2,
     world.windowWidth / world.renderScaleWidth,
     world.windowHeight / world.renderScaleWidth,
 
@@ -46,7 +52,7 @@ export const renderingSystem = defineSystem((world) => {
     world.windowWidth / world.renderScaleWidth,
     world.windowHeight / world.renderScaleWidth
   );
-  ctx.translate(-Position.x[meId], -Position.y[meId]);
+  ctx.translate(-meX, -meY);
 
   const renderables = renderableQuery(world);
   for (const id of renderables) {
