@@ -12,8 +12,7 @@ import { Velocity } from "../components/Velocity.js";
 import { TimeToLive } from "../components/TimeToLive.js";
 import { Animation } from "../components/Animation.js";
 
-const removeSpritesQuery = defineQuery([Not(Animation), TimeToLive]);
-const AnimationSpritesQuery = defineQuery([Animation]);
+const removeSpritesQuery = defineQuery([TimeToLive]);
 
 export const timeToLiveSystem = defineSystem((world) => {
   const spritesToRemove = removeSpritesQuery(world);
