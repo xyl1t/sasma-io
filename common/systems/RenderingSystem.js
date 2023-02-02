@@ -49,12 +49,8 @@ export const renderingSystem = defineSystem((world) => {
     const diagnoal = Math.sqrt(2) * max;
     ctx.drawImage(
       map,
-      meX +
-        map.width / 2 -
-        diagnoal / world.renderScaleWidth / 2,
-      meY +
-        map.height / 2 -
-        diagnoal / world.renderScaleWidth / 2,
+      meX + map.width / 2 - diagnoal / world.renderScaleWidth / 2,
+      meY + map.height / 2 - diagnoal / world.renderScaleWidth / 2,
       diagnoal / world.renderScaleWidth,
       diagnoal / world.renderScaleWidth,
 
@@ -66,12 +62,8 @@ export const renderingSystem = defineSystem((world) => {
   } else {
     ctx.drawImage(
       map,
-      meX +
-        map.width / 2 -
-        world.windowWidth / world.renderScaleWidth / 2,
-      meY +
-        map.height / 2 -
-        world.windowHeight / world.renderScaleWidth / 2,
+      meX + map.width / 2 - world.windowWidth / world.renderScaleWidth / 2,
+      meY + map.height / 2 - world.windowHeight / world.renderScaleWidth / 2,
       world.windowWidth / world.renderScaleWidth,
       world.windowHeight / world.renderScaleWidth,
 
@@ -137,8 +129,8 @@ function drawPlayer(world, id, meId) {
   const tankBarrel = getAsset(assetIdMap["tank_barrel_" + color + "_2"]);
   ctx.save();
   ctx.rotate(
-    Gun.angle[id] - Math.PI/2
-      // - (world.dynamicCamera && id == meId ? -Body.angle[meId] : Math.PI / 2)
+    Gun.angle[id] - Math.PI / 2
+    // - (world.dynamicCamera && id == meId ? -Body.angle[meId] : Math.PI / 2)
   ); //dynamic camera --> add Body.angle instead of subtracting Math.PI / 2;
   ctx.translate(
     -tankBarrel.width / 2,
@@ -146,6 +138,71 @@ function drawPlayer(world, id, meId) {
   );
   ctx.drawImage(tankBarrel, 0, 0);
   ctx.restore();
+
+  if (world.isMobile && id == meId) {
+    drawPath(world, id);
+  }
+
+  ctx.restore();
+}
+
+function drawPath(world, id) {
+  const { canvas, ctx, assetIdMap, getAsset } = world;
+  const arrow = getAsset(assetIdMap["directionArrow"]);
+  let inputY = Input.inputY[id];
+  let inputX = Input.inputX[id];
+
+  let moving = false;
+  const space = Math.sqrt(Math.pow(inputY * 20, 2));
+  const rotationStep = (Input.inputX[id] * 2) / 4;
+  ctx.save();
+
+  const threshhold = 0.3;
+
+  if (inputY >= threshhold) {
+    ctx.rotate(Body.angle[id] + Math.PI / 2);
+    ctx.translate(0, -40);
+    moving = true;
+  } else {
+    if (inputY <= -threshhold) {
+      ctx.rotate(Body.angle[id] - Math.PI / 2);
+      ctx.translate(0, -40);
+      moving = true;
+    }
+  }
+
+  if (moving) {
+    for (let i = 0; i < 4; i++) {
+      ctx.drawImage(arrow, -arrow.width / 2, 0, 25, 8);
+      ctx.rotate(rotationStep);
+      ctx.translate(0, -space);
+    }
+  } else {
+    if (inputX >= threshhold || inputX <= -threshhold) {
+      let rotationFactor;
+
+      if (inputX >= threshhold) {
+        rotationFactor = 1;
+      } else {
+        if (inputX <= -threshhold) rotationFactor = -1;
+      }
+
+      arrow.width = 20;
+
+      ctx.save();
+      ctx.rotate(Body.angle[id] + Math.PI / 2);
+      ctx.translate(-35 * rotationFactor, -10);
+      ctx.drawImage(arrow, -arrow.width / 2, -arrow.height / 2, 20, 8);
+      ctx.translate(0, 20);
+      ctx.drawImage(arrow, -arrow.width / 2, -arrow.height / 2, 20, 8);
+      ctx.restore();
+      ctx.rotate(Body.angle[id] - Math.PI / 2);
+      ctx.translate(-35 * rotationFactor, -10);
+      ctx.drawImage(arrow, -arrow.width / 2, -arrow.height / 2, 20, 8);
+      ctx.translate(0, 20);
+      ctx.drawImage(arrow, -arrow.width / 2, -arrow.height / 2, 20, 8);
+    }
+  }
 
   ctx.restore();
 }
