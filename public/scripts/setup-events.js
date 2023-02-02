@@ -22,20 +22,33 @@ export async function setupEvents() {
     world.isMobile = true;
   });
 
+  $("#btnJoin").attr("disabled", true);
   $("#btnJoin").click(btnJoinClick);
   $("#btnView").click(btnViewClick);
   //easter egg
   $("#bullet").click(ea);
 
   let portrait = window.matchMedia("(orientation: portrait)");
+
+  checkLoadedWorld();
+  
+}
+
+function checkLoadedWorld(){
+  if (!world.hasLoaded){
+    setTimeout(checkLoadedWorld, 1000);
+  } else {
+    $('#btnJoin').html('Join');
+    $("#btnJoin").attr("disabled", false);
+  }
 }
 
 function btnJoinClick(e) {
-  if(world.hasLoaded){
-    console.log("join clicked");
+  if (!$('#btnJoin').attr('disabled')) {
+    console.log('Player joined');
     $("#startPageContainer").css("display", "none");
     $("#gameContainer").css("filter", "none");
-  
+
     //activate mobile controls
     if (world.isMobile) $("#joyCtrl").css("visibility", "visible");
 
@@ -55,6 +68,7 @@ function btnJoinClick(e) {
       );
     }
   }
+  
 }
 
 function btnViewClick(e) {
