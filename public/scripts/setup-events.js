@@ -38,8 +38,22 @@ function btnJoinClick(e) {
   
     //activate mobile controls
     if (world.isMobile) $("#joyCtrl").css("visibility", "visible");
-  
-    world.socket.emit("join", world.windowWidth, world.windowHeight);
+
+    //activate mobile controls
+    if (world.isMobile) {
+      $("#joyCtrl").css("visibility", "visible");
+      const max = Math.max(
+        world.windowWidth / world.renderScaleWidth,
+        world.windowHeight / world.renderScaleHeight
+      );
+      world.socket.emit("join", max, max);
+    } else {
+      world.socket.emit(
+        "join",
+        world.windowWidth / world.renderScaleWidth,
+        world.windowHeight / world.renderScaleHeight
+      );
+    }
   }
 }
 
