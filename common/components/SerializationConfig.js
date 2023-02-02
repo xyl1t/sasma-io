@@ -15,28 +15,31 @@ import { Force } from "./Force.js";
 import { Mass } from "./Mass.js";
 import { CircleCollider } from "./CircleCollider.js";
 import { TimeToLive } from "./TimeToLive.js";
+import { Visible } from "./Visible.js";
+import { CapsuleCollider } from "./CapsuleCollider.js";
 import { Animation } from "./Animation.js";
 import { Track } from "./Track.js";
 
 // necessary config for serialization and deserialization
 export const serializationConfig = [
-  Acceleration,
+  // Acceleration,
   Animation,
   Body,
-  Bot,
+  // Bot,
   Bullet,
-  Force,
+  // Force,
   Gun,
-  Input,
-  Map,
-  Mass,
+  // Input,
+  // Map,
+  // Mass,
   Me,
   Player,
   Position,
   Rotation,
   Sprite,
-  TimeToLive,
+  // TimeToLive,
   Track,
   Velocity,
   CircleCollider,
+  CapsuleCollider,
 ];
