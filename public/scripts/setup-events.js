@@ -9,16 +9,40 @@ export async function setupEvents() {
   world.canvas.addEventListener("wheel", wheel, false);
   window.addEventListener("keydown", keydown, true);
   window.addEventListener("keyup", keyup, true);
+
+  $("#joyMoveBase").on("touchstart", onJoyMove);
+  $("#joyMoveBase").on("touchmove", onJoyMove);
+  $("#joyMoveBase").on("touchend", onJoyRelease);
+
+  $("#joyAngleBase").on("touchstart", onJoyMove);
+  $("#joyAngleBase").on("touchmove", onJoyMove);
+  $("#joyAngleBase").on("touchend", onJoyRelease);
+
+  window.addEventListener("touchstart", () => {
+    world.isMobile = true;
+  });
+
   $("#btnJoin").click(btnJoinClick);
+  $("#btnView").click(btnViewClick);
   //easter egg
-  $("#bullet").click((ea));
+  $("#bullet").click(ea);
+
+  let portrait = window.matchMedia("(orientation: portrait)");
 }
 
 function btnJoinClick(e) {
   console.log("join clicked");
   $("#startPageContainer").css("display", "none");
   $("#gameContainer").css("filter", "none");
+
+  //activate mobile controls
+  if (world.isMobile) $("#joyCtrl").css("visibility", "visible");
+
   world.socket.emit("join" /*, name, x, y, z*/);
+}
+
+function btnViewClick(e) {
+  world.dynamicCamera = !world.dynamicCamera;
 }
 
 function mousedown(e) {
@@ -72,6 +96,11 @@ function wheel(e) {
 }
 
 function keydown(e) {
+  if (e.key == "Enter") {
+    //join on enter
+    $("#btnJoin").click();
+  }
+
   world.keyboard[e.key.toLowerCase()] = true;
 
   // debug
@@ -98,7 +127,83 @@ function keyup(e) {
   world.keyboard[e.key.toLowerCase()] = false;
 }
 
-function ea(e){
- $("#bullet").attr("src","./assets/frontpageImages/easterEgg.png");
- $("#bullet2").attr("src","./assets/frontpageImages/easterEgg.png")
+function onJoyMove(e) {
+  e = e.originalEvent;
+
+  e.preventDefault();
+
+  let base = e.srcElement;
+  let btn = e.srcElement.nextElementSibling;
+  let touch;
+
+  for (let t of e.changedTouches) {
+    if (t.target == base) {
+      touch = t;
+    }
+  }
+
+  let rect = base.getBoundingClientRect();
+
+  let convertedInputX = 0;
+  let convertedInputY = 0;
+  let angle = 0;
+  let bounds = false;
+
+  let xDif = (-1 * rect.width) / 2 + touch.clientX - rect.left;
+  let yDif = (-1 * rect.height) / 2 + touch.clientY - rect.top;
+
+  let distanceToMiddle = Math.sqrt(Math.pow(xDif, 2) + Math.pow(yDif, 2));
+
+  if (distanceToMiddle <= rect.width / 2) {
+    btn.style.left = xDif + "px";
+    btn.style.top = yDif + "px";
+  } else {
+    //happens, when touch is out of the joystick area
+
+    let newTop = (rect.width / 2 / distanceToMiddle) * yDif;
+    let newBot = (rect.width / 2 / distanceToMiddle) * xDif;
+
+    btn.style.top = newTop + "px";
+    btn.style.left = newBot + "px";
+
+    bounds = true; //out of bounds
+  }
+
+  if (base.style.left != "0px")
+    convertedInputX =
+      parseInt(btn.style.left.substring(0, btn.style.left.length - 2)) /
+      (rect.width / 2);
+  else convertedInputX = 0;
+
+  if (base.style.left != "0px")
+    convertedInputY =
+      parseInt(btn.style.top.substring(0, btn.style.top.length - 2)) /
+      (rect.height / 2);
+  else convertedInputY = 0;
+
+  angle = Math.atan2(yDif, xDif);
+
+  world.joy[base.parentElement.id].x = convertedInputX;
+  world.joy[base.parentElement.id].y = convertedInputY * -1;
+  world.joy[base.parentElement.id].angle = angle;
+  world.joy[base.parentElement.id].bounds = bounds;
+}
+
+function onJoyRelease(e) {
+  e = e.originalEvent;
+  let base = e.srcElement;
+  let btn = e.srcElement.nextElementSibling;
+
+  btn.style.left = 0;
+  btn.style.top = 0;
+
+  world.joy[base.parentElement.id].x = 0;
+  world.joy[base.parentElement.id].y = 0;
+  //world.joy[base.parentElement.id].angle = 0;     //angle should stay
+  world.joy[base.parentElement.id].bounds = false;
+}
+
+function ea(e) {
+  $("#bullet").attr("src", "./assets/frontpageImages/easterEgg.png");
+  $("#bullet2").attr("src", "./assets/frontpageImages/easterEgg.png");
 }

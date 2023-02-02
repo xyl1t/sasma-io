@@ -35,6 +35,20 @@ async function setupWorldParameters() {
     rightDown: false,
   };
   world.keyboard = {};
+  world.joy = {
+    joyMove: {
+      x: 0,
+      y: 0,
+      angle: 0,
+      bounds: false, //whether the touch moves out of the joystick
+    },
+    joyAngle: {
+      x: 0,
+      y: 0,
+      angle: 0,
+      bounds: false,
+    },
+  };
   world.windowWidth = -1;
   world.windowHeight = -1;
 
@@ -44,21 +58,23 @@ async function setupWorldParameters() {
   world.renderScaleHeight = 1;
 
   world.resize = () => {
-    world.canvas.width = window.innerWidth;
-    world.canvas.height = window.innerHeight;
-    world.canvas.style.width = window.innerWidth + "px";
+    world.canvas.width = document.documentElement.clientWidth;
+    world.canvas.height = document.documentElement.clientHeight;
+    world.canvas.style.width = document.documentElement.clientWidth + "px";
     world.canvas.style.height = window.innerHieght + "px";
-    world.windowWidth = window.innerWidth;
-    world.windowHeight = window.innerHeight;
+    world.windowWidth = document.documentElement.clientWidth;
+    world.windowHeight = document.documentElement.clientHeight;
 
-    if (window.innerWidth > window.innerHeight) {
-      let ratio = window.innerHeight / world.constHeight;
+    if (
+      document.documentElement.clientWidth >
+      document.documentElement.clientHeight
+    ) {
+      let ratio = document.documentElement.clientHeight / world.constHeight;
       ratio = Math.max(0.7, ratio);
       world.renderScaleWidth = ratio;
       world.renderScaleHeight = ratio;
-    }
-    else {
-      let ratio = window.innerWidth / world.constWidth;
+    } else {
+      let ratio = document.documentElement.clientWidth / world.constWidth;
       ratio = Math.max(0.7, ratio);
       world.renderScaleWidth = ratio;
       world.renderScaleHeight = ratio;
@@ -73,13 +89,14 @@ async function setupWorldParameters() {
     } else {
       return world.placeholderAsset;
     }
-  }
+  };
   world.colorMap = []; // eg 0 -> blue, 1 -> green, etc
   world.debug = {
     showIds: false,
     showVelocity: false,
     showColliders: false,
   };
+  (world.isMobile = false), (world.dynamicCamera = false);
 }
 
 async function loadPlaceholderAsset() {
