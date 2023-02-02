@@ -5,6 +5,7 @@ import {
   defineSystem,
   hasComponent,
   Not,
+  removeEntity,
 } from "../bitecs.js";
 
 import { Body } from "../components/Body.js";
@@ -19,10 +20,15 @@ import { Sprite } from "../components/Sprite.js";
 import { TimeToLive } from "../components/TimeToLive.js";
 import { Bullet } from "../components/Bullet.js";
 import { CircleCollider } from "../components/CircleCollider.js";
+import { CapsuleCollider } from "../components/CapsuleCollider.js";
+import { Fake } from "../components/Fake.js";
 
 // QUERIES // Selects all entities that have the following components
 const movementQuery = defineQuery([Position, Velocity]);
-const circleColliderQuery = defineQuery([Position, Velocity, CircleCollider]);
+const circleColliderWithoutFakeQuery = defineQuery([Position, CircleCollider, Not(Fake)]);
+const fakeQuery = defineQuery([Fake]);
+const circleColliderQuery = defineQuery([Position, CircleCollider]);
+const capsuleColliderQuery = defineQuery([Position, CapsuleCollider]);
 
 const friction = 3;
 
@@ -82,27 +88,96 @@ export const movementSystem = defineSystem((world) => {
     Force.y[id] = 0;
   }
 
-  const collidingPairs = resolveStaticCollision(circleColliderQuery(world));
-  resolveDynamicCollision(collidingPairs);
+  const collidingPairs = resolveStaticCollision(world, circleColliderWithoutFakeQuery(world), capsuleColliderQuery(world));
+  resolveDynamicCollision(world, collidingPairs, circleColliderQuery(world));
+  for (const id of fakeQuery(world)) {
+    removeEntity(world, id);
+  }
 
   return world;
 });
 
 
-function resolveStaticCollision(entities) {
+function resolveStaticCollision(world, circleCollidersWithoutFake, capsuleColliders) {
   const collidingPairs = [];
 
   // Static collisions, i.e. overlap
-  for (const id of entities) {
-    for (const targetId of entities) {
+  for (const id of circleCollidersWithoutFake) {
+    const x1 = Position.x[id];
+    const y1 = Position.y[id];
+    const r1 = CircleCollider.radius[id];
+
+    // Against Edges
+    for (const capsuleId of capsuleColliders)
+    {
+      const sx = CapsuleCollider.sx[capsuleId] + Position.x[capsuleId];
+      const sy = CapsuleCollider.sy[capsuleId] + Position.y[capsuleId];
+      const ex = CapsuleCollider.ex[capsuleId] + Position.x[capsuleId];
+      const ey = CapsuleCollider.ey[capsuleId] + Position.y[capsuleId];
+      const r = CapsuleCollider.radius[capsuleId];
+      
+      // Check that line formed by velocity vector, intersects with line segment
+      const fLineX1 = ex - sx;
+      const fLineY1 = ey - sy;
+
+      const fLineX2 = x1 - sx;
+      const fLineY2 = y1 - sy;
+
+      const fEdgeLength = fLineX1 * fLineX1 + fLineY1 * fLineY1;
+
+      // This is nifty - It uses the DP of the line segment vs the line to the object, to work out
+      // how much of the segment is in the "shadow" of the object vector. The min and max clamp
+      // this to lie between 0 and the line segment length, which is then normalised. We can
+      // use this to calculate the closest point on the line segment
+      const t = Math.max(0, Math.min(fEdgeLength, (fLineX1 * fLineX2 + fLineY1 * fLineY2))) / fEdgeLength;
+
+      // Which we do here
+      const fClosestPointX = sx + t * fLineX1;
+      const fClosestPointY = sy + t * fLineY1;
+
+      // And once we know the closest point, we can check if the ball has collided with the segment in the
+      // same way we check if two balls have collided
+      const fDistance = Math.sqrt((x1 - fClosestPointX)**2 + (y1 - fClosestPointY)**2);
+
+      if (fDistance <= (r1 + r))
+      {
+
+        // Collision has occurred - treat collision point as a ball that cannot move. To make this
+        // compatible with the dynamic resolution code below, we add a fake ball with an infinite mass
+        // so it behaves like a solid object when the momentum calculations are performed
+
+        const fakeCircleColliderId = addEntity(world);
+        addComponent(world, Fake, fakeCircleColliderId);
+        addComponent(world, Position, fakeCircleColliderId);
+        Position.x[fakeCircleColliderId] = fClosestPointX;
+        Position.y[fakeCircleColliderId] = fClosestPointY;
+        addComponent(world, Velocity, fakeCircleColliderId);
+        Velocity.x[fakeCircleColliderId] = -Velocity.x[id];
+        Velocity.y[fakeCircleColliderId] = -Velocity.y[id];
+        addComponent(world, Mass, fakeCircleColliderId);
+        Mass.value[fakeCircleColliderId] = Mass.value[id];
+        addComponent(world, CircleCollider, fakeCircleColliderId);
+        CircleCollider.radius[fakeCircleColliderId] = CircleCollider.radius[id];
+
+        // Add collision to vector of collisions for dynamic resolution
+        collidingPairs.push([ id, fakeCircleColliderId ]);
+
+        // Calculate displacement required
+        const fOverlap = 1.0 * (fDistance - r1 - r);
+
+        // Displace Current Ball away from collision
+        Position.x[id] -= fOverlap * (x1 - fClosestPointX) / fDistance;
+        Position.y[id] -= fOverlap * (y1 - fClosestPointY) / fDistance;
+      }
+    }
+
+
+    for (const targetId of circleCollidersWithoutFake) {
       if (id == targetId) continue;
       if (!areCirclesOverlapping(id, targetId)) continue;
       // Collision has occured
       collidingPairs.push([ id, targetId ]);
 
-      const x1 = Position.x[id];
-      const y1 = Position.y[id];
-      const r1 = CircleCollider.radius[id];
       const x2 = Position.x[targetId];
       const y2 = Position.y[targetId];
       const r2 = CircleCollider.radius[targetId];
@@ -122,25 +197,25 @@ function resolveStaticCollision(entities) {
       Position.y[targetId] += (overlap * (y1 - y2)) / dist;
     }
   }
-  
+
   return collidingPairs;
 }
 
-function resolveDynamicCollision(collidingPairs) {
+function resolveDynamicCollision(world, collidingPairs) {
   for (const pair of collidingPairs) {
     const id1 = pair[0];
     const id2 = pair[1];
 
     const x1 = Position.x[id1];
     const y1 = Position.y[id1];
-    const vx1 = Velocity.x[id1];
-    const vy1 = Velocity.y[id1];
+    const vx1 = Velocity.x[id1]// + (hasComponent(world, Body, id1) ? Body.velocity[id1] * Math.cos(Body.angle[id1]) : 0);
+    const vy1 = Velocity.y[id1]// + (hasComponent(world, Body, id1) ? Body.velocity[id1] * Math.sin(Body.angle[id1]) : 0);
     const r1 = CircleCollider.radius[id1];
     const mass1 = Mass.value[id1];
     const x2 = Position.x[id2];
     const y2 = Position.y[id2];
-    const vx2 = Velocity.x[id2];
-    const vy2 = Velocity.y[id2];
+    const vx2 = Velocity.x[id2]// + (hasComponent(world, Body, id2) ? Body.velocity[id2] * Math.cos(Body.angle[id2]) : 0);
+    const vy2 = Velocity.y[id2]// + (hasComponent(world, Body, id2) ? Body.velocity[id2] * Math.sin(Body.angle[id2]) : 0);
     const r2 = CircleCollider.radius[id2];
     const mass2 = Mass.value[id2];
 
