@@ -120,6 +120,10 @@ function keydown(e) {
     if (world.keyboard["p"]) {
       world.debug.showColliders = !world.debug.showColliders;
     }
+    // if (world.keyboard["j"]) {
+    //   world.isMobile = !world.isMobile;
+    //   $("#joyCtrl").css("visibility", world.isMobile ? "visible" : "hidden");
+    // }
   }
 }
 
