@@ -144,6 +144,10 @@ function drawPlayer(world, id, meId) {
     drawPath(world, id);
   }
 
+  if (id == meId && hasComponent(world, Gun, id)) {
+    drawReloadIndicator(world, id);
+  }
+
   ctx.restore();
 }
 
@@ -206,6 +210,23 @@ function drawPath(world, id) {
   }
 
   ctx.restore();
+}
+
+function drawReloadIndicator(world, id) {
+  if (Gun.reloadTimeLeft[id] > 0) {
+    const { canvas, ctx, assetIdMap, getAsset } = world;
+
+    const radius = 10;
+    const startAngleDeg = -90;
+    const startAngle = startAngleDeg * (Math.PI / 180);
+    const endAngle = startAngle + Math.PI * (2 * (Gun.reloadTimeLeft[id] / Gun.rateOfFire[id]));
+
+    ctx.beginPath();
+    ctx.moveTo(0, 0);
+
+    ctx.arc(0, 0, radius, startAngle, endAngle, false);
+    ctx.fill();
+  }
 }
 
 function drawSprite(world, id) {
