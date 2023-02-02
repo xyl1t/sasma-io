@@ -145,22 +145,25 @@ if(moving){
   }
 }else{
   if(inputX!=0){
-    let rotationFactor = 0;
+    let rotationFactor;
+
     if(inputX>0){
       rotationFactor = 1; 
     }else{
       rotationFactor = -1;
     }
 
+    arrow.width = 20;
+
     ctx.save();
     ctx.rotate(Body.angle[id]+Math.PI/2);
-    ctx.translate(-30*rotationFactor,-10);
+    ctx.translate(-35*rotationFactor,-10);
     ctx.drawImage(arrow,-arrow.width/2,-arrow.height/2,20,8);
     ctx.translate(0,20);
     ctx.drawImage(arrow,-arrow.width/2,-arrow.height/2,20,8);
     ctx.restore();
     ctx.rotate(Body.angle[id]-Math.PI/2);
-    ctx.translate(-30*rotationFactor,-10);
+    ctx.translate(-35*rotationFactor,-10);
     ctx.drawImage(arrow,-arrow.width/2,-arrow.height/2,20,8);
     ctx.translate(0,20);
     ctx.drawImage(arrow,-arrow.width/2,-arrow.height/2,20,8);
