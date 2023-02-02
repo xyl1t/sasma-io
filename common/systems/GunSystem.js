@@ -31,9 +31,9 @@ export const gunSystem = defineSystem((world) => {
   for (const id of entities) {
     if (
       Gun.shooting[id] &&
-      Gun.lastTimeFired[id] + Gun.rateOfFire[id] < world.timeSinceStart
+      Gun.reloadTimeLeft[id] <= 0
     ) {
-      Gun.lastTimeFired[id] = world.timeSinceStart;
+      Gun.reloadTimeLeft[id] = Gun.rateOfFire[id];
 
       const barrelExplosionId = addEntity(world);
       addComponent(world, TimeToLive, barrelExplosionId);
@@ -89,6 +89,11 @@ export const gunSystem = defineSystem((world) => {
 
       addComponent(world, Bullet, bulletId);
       Bullet.source[bulletId] = id;
+    }else{
+      if(Gun.reloadTimeLeft[id]>0){
+        Gun.reloadTimeLeft[id] -= world.dt;
+      }
+      
     }
   }
 
