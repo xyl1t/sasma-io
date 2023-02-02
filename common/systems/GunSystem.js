@@ -20,6 +20,7 @@ import { Mass } from "../components/Mass.js";
 import { CircleCollider } from "../components/CircleCollider.js";
 import { TimeToLive } from "../components/TimeToLive.js";
 import { Track } from "../components/Track.js";
+import { Layer } from "../components/Layer.js";
 
 // const query = defineQuery([Gun, Position, Not(Bot)]);
 const query = defineQuery([Gun, Position]);
@@ -30,9 +31,9 @@ export const gunSystem = defineSystem((world) => {
   for (const id of entities) {
     if (
       Gun.shooting[id] &&
-      Gun.lastTimeFired[id] + Gun.rateOfFire[id] < world.timeSinceStart
+      Gun.reloadTimeLeft[id] <= 0
     ) {
-      Gun.lastTimeFired[id] = world.timeSinceStart;
+      Gun.reloadTimeLeft[id] = Gun.rateOfFire[id];
 
       const barrelExplosionId = addEntity(world);
       addComponent(world, TimeToLive, barrelExplosionId);
@@ -48,6 +49,9 @@ export const gunSystem = defineSystem((world) => {
 
       addComponent(world, Sprite, barrelExplosionId);
       Sprite.texture[barrelExplosionId] = world.assetIdMap.shotLarge;
+
+      addComponent(world, Layer, barrelExplosionId);
+      Layer.layer[barrelExplosionId] = 13;
 
       addComponent(world, Track, barrelExplosionId);
       Track.source[barrelExplosionId] = id;
@@ -80,8 +84,18 @@ export const gunSystem = defineSystem((world) => {
       }
       Sprite.texture[bulletId] = spriteId;
 
+      addComponent(world, Layer, bulletId);
+      Layer.layer[bulletId] = 11;
+
       addComponent(world, Bullet, bulletId);
       Bullet.source[bulletId] = id;
+      Bullet.damage[bulletId] = Gun.damage[id];
+
+    }else{
+      if(Gun.reloadTimeLeft[id]>0){
+        Gun.reloadTimeLeft[id] -= world.dt;
+      }
+      
     }
   }
 
