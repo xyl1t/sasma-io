@@ -5,6 +5,7 @@ import {
   defineSystem,
   hasComponent,
   Not,
+  removeEntity,
 } from "../bitecs.js";
 
 import { Body } from "../components/Body.js";
@@ -20,9 +21,12 @@ import { TimeToLive } from "../components/TimeToLive.js";
 import { Bullet } from "../components/Bullet.js";
 import { CircleCollider } from "../components/CircleCollider.js";
 import { CapsuleCollider } from "../components/CapsuleCollider.js";
+import { Fake } from "../components/Fake.js";
 
 // QUERIES // Selects all entities that have the following components
 const movementQuery = defineQuery([Position, Velocity]);
+const circleColliderWithoutFakeQuery = defineQuery([Position, CircleCollider, Not(Fake)]);
+const fakeQuery = defineQuery([Fake]);
 const circleColliderQuery = defineQuery([Position, CircleCollider]);
 const capsuleColliderQuery = defineQuery([Position, CapsuleCollider]);
 
@@ -84,18 +88,21 @@ export const movementSystem = defineSystem((world) => {
     Force.y[id] = 0;
   }
 
-  const collidingPairs = resolveStaticCollision(circleColliderQuery(world), capsuleColliderQuery(world));
-  resolveDynamicCollision(collidingPairs);
+  const collidingPairs = resolveStaticCollision(world, circleColliderWithoutFakeQuery(world), capsuleColliderQuery(world));
+  resolveDynamicCollision(world, collidingPairs, circleColliderQuery(world));
+  for (const id of fakeQuery(world)) {
+    removeEntity(world, id);
+  }
 
   return world;
 });
 
 
-function resolveStaticCollision(circleColliders, capsuleColliders) {
+function resolveStaticCollision(world, circleCollidersWithoutFake, capsuleColliders) {
   const collidingPairs = [];
 
   // Static collisions, i.e. overlap
-  for (const id of circleColliders) {
+  for (const id of circleCollidersWithoutFake) {
     const x1 = Position.x[id];
     const y1 = Position.y[id];
     const r1 = CircleCollider.radius[id];
@@ -134,26 +141,28 @@ function resolveStaticCollision(circleColliders, capsuleColliders) {
 
       if (fDistance <= (r1 + r))
       {
-        // // Collision has occurred - treat collision point as a ball that cannot move. To make this
-        // // compatible with the dynamic resolution code below, we add a fake ball with an infinite mass
-        // // so it behaves like a solid object when the momentum calculations are performed
-        // sBall *fakeball = new sBall();
-        // fakeball->radius = edge.radius;
-        // fakeball->mass = ball.mass * 0.8f;
-        // fakeball->px = fClosestPointX;
-        // fakeball->py = fClosestPointY;
-        // fakeball->vx = -ball.vx;	// We will use these later to allow the lines to impart energy into ball
-        // fakeball->vy = -ball.vy;	// if the lines are moving, i.e. like pinball flippers
-        // 
-        // // Store Fake Ball
-        // vecFakeBalls.push_back(fakeball);
-        // 
-        // // Add collision to vector of collisions for dynamic resolution
-        // vecCollidingPairs.push_back({ &ball, fakeball });
-        //
-        // // Calculate displacement required
-        // const fOverlap = 1.0f * (fDistance - ball.radius - fakeball->radius);
 
+        // Collision has occurred - treat collision point as a ball that cannot move. To make this
+        // compatible with the dynamic resolution code below, we add a fake ball with an infinite mass
+        // so it behaves like a solid object when the momentum calculations are performed
+
+        const fakeCircleColliderId = addEntity(world);
+        addComponent(world, Fake, fakeCircleColliderId);
+        addComponent(world, Position, fakeCircleColliderId);
+        Position.x[fakeCircleColliderId] = fClosestPointX;
+        Position.y[fakeCircleColliderId] = fClosestPointY;
+        addComponent(world, Velocity, fakeCircleColliderId);
+        Velocity.x[fakeCircleColliderId] = -Velocity.x[id];
+        Velocity.y[fakeCircleColliderId] = -Velocity.y[id];
+        addComponent(world, Mass, fakeCircleColliderId);
+        Mass.value[fakeCircleColliderId] = Mass.value[id];
+        addComponent(world, CircleCollider, fakeCircleColliderId);
+        CircleCollider.radius[fakeCircleColliderId] = CircleCollider.radius[id];
+
+        // Add collision to vector of collisions for dynamic resolution
+        collidingPairs.push([ id, fakeCircleColliderId ]);
+
+        // Calculate displacement required
         const fOverlap = 1.0 * (fDistance - r1 - r);
 
         // Displace Current Ball away from collision
@@ -163,8 +172,7 @@ function resolveStaticCollision(circleColliders, capsuleColliders) {
     }
 
 
-
-    for (const targetId of circleColliders) {
+    for (const targetId of circleCollidersWithoutFake) {
       if (id == targetId) continue;
       if (!areCirclesOverlapping(id, targetId)) continue;
       // Collision has occured
@@ -189,25 +197,25 @@ function resolveStaticCollision(circleColliders, capsuleColliders) {
       Position.y[targetId] += (overlap * (y1 - y2)) / dist;
     }
   }
-  
+
   return collidingPairs;
 }
 
-function resolveDynamicCollision(collidingPairs) {
+function resolveDynamicCollision(world, collidingPairs) {
   for (const pair of collidingPairs) {
     const id1 = pair[0];
     const id2 = pair[1];
 
     const x1 = Position.x[id1];
     const y1 = Position.y[id1];
-    const vx1 = Velocity.x[id1];
-    const vy1 = Velocity.y[id1];
+    const vx1 = Velocity.x[id1]// + (hasComponent(world, Body, id1) ? Body.velocity[id1] * Math.cos(Body.angle[id1]) : 0);
+    const vy1 = Velocity.y[id1]// + (hasComponent(world, Body, id1) ? Body.velocity[id1] * Math.sin(Body.angle[id1]) : 0);
     const r1 = CircleCollider.radius[id1];
     const mass1 = Mass.value[id1];
     const x2 = Position.x[id2];
     const y2 = Position.y[id2];
-    const vx2 = Velocity.x[id2];
-    const vy2 = Velocity.y[id2];
+    const vx2 = Velocity.x[id2]// + (hasComponent(world, Body, id2) ? Body.velocity[id2] * Math.cos(Body.angle[id2]) : 0);
+    const vy2 = Velocity.y[id2]// + (hasComponent(world, Body, id2) ? Body.velocity[id2] * Math.sin(Body.angle[id2]) : 0);
     const r2 = CircleCollider.radius[id2];
     const mass2 = Mass.value[id2];
 
