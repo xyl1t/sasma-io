@@ -97,7 +97,8 @@ async function setupWorldParameters() {
     showColliders: false,
   };
   world.isMobile = false;
-  world.dynamicCamera = false), (world.hasLoaded = false;
+  world.dynamicCamera = false;
+  world.hasLoaded = false;
 }
 
 async function loadPlaceholderAsset() {
