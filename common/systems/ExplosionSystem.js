@@ -13,6 +13,7 @@ import { Position } from "../components/Position.js";
 import { Velocity } from "../components/Velocity.js";
 import { Sprite } from "../components/Sprite.js";
 import { TimeToLive } from "../components/TimeToLive.js";
+import { Animation } from "../components/Animation.js";
 
 const bulletQuery = defineQuery([Not(Body), Position, Velocity]);
 const explosionQuery = defineQuery([Not(Body), Position, Not(Velocity)]);
@@ -35,8 +36,18 @@ export const explosionSystem = defineSystem((world) => {
 
       addComponent(world, TimeToLive, explosionId);
       TimeToLive.timeToLive[explosionId] = 20;
-      TimeToLive.fadeTime[explosionId] = 1;
-
+      TimeToLive.fadeTime[explosionId] = 20;
+      
+      addComponent(world, Animation, explosionId);
+      let spriteIdxs = [];
+      for (let idx = 1; idx <= 5; idx ++){
+        spriteIdxs.push(world.assetIdMap['explosionSmoke' + idx]);
+      }
+      Animation.numberOfSprites[explosionId] = spriteIdxs.length;
+      Animation.sprites[explosionId].set(spriteIdxs)
+      Animation.interval[explosionId] = 0.05;
+      Animation.lastTime[explosionId] = 0;
+      Animation.current[explosionId] = 0;
     }
   }
 });

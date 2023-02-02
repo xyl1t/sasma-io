@@ -8,9 +8,11 @@ import { Input } from "../components/Input.js";
 import { Player } from "../components/Player.js";
 import { Position } from "../components/Position.js";
 import { Sprite } from "../components/Sprite.js";
+import { Animation } from "../components/Animation.js";
 import { Velocity } from "../components/Velocity.js";
-import { Me } from "/components/Me.js";
-import { CircleCollider } from "/components/CircleCollider.js";
+import { Me } from "../components/Me.js";
+import { CircleCollider } from "../components/CircleCollider.js";
+import { Track } from "../components/Track.js";
 
 const spriteQuery = defineQuery([Position, Sprite]);
 const playerQuery = defineQuery([Player, Position, Velocity]);
@@ -80,6 +82,9 @@ export const renderingSystem = defineSystem((world) => {
     }
     if (hasComponent(world, Sprite, id)) {
       drawSprite(world, id);
+    }
+    if (hasComponent(world, Animation, id)) {
+      drawAnimation(world, id);
     }
     if (world.debug.showVelocity) {
       if (hasComponent(world, Body, id) || hasComponent(world, Velocity, id)) {
@@ -207,7 +212,14 @@ function drawSprite(world, id) {
 
   const img = getAsset([Sprite.texture[id]]);
   ctx.save();
+  console.log()
   ctx.translate(Position.x[id], Position.y[id]);
+
+  if (hasComponent(world, Track, id)){
+    const offsetX = Position.x[Track.source[id]];
+    const offsetY = Position.y[Track.source[id]];
+    ctx.translate(offsetX, offsetY);
+  }
   if (hasComponent(world, Rotation, id)) {
     ctx.rotate(Rotation.angle[id] + Math.PI / 2);
   }
@@ -218,6 +230,23 @@ function drawSprite(world, id) {
   ctx.translate(-img.width / 2, -img.height / 2);
   ctx.drawImage(img, 0, 0);
   ctx.restore();
+}
+
+function drawAnimation(world, id) {
+  const { canvas, ctx, assetIdMap, getAsset } = world;
+
+  //console.log(getAsset('explosionSmoke1'))
+    const img = getAsset(Animation.sprites[id][Animation.current[id]]);
+    ctx.save();
+    ctx.translate(Position.x[id], Position.y[id]);
+    if (hasComponent(world, Rotation, id)) {
+      ctx.rotate(Rotation.angle[id] + Math.PI / 2);
+    }
+    ctx.translate(-img.width / 2, -img.height / 2);
+    ctx.drawImage(img, 0, 0);
+    ctx.restore();
+
+  
 }
 
 function drawVelocityVectors(world, id) {
