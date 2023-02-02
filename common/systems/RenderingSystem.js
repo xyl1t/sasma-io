@@ -142,7 +142,7 @@ function drawPlayer(world, id, meId) {
   ctx.drawImage(tankBarrel, 0, 0);
   ctx.restore();
 
-  if(id == meId){
+  if(world.isMobile&&id == meId){
     drawPath(world,id);
   }
 
@@ -160,12 +160,12 @@ function drawPath(world,id){
   const rotationStep = Input.inputX[id]*2/4;
   ctx.save();
 
-  if(inputY>=0.5){
+  if(inputY>=0.3){
     ctx.rotate(Body.angle[id]+Math.PI/2);
     ctx.translate(0,-40);
     moving = true;
   }else{
-    if(inputY<=-0.5){
+    if(inputY<=-0.3){
       ctx.rotate(Body.angle[id]-Math.PI/2);
       ctx.translate(0,-40);
       moving = true;
@@ -179,13 +179,14 @@ if(moving){
     ctx.translate(0,-space);
   }
 }else{
-  if(inputX!=0){
+  if(inputX>=0.3||inputX<=-0.3){
     let rotationFactor;
 
-    if(inputX>0){
+    if(inputX>=0.3){
       rotationFactor = 1; 
     }else{
-      rotationFactor = -1;
+      if(inputX<=-0.3)
+        rotationFactor = -1;
     }
 
     arrow.width = 20;
