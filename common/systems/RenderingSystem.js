@@ -11,6 +11,7 @@ import { Sprite } from "../components/Sprite.js";
 import { Velocity } from "../components/Velocity.js";
 import { Me } from "/components/Me.js";
 import { CircleCollider } from "/components/CircleCollider.js";
+import { CapsuleCollider } from "../components/CapsuleCollider.js";
 
 const spriteQuery = defineQuery([Position, Sprite]);
 const playerQuery = defineQuery([Player, Position, Velocity]);
@@ -207,6 +208,35 @@ function drawColliders(world, id) {
   if (hasComponent(world, CircleCollider, id)) {
     ctx.beginPath();
     ctx.arc(0, 0, CircleCollider.radius[id], 0, 2 * Math.PI);
+    ctx.stroke();
+  }
+  if (hasComponent(world, CapsuleCollider, id)) {
+    const sx = CapsuleCollider.sx[id];
+    const sy = CapsuleCollider.sy[id];
+    const ex = CapsuleCollider.ex[id];
+    const ey = CapsuleCollider.ey[id];
+    const r = CapsuleCollider.radius[id];
+
+    let nx = -(ey - sy);
+    let ny = ex - sx;
+    let d = Math.sqrt(nx * nx + ny * ny);
+    nx /= d;
+    ny /= d;
+
+    ctx.beginPath();
+    ctx.arc(sx, sy, r, 0, 2 * Math.PI);
+    ctx.stroke();
+
+    ctx.beginPath();
+    ctx.arc(ex, ey, r, 0, 2 * Math.PI);
+    ctx.stroke();
+
+    ctx.beginPath();
+    ctx.moveTo(sx + nx * r, sy + ny * r);
+    ctx.lineTo(ex + nx * r, ey + ny * r);
+
+    ctx.moveTo(sx - nx * r, sy - ny * r);
+    ctx.lineTo(ex - nx * r, ey - ny * r);
     ctx.stroke();
   }
   ctx.restore();

@@ -15,6 +15,7 @@ import { Force } from "./Force.js";
 import { Mass } from "./Mass.js";
 import { CircleCollider } from "./CircleCollider.js";
 import { TimeToLive } from "./TimeToLive.js";
+import { CapsuleCollider } from "./CapsuleCollider.js";
 
 // necessary config for serialization and deserialization
 export const serializationConfig = [
@@ -35,4 +36,5 @@ export const serializationConfig = [
   TimeToLive,
   Velocity,
   CircleCollider,
+  CapsuleCollider,
 ];
