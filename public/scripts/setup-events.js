@@ -9,24 +9,25 @@ export async function setupEvents() {
   world.canvas.addEventListener("wheel", wheel, false);
   window.addEventListener("keydown", keydown, true);
   window.addEventListener("keyup", keyup, true);
-  
 
-  $('#joyMoveBase').on('touchstart',onJoyMove);
-  $('#joyMoveBase').on('touchmove',onJoyMove);
-  $('#joyMoveBase').on('touchend',onJoyRelease);
+  $("#joyMoveBase").on("touchstart", onJoyMove);
+  $("#joyMoveBase").on("touchmove", onJoyMove);
+  $("#joyMoveBase").on("touchend", onJoyRelease);
 
-  $('#joyAngleBase').on('touchstart',onJoyMove);
-  $('#joyAngleBase').on('touchmove',onJoyMove);
-  $('#joyAngleBase').on('touchend',onJoyRelease);
+  $("#joyAngleBase").on("touchstart", onJoyMove);
+  $("#joyAngleBase").on("touchmove", onJoyMove);
+  $("#joyAngleBase").on("touchend", onJoyRelease);
 
   window.addEventListener("touchstart", () => {
     world.isMobile = true;
-  })
-   
+  });
+
   $("#btnJoin").click(btnJoinClick);
   $("#btnView").click(btnViewClick);
   //easter egg
-  $("#bullet").click((ea));
+  $("#bullet").click(ea);
+
+  let portrait = window.matchMedia("(orientation: portrait)");
 }
 
 function btnJoinClick(e) {
@@ -35,13 +36,12 @@ function btnJoinClick(e) {
   $("#gameContainer").css("filter", "none");
 
   //activate mobile controls
-  if (world.isMobile)
-    $('#joyCtrl').css("visibility", "visible")
+  if (world.isMobile) $("#joyCtrl").css("visibility", "visible");
 
   world.socket.emit("join" /*, name, x, y, z*/);
 }
 
-function btnViewClick(e){
+function btnViewClick(e) {
   world.dynamicCamera = !world.dynamicCamera;
 }
 
@@ -96,9 +96,9 @@ function wheel(e) {
 }
 
 function keydown(e) {
-
-  if(e.key == "Enter"){     //join on enter
-    $('#btnJoin').click();
+  if (e.key == "Enter") {
+    //join on enter
+    $("#btnJoin").click();
   }
 
   world.keyboard[e.key.toLowerCase()] = true;
@@ -127,18 +127,17 @@ function keyup(e) {
   world.keyboard[e.key.toLowerCase()] = false;
 }
 
-function onJoyMove(e){
+function onJoyMove(e) {
   e = e.originalEvent;
 
   e.preventDefault();
-
 
   let base = e.srcElement;
   let btn = e.srcElement.nextElementSibling;
   let touch;
 
-  for(let t of e.changedTouches){
-    if(t.target==base){
+  for (let t of e.changedTouches) {
+    if (t.target == base) {
       touch = t;
     }
   }
@@ -150,55 +149,51 @@ function onJoyMove(e){
   let angle = 0;
   let bounds = false;
 
-  let xDif = (-1)*(rect.width)/2 + touch.clientX-rect.left;
-  let yDif = (-1)*(rect.height)/2 + touch.clientY-rect.top;
+  let xDif = (-1 * rect.width) / 2 + touch.clientX - rect.left;
+  let yDif = (-1 * rect.height) / 2 + touch.clientY - rect.top;
 
-  let distanceToMiddle = Math.sqrt(Math.pow(xDif,2) + Math.pow(yDif,2));
+  let distanceToMiddle = Math.sqrt(Math.pow(xDif, 2) + Math.pow(yDif, 2));
 
-  if(distanceToMiddle <= (rect.width/2)){
-    btn.style.left = (xDif+"px");
-    btn.style.top = (yDif+"px");
-
-  }else{
-
+  if (distanceToMiddle <= rect.width / 2) {
+    btn.style.left = xDif + "px";
+    btn.style.top = yDif + "px";
+  } else {
     //happens, when touch is out of the joystick area
 
-    let newTop = ((rect.width/2)/distanceToMiddle*yDif);
-    let newBot = ((rect.width/2)/distanceToMiddle*xDif);
+    let newTop = (rect.width / 2 / distanceToMiddle) * yDif;
+    let newBot = (rect.width / 2 / distanceToMiddle) * xDif;
 
-    btn.style.top = newTop+"px";
-    btn.style.left = newBot+"px";
+    btn.style.top = newTop + "px";
+    btn.style.left = newBot + "px";
 
     bounds = true; //out of bounds
-
   }
 
+  if (base.style.left != "0px")
+    convertedInputX =
+      parseInt(btn.style.left.substring(0, btn.style.left.length - 2)) /
+      (rect.width / 2);
+  else convertedInputX = 0;
 
+  if (base.style.left != "0px")
+    convertedInputY =
+      parseInt(btn.style.top.substring(0, btn.style.top.length - 2)) /
+      (rect.height / 2);
+  else convertedInputY = 0;
 
-  if(base.style.left != "0px")
-    convertedInputX = parseInt(btn.style.left.substring(0,btn.style.left.length-2))/(rect.width/2);
-  else
-    convertedInputX=0;
-
-
-  if(base.style.left != "0px")
-    convertedInputY = parseInt(btn.style.top.substring(0,btn.style.top.length-2))/(rect.height/2);
-  else
-    convertedInputY=0;
-
-  if(xDif>0){
-    angle = Math.atan(yDif/xDif);
-  }else{
-    angle = Math.PI + Math.atan(yDif/xDif);
+  if (xDif > 0) {
+    angle = Math.atan(yDif / xDif);
+  } else {
+    angle = Math.PI + Math.atan(yDif / xDif);
   }
 
   world.joy[base.parentElement.id].x = convertedInputX;
-  world.joy[base.parentElement.id].y = convertedInputY * (-1);
+  world.joy[base.parentElement.id].y = convertedInputY * -1;
   world.joy[base.parentElement.id].angle = angle;
   world.joy[base.parentElement.id].bounds = bounds;
 }
 
-function onJoyRelease(e){
+function onJoyRelease(e) {
   e = e.originalEvent;
   let base = e.srcElement;
   let btn = e.srcElement.nextElementSibling;
@@ -212,8 +207,7 @@ function onJoyRelease(e){
   world.joy[base.parentElement.id].bounds = false;
 }
 
-function ea(e){
- $("#bullet").attr("src","./assets/frontpageImages/easterEgg.png");
- $("#bullet2").attr("src","./assets/frontpageImages/easterEgg.png")
+function ea(e) {
+  $("#bullet").attr("src", "./assets/frontpageImages/easterEgg.png");
+  $("#bullet2").attr("src", "./assets/frontpageImages/easterEgg.png");
 }
-
