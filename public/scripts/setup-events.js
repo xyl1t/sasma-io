@@ -38,7 +38,7 @@ function btnJoinClick(e) {
   //activate mobile controls
   if (world.isMobile) $("#joyCtrl").css("visibility", "visible");
 
-  world.socket.emit("join" /*, name, x, y, z*/);
+  world.socket.emit("join", world.windowWidth, world.windowHeight);
 }
 
 function btnViewClick(e) {

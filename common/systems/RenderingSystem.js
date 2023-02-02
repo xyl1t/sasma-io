@@ -8,18 +8,18 @@ import { Input } from "../components/Input.js";
 import { Player } from "../components/Player.js";
 import { Position } from "../components/Position.js";
 import { Sprite } from "../components/Sprite.js";
-import { Animation } from "../components/Animation.js";
+import { AnimatedSprite } from "../components/AnimatedSprite.js";
 import { Velocity } from "../components/Velocity.js";
+import { CapsuleCollider } from "../components/CapsuleCollider.js";
 import { Me } from "../components/Me.js";
 import { CircleCollider } from "../components/CircleCollider.js";
 import { Track } from "../components/Track.js";
+import { Layer } from "../components/Layer.js";
 import { Zone } from "../components/Zone.js";
 
-const spriteQuery = defineQuery([Position, Sprite]);
-const playerQuery = defineQuery([Player, Position, Velocity]);
-const entities = defineQuery([Position]);
 const meQuery = defineQuery([Me]);
-const renderableQuery = defineQuery([Position]);
+const noLayerQuery = defineQuery([Position, Not(Layer)]);
+const layerQuery = defineQuery([Position, Layer]);
 const zoneQuery = defineQuery([Zone]);
 
 export const renderingSystem = defineSystem((world) => {
@@ -79,7 +79,13 @@ export const renderingSystem = defineSystem((world) => {
   }
   ctx.translate(-meX, -meY);
 
-  const renderables = renderableQuery(world);
+  let layerIds = layerQuery(world);
+  let noLayerIds = noLayerQuery(world);
+  layerIds = layerIds.sort((a, b) => {
+    return Layer.layer[a] - Layer.layer[b];
+  });
+  const renderables = [...noLayerIds, ...layerIds];
+  
   for (const id of renderables) {
     if (hasComponent(world, Player, id)) {
       drawPlayer(world, id, meId);
@@ -87,7 +93,7 @@ export const renderingSystem = defineSystem((world) => {
     if (hasComponent(world, Sprite, id)) {
       drawSprite(world, id);
     }
-    if (hasComponent(world, Animation, id)) {
+    if (hasComponent(world, AnimatedSprite, id)) {
       drawAnimation(world, id);
     }
     if (world.debug.showVelocity) {
@@ -145,6 +151,10 @@ function drawPlayer(world, id, meId) {
 
   if (world.isMobile && id == meId) {
     drawPath(world, id);
+  }
+
+  if (id == meId && hasComponent(world, Gun, id)) {
+    drawReloadIndicator(world, id);
   }
 
   ctx.restore();
@@ -211,6 +221,23 @@ function drawPath(world, id) {
   ctx.restore();
 }
 
+function drawReloadIndicator(world, id) {
+  if (Gun.reloadTimeLeft[id] > 0) {
+    const { canvas, ctx, assetIdMap, getAsset } = world;
+
+    const radius = 10;
+    const startAngleDeg = -90;
+    const startAngle = startAngleDeg * (Math.PI / 180);
+    const endAngle = startAngle + Math.PI * (2 * (Gun.reloadTimeLeft[id] / Gun.rateOfFire[id]));
+
+    ctx.beginPath();
+    ctx.moveTo(0, 0);
+
+    ctx.arc(0, 0, radius, startAngle, endAngle, false);
+    ctx.fill();
+  }
+}
+
 function drawSprite(world, id) {
   const { canvas, ctx, assetIdMap, getAsset } = world;
 
@@ -218,7 +245,7 @@ function drawSprite(world, id) {
   ctx.save();
   ctx.translate(Position.x[id], Position.y[id]);
 
-  if (hasComponent(world, Track, id)){
+  if (hasComponent(world, Track, id)) {
     const offsetX = Position.x[Track.source[id]];
     const offsetY = Position.y[Track.source[id]];
     ctx.translate(offsetX, offsetY);
@@ -238,18 +265,15 @@ function drawSprite(world, id) {
 function drawAnimation(world, id) {
   const { canvas, ctx, assetIdMap, getAsset } = world;
 
-  //console.log(getAsset('explosionSmoke1'))
-    const img = getAsset(Animation.sprites[id][Animation.current[id]]);
-    ctx.save();
-    ctx.translate(Position.x[id], Position.y[id]);
-    if (hasComponent(world, Rotation, id)) {
-      ctx.rotate(Rotation.angle[id] + Math.PI / 2);
-    }
-    ctx.translate(-img.width / 2, -img.height / 2);
-    ctx.drawImage(img, 0, 0);
-    ctx.restore();
-
-  
+  const img = getAsset(AnimatedSprite.sprites[id][AnimatedSprite.current[id]]);
+  ctx.save();
+  ctx.translate(Position.x[id], Position.y[id]);
+  if (hasComponent(world, Rotation, id)) {
+    ctx.rotate(Rotation.angle[id] + Math.PI / 2);
+  }
+  ctx.translate(-img.width / 2, -img.height / 2);
+  ctx.drawImage(img, 0, 0);
+  ctx.restore();
 }
 
 function drawVelocityVectors(world, id) {
@@ -297,6 +321,41 @@ function drawColliders(world, id) {
     ctx.beginPath();
     ctx.arc(0, 0, CircleCollider.radius[id], 0, 2 * Math.PI);
     ctx.stroke();
+  }
+  if (hasComponent(world, CapsuleCollider, id)) {
+    for (
+      let i_cap = 0;
+      i_cap < CapsuleCollider.capsuleCount[id];
+      i_cap++
+    ) {
+      const sx = CapsuleCollider.sx[id][i_cap];
+      const sy = CapsuleCollider.sy[id][i_cap];
+      const ex = CapsuleCollider.ex[id][i_cap];
+      const ey = CapsuleCollider.ey[id][i_cap];
+      const r = CapsuleCollider.radius[id];
+
+      let nx = -(ey - sy);
+      let ny = ex - sx;
+      let d = Math.sqrt(nx * nx + ny * ny);
+      nx /= d;
+      ny /= d;
+
+      ctx.beginPath();
+      ctx.arc(sx, sy, r, 0, 2 * Math.PI);
+      ctx.stroke();
+
+      ctx.beginPath();
+      ctx.arc(ex, ey, r, 0, 2 * Math.PI);
+      ctx.stroke();
+
+      ctx.beginPath();
+      ctx.moveTo(sx + nx * r, sy + ny * r);
+      ctx.lineTo(ex + nx * r, ey + ny * r);
+
+      ctx.moveTo(sx - nx * r, sy - ny * r);
+      ctx.lineTo(ex - nx * r, ey - ny * r);
+      ctx.stroke();
+    }
   }
   ctx.restore();
 }

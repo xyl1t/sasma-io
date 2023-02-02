@@ -10,7 +10,7 @@ import { Position } from "../components/Position.js";
 import { Sprite } from "../components/Sprite.js";
 import { Velocity } from "../components/Velocity.js";
 import { TimeToLive } from "../components/TimeToLive.js";
-import { Animation } from "../components/Animation.js";
+import { AnimatedSprite } from "../components/AnimatedSprite.js";
 
 const removeSpritesQuery = defineQuery([TimeToLive]);
 
