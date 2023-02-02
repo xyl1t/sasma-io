@@ -77,8 +77,8 @@ export const renderingSystem = defineSystem((world) => {
 
   let layerIds = layerQuery(world);
   let noLayerIds = noLayerQuery(world);
-  layerIds = layerIds.sort((a, b)=>{
-    return Layer.layer[a] > Layer.layer[b];
+  layerIds = layerIds.sort((a, b) => {
+    return Layer.layer[a] - Layer.layer[b];
   });
   const renderables = [...noLayerIds, ...layerIds];
   
