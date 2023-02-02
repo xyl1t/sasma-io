@@ -33,25 +33,52 @@ export const renderingSystem = defineSystem((world) => {
 
   // move to current player
   const meId = meQuery(world)[0];
-  const map = getAsset(assetIdMap["MAP"]);
   let meX = 0;
   let meY = 0;
   if (hasComponent(world, Position, meId)) {
     meX = Position.x[meId];
     meY = Position.y[meId];
   }
-  ctx.drawImage(
-    map,
-    meX + map.width / 2 - world.windowWidth / world.renderScaleWidth / 2,
-    meY + map.height / 2 - world.windowHeight  / world.renderScaleWidth/ 2,
-    world.windowWidth / world.renderScaleWidth,
-    world.windowHeight / world.renderScaleWidth,
+  const map = getAsset(assetIdMap["MAP"]);
 
-    -world.windowWidth / 2 / world.renderScaleWidth,
-    -world.windowHeight / 2 / world.renderScaleWidth,
-    world.windowWidth / world.renderScaleWidth,
-    world.windowHeight / world.renderScaleWidth
-  );
+  if (world.dynamicCamera) {
+    ctx.rotate(-Body.angle[meId] - Math.PI / 2);
+    const max = Math.max(world.windowWidth, world.windowHeight);
+    const diagnoal = Math.sqrt(2) * max;
+    ctx.drawImage(
+      map,
+      meX +
+        map.width / 2 -
+        diagnoal / world.renderScaleWidth / 2,
+      meY +
+        map.height / 2 -
+        diagnoal / world.renderScaleWidth / 2,
+      diagnoal / world.renderScaleWidth,
+      diagnoal / world.renderScaleWidth,
+
+      -diagnoal / 2 / world.renderScaleWidth,
+      -diagnoal / 2 / world.renderScaleWidth,
+      diagnoal / world.renderScaleWidth,
+      diagnoal / world.renderScaleWidth
+    );
+  } else {
+    ctx.drawImage(
+      map,
+      meX +
+        map.width / 2 -
+        world.windowWidth / world.renderScaleWidth / 2,
+      meY +
+        map.height / 2 -
+        world.windowHeight / world.renderScaleWidth / 2,
+      world.windowWidth / world.renderScaleWidth,
+      world.windowHeight / world.renderScaleWidth,
+
+      -world.windowWidth / 2 / world.renderScaleWidth,
+      -world.windowHeight / 2 / world.renderScaleWidth,
+      world.windowWidth / world.renderScaleWidth,
+      world.windowHeight / world.renderScaleWidth
+    );
+  }
   ctx.translate(-meX, -meY);
 
   const renderables = renderableQuery(world);
@@ -62,11 +89,10 @@ export const renderingSystem = defineSystem((world) => {
     if (hasComponent(world, Sprite, id)) {
       drawSprite(world, id);
     }
-    if (
-      world.debug.showVelocity &&
-      (hasComponent(world, Body, id) || hasComponent(world, Velocity, id))
-    ) {
-      drawVelocityVectors(world, id);
+    if (world.debug.showVelocity) {
+      if (hasComponent(world, Body, id) || hasComponent(world, Velocity, id)) {
+        drawVelocityVectors(world, id);
+      }
     }
     if (world.debug.showIds) {
       drawId(world, id);
@@ -105,7 +131,10 @@ function drawPlayer(world, id, meId) {
   // Barrel
   const tankBarrel = getAsset(assetIdMap["tank_barrel_" + color + "_2"]);
   ctx.save();
-  ctx.rotate(Gun.angle[id] - Math.PI / 2);
+  ctx.rotate(
+    Gun.angle[id] - Math.PI/2
+      // - (world.dynamicCamera && id == meId ? -Body.angle[meId] : Math.PI / 2)
+  ); //dynamic camera --> add Body.angle instead of subtracting Math.PI / 2;
   ctx.translate(
     -tankBarrel.width / 2,
     -tankBarrel.height / 2 + tankBody.height / 4
