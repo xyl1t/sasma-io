@@ -1,6 +1,6 @@
 import { defineComponent, Types } from "../bitecs.js";
 
-export const Animation = defineComponent({
+export const AnimatedSprite = defineComponent({
   sprites: [Types.ui8, 255],
   interval: Types.f32,
   lastTime: Types.f32,
