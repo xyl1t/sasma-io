@@ -9,6 +9,7 @@ import {
 } from "../bitecs.js";
 
 import { Body } from "../components/Body.js";
+import { Player } from "../components/Player.js";
 import { Rotation } from "../components/Rotation.js";
 import { Position } from "../components/Position.js";
 import { Velocity } from "../components/Velocity.js";
@@ -35,13 +36,15 @@ const capsuleColliderQuery = defineQuery([Position, CapsuleCollider]);
 
 const friction = 3;
 
+
 // SYSTEMS // a function that runs through some entities and modifies their components
 export const movementSystem = defineSystem((world) => {
   const movingEntities = movementQuery(world);
   for (const id of movingEntities) {
-    if (hasComponent(world, Force, id) && hasComponent(world, Mass, id)) {
-      Acceleration.x[id] = Force.x[id] / Mass.value[id];
-      Acceleration.y[id] = Force.y[id] / Mass.value[id];
+    const mass = hasComponent(world, Mass, id) ? Mass.value[id] : 1;
+    if (hasComponent(world, Force, id)) {
+      Acceleration.x[id] = Force.x[id] / mass;
+      Acceleration.y[id] = Force.y[id] / mass;
     }
     if (hasComponent(world, Acceleration, id)) {
       Velocity.x[id] += Acceleration.x[id] * world.dt;
@@ -49,7 +52,7 @@ export const movementSystem = defineSystem((world) => {
     }
 
     if (hasComponent(world, Body, id)) {
-      Body.acceleration[id] = Body.force[id] / Mass.value[id];
+      Body.acceleration[id] = Body.force[id] / mass;
       Body.velocity[id] += Body.acceleration[id] * world.dt;
       Position.x[id] += Math.cos(Body.angle[id]) * Body.velocity[id] * world.dt;
       Position.y[id] += Math.sin(Body.angle[id]) * Body.velocity[id] * world.dt;
@@ -92,6 +95,7 @@ export const movementSystem = defineSystem((world) => {
 
     Force.x[id] = 0;
     Force.y[id] = 0;
+
   }
 
   world.collidingPairs = []
