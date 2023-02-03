@@ -22,7 +22,7 @@ export const collisionSystem = defineSystem((world) => {
             Position.x[id] = (posX * zoneSize) / hypotenuse;
             Position.y[id] = (posY * zoneSize) / hypotenuse;
           }else{
-           //damage
+            Player.health[id] -= 10  * world.dt;
           }
         }
     }
