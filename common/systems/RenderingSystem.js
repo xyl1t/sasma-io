@@ -116,7 +116,7 @@ export const renderingSystem = defineSystem((world) => {
   drawZones(world,zoneEntitys);
 
   // set player count
-  $("#txtPlayerCount").text((world.gameStarted?`Game started, Remaining players: `:"Waiting for Players: ") + `${world.players?.length}`);
+  $("#txtPlayerCount").text((world.gameStarted?`Game started, Remaining players: `:"Waiting for Players: ") + `${(world.players?.length<=2)?2-world.players?.length:0}`);
   if (world.waitingTime > 0) {
     $("#txtWaitingCount").text(`Game starts in : ${world.waitingTime}`);
   } else {
