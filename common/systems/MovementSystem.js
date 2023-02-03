@@ -41,9 +41,10 @@ const friction = 3;
 export const movementSystem = defineSystem((world) => {
   const movingEntities = movementQuery(world);
   for (const id of movingEntities) {
-    if (hasComponent(world, Force, id) && hasComponent(world, Mass, id)) {
-      Acceleration.x[id] = Force.x[id] / Mass.value[id];
-      Acceleration.y[id] = Force.y[id] / Mass.value[id];
+    const mass = hasComponent(world, Mass, id) ? Mass.value[id] : 1;
+    if (hasComponent(world, Force, id)) {
+      Acceleration.x[id] = Force.x[id] / mass;
+      Acceleration.y[id] = Force.y[id] / mass;
     }
     if (hasComponent(world, Acceleration, id)) {
       Velocity.x[id] += Acceleration.x[id] * world.dt;
@@ -51,7 +52,7 @@ export const movementSystem = defineSystem((world) => {
     }
 
     if (hasComponent(world, Body, id)) {
-      Body.acceleration[id] = Body.force[id] / Mass.value[id];
+      Body.acceleration[id] = Body.force[id] / mass;
       Body.velocity[id] += Body.acceleration[id] * world.dt;
       Position.x[id] += Math.cos(Body.angle[id]) * Body.velocity[id] * world.dt;
       Position.y[id] += Math.sin(Body.angle[id]) * Body.velocity[id] * world.dt;
@@ -214,7 +215,7 @@ function resolveStaticCollision(
       const dist = Math.sqrt((x2 - x1) ** 2 + (y2 - y1) ** 2);
 
       // Calculate displacement required
-      const overlap = 0.7 * (dist - r1 - r2);
+      const overlap = 0.6 * (dist - r1 - r2);
 
       // Displace Current ball away from collision
       Position.x[id] -= (overlap * (x1 - x2)) / dist; // TODO: optimize

@@ -83,7 +83,7 @@ export const renderingSystem = defineSystem((world) => {
   const renderables = [...noLayerIds, ...layerIds];
   
   for (const id of renderables) {
-    if (hasComponent(world, Player, id)) {
+    if (hasComponent(world, Input, id)) {
       drawPlayer(world, id, meId);
     }
     if (hasComponent(world, Sprite, id)) {
