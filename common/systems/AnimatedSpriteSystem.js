@@ -1,4 +1,4 @@
-import { defineQuery, defineSystem, removeComponent } from "../bitecs.js";
+import { defineQuery, defineSystem, removeComponent, removeEntity } from "../bitecs.js";
 import { AnimatedSprite } from "../components/AnimatedSprite.js";
 
 const AnimatedSpriteSpritesQuery = defineQuery([AnimatedSprite]);
@@ -10,7 +10,7 @@ export const animatedSpriteSystem = defineSystem((world) => {
       AnimatedSprite.lastTime[id] -= AnimatedSprite.interval[id];
       AnimatedSprite.current[id]++;
       if (AnimatedSprite.current[id] >= AnimatedSprite.numberOfSprites[id]) {
-        removeComponent(world, AnimatedSprite, id);
+        removeEntity(world, id);
       }
     }
     AnimatedSprite.lastTime[id] += world.dt;

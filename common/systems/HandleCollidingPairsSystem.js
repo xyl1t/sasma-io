@@ -42,7 +42,8 @@ function handleBulletPlayerHit(world, bulletId, playerId) {
   AnimatedSprite.interval[explosionId] = 0.05;
   AnimatedSprite.lastTime[explosionId] = 0;
   AnimatedSprite.current[explosionId] = 0;
-  removeEntity(world, bulletId);
 
   Player.health[playerId] -= Bullet.damage[bulletId];
+
+  removeEntity(world, bulletId);
 }
