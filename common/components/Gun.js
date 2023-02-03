@@ -6,4 +6,5 @@ export const Gun = defineComponent({
   rateOfFire: Types.f32,
   reloadTimeLeft: Types.f32,
   source: Types.eid,
+  damage: Types.f32
 });

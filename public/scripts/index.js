@@ -10,6 +10,12 @@ $(async () => {
 
 import { world, serialize, deserialize, queryMe } from "./world.js";
 import { DESERIALIZE_MODE } from "/bitecs.js";
+import { Input } from "/components/Input.js";
+import { defineQuery, enterQuery, exitQuery } from "/bitecs.js";
+
+const inputQuery = defineQuery([Input]);
+const enteredInputQuery = enterQuery(inputQuery);
+const exitInputQuery = exitQuery(inputQuery);
 
 let oldTime = 0;
 let accumulator = 0;
@@ -35,6 +41,14 @@ function gameloop(currentTime = 0) {
 
   // TODO: interpolate game states for rendering?
   renderingSystem(world);
+
+  if (!hasComponent(world, Input, queryMe(world)[0])) {
+    $("#startPageContainer").css("display", "block");
+    $("#gameContainer").css("filter", "brightness(30%)");
+  } else {
+    $("#startPageContainer").css("display", "none");
+    $("#gameContainer").css("filter", "none");
+  }
 
   window.requestAnimationFrame(gameloop);
 }

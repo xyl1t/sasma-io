@@ -28,7 +28,6 @@ export const handleCollidingPairsSystem = defineSystem((world) => {
 });
 
 function handleBulletPlayerHit(world, bulletId, playerId) {
-  // TODO: export to some constant or to bullet/gun comoponent
   const explosionId = addEntity(world);
   addComponent(world, Position, explosionId);
   Position.x[explosionId] = Position.x[bulletId];
@@ -43,6 +42,8 @@ function handleBulletPlayerHit(world, bulletId, playerId) {
   AnimatedSprite.interval[explosionId] = 0.05;
   AnimatedSprite.lastTime[explosionId] = 0;
   AnimatedSprite.current[explosionId] = 0;
+
+  Player.health[playerId] -= Bullet.damage[bulletId];
 
   removeEntity(world, bulletId);
 }

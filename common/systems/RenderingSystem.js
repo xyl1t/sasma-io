@@ -83,7 +83,7 @@ export const renderingSystem = defineSystem((world) => {
   const renderables = [...noLayerIds, ...layerIds];
   
   for (const id of renderables) {
-    if (hasComponent(world, Player, id)) {
+    if (hasComponent(world, Input, id)) {
       drawPlayer(world, id, meId);
     }
     if (hasComponent(world, Sprite, id)) {
@@ -148,6 +148,35 @@ function drawPlayer(world, id, meId) {
   if (world.isMobile && id == meId) {
     drawPath(world, id);
   }
+
+  //healthbar
+  ctx.save();
+  const width = 50;
+  const height = 8;
+  const healthWidth = (width * Player.health[id]) / 100;
+  const rad = height / 2;
+  const verticalOffset = -20 * 2;
+  ctx.beginPath();
+  ctx.fillStyle = "#444";
+  ctx.arc(-width / 2, verticalOffset + rad, rad, 0, Math.PI * 2, false);
+  ctx.arc(+width / 2, verticalOffset + rad, rad, 0, Math.PI * 2, false);
+  ctx.rect(-width / 2, verticalOffset, width, height);
+  ctx.fill();
+
+  ctx.beginPath();
+  ctx.fillStyle = "#3d0";
+  ctx.arc(-width / 2, verticalOffset + rad, rad - 2, 0, Math.PI * 2, false);
+  ctx.arc(
+    healthWidth - width / 2,
+    verticalOffset + rad,
+    rad - 2,
+    0,
+    Math.PI * 2,
+    false
+  );
+  ctx.rect(-width / 2, verticalOffset + 2, healthWidth, height - 4);
+  ctx.fill();
+  ctx.restore();
 
   if (id == meId && hasComponent(world, Gun, id)) {
     drawReloadIndicator(world, id);
