@@ -16,11 +16,14 @@ import { CircleCollider } from "../components/CircleCollider.js";
 import { Track } from "../components/Track.js";
 import { Layer } from "../components/Layer.js";
 import { Zone } from "../components/Zone.js";
+import { PickupEffect } from "../components/PickupEffect.js";
 
 const meQuery = defineQuery([Me]);
 const noLayerQuery = defineQuery([Position, Not(Layer)]);
 const layerQuery = defineQuery([Position, Layer]);
 const zoneQuery = defineQuery([Zone]);
+const effectQuery = defineQuery([PickupEffect,Player]);
+
 
 export const renderingSystem = defineSystem((world) => {
   const { canvas, ctx, assetIdMap, getAsset } = world;
@@ -147,6 +150,7 @@ function drawZones(world,zoneEntitys){
 
 function drawPlayer(world, id, meId) {
   const { canvas, ctx, assetIdMap, getAsset } = world;
+  let playersWithEffects = effectQuery(world);
   ctx.save();
   ctx.translate(Position.x[id], Position.y[id]);
 
@@ -206,6 +210,17 @@ function drawPlayer(world, id, meId) {
   ctx.rect(-width / 2, verticalOffset + 2, healthWidth, height - 4);
   ctx.fill();
   ctx.restore();
+
+  //Effect
+  if(hasComponent(world,PickupEffect,id)){
+    ctx.save();
+    const effect = getAsset(PickupEffect.type[id]);
+    ctx.translate(-effect.width/2,effect.height/2)
+    ctx.drawImage(effect,0,0);
+    ctx.restore();
+  }
+  
+
 
   if (id == meId && hasComponent(world, Gun, id)) {
     drawReloadIndicator(world, id);
