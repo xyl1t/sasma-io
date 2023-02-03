@@ -172,6 +172,17 @@ function drawPlayer(world, id, meId) {
   ctx.drawImage(tankBody, 0, 0);
   ctx.restore();
 
+  
+  //Effect
+  if(hasComponent(world,PickupEffect,id)){
+    ctx.save();
+    const effect = getAsset(PickupEffect.type[id]);
+    ctx.translate(-effect.width/2,effect.height/2)
+    ctx.drawImage(effect,0,0);
+    ctx.restore();
+  }
+
+  
   // Barrel
   const tankBarrel = getAsset(assetIdMap["tank_barrel_" + color + "_2"]);
   ctx.save();
@@ -218,17 +229,6 @@ function drawPlayer(world, id, meId) {
   ctx.rect(-width / 2, verticalOffset + 2, healthWidth, height - 4);
   ctx.fill();
   ctx.restore();
-
-  //Effect
-  if(hasComponent(world,PickupEffect,id)){
-    ctx.save();
-    const effect = getAsset(PickupEffect.type[id]);
-    ctx.translate(-effect.width/2,effect.height/2)
-    ctx.drawImage(effect,0,0);
-    ctx.restore();
-  }
-  
-
 
   if (id == meId && hasComponent(world, Gun, id)) {
     drawReloadIndicator(world, id);
