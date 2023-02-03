@@ -31,15 +31,26 @@ export async function setupEvents() {
 }
 
 function btnJoinClick(e) {
-  if(world.hasLoaded){
+  if (world.hasLoaded) {
     console.log("join clicked");
     $("#startPageContainer").css("display", "none");
     $("#gameContainer").css("filter", "none");
-  
+
     //activate mobile controls
-    if (world.isMobile) $("#joyCtrl").css("visibility", "visible");
-  
-    world.socket.emit("join" /*, name, x, y, z*/);
+    if (world.isMobile) {
+      $("#joyCtrl").css("visibility", "visible");
+      const max = Math.max(
+        world.windowWidth / world.renderScaleWidth,
+        world.windowHeight / world.renderScaleHeight
+      );
+      world.socket.emit("join", max, max);
+    } else {
+      world.socket.emit(
+        "join",
+        world.windowWidth / world.renderScaleWidth,
+        world.windowHeight / world.renderScaleHeight
+      );
+    }
   }
 }
 

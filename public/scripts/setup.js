@@ -61,7 +61,7 @@ async function setupWorldParameters() {
     world.canvas.width = document.documentElement.clientWidth;
     world.canvas.height = document.documentElement.clientHeight;
     world.canvas.style.width = document.documentElement.clientWidth + "px";
-    world.canvas.style.height = window.innerHieght + "px";
+    world.canvas.style.height = window.innerHeight + "px";
     world.windowWidth = document.documentElement.clientWidth;
     world.windowHeight = document.documentElement.clientHeight;
 
@@ -96,7 +96,10 @@ async function setupWorldParameters() {
     showVelocity: false,
     showColliders: false,
   };
-  (world.isMobile = false), (world.dynamicCamera = false), (world.hasLoaded = false);
+
+  world.isMobile = false;
+  world.dynamicCamera = false;
+  world.hasLoaded = false;
 }
 
 async function loadPlaceholderAsset() {
