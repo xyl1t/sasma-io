@@ -14,6 +14,7 @@ import { Layer } from "../components/Layer.js";
 import { Sprite } from "../components/Sprite.js";
 import { Pickup } from "../components/Pickup.js";
 import { randBetween } from "../util.js";
+import { Velocity } from "../components/Velocity.js";
 
 export const handleCollidingPairsSystem = defineSystem((world) => {
   for (let [id1, id2] of world.collidingPairs) {
@@ -66,14 +67,18 @@ function handleBulletDropperHit(world, bulletId, dropperId){
   Position.x[pickupId] = Position.x[dropperId];
   Position.y[pickupId] = Position.y[dropperId];
   addComponent(world, Layer, pickupId);
-  Layer.layer[pickupId] = 7;
+  Layer.layer[pickupId] = 9;
   addComponent(world, Sprite, pickupId);
+  addComponent(world, Velocity, pickupId);
+  Velocity.x[pickupId] = randBetween(-100,100);
+  Velocity.y[pickupId] = randBetween(-100,100);
+
 
   const types = [world.assetIdMap.pickup_damage,
     world.assetIdMap.pickup_heal,
     world.assetIdMap.pickup_movement,
-    world.assetIdMap.pickup_reload,
-    world.assetIdMap.pickup_view];
+    world.assetIdMap.pickup_reload
+  ];
 
   let randType = types[Math.round(randBetween(0,types.length-1))];
 

@@ -22,6 +22,12 @@ const effectQuery = defineQuery([PickupEffect,Body,Gun]);
 
 const collectRadius = 40;
 
+const speedBoostFactor = 2;
+const rateOfFireBoostFactor = 0.5;
+const damageBoostFactor = 2;
+const healingFactor = 40;
+const viewFactor = 2;
+
 export const pickupSystem = defineSystem((world) => {
   const pickups = pickupQuery(world);
   const players = playerQuery(world);
@@ -44,13 +50,13 @@ export const pickupSystem = defineSystem((world) => {
         ********/
         const effectDuration = 4;
 
-        const speedBoostFactor = 2;
-        const rateOfFireBoostFactor = 0.5;
-        const damageBoostFactor = 2;
-        const healingFactor = 10;
+
 
         if(hasComponent(world,PickupEffect,playerId)){
+          if(PickupEffect.type[playerId] == Pickup.type[puId]){
             PickupEffect.effectDuration[playerId] = effectDuration;
+            removeEntity(world, puId);
+          }
         }else{
             switch(Pickup.type[puId]){
                 case world.assetIdMap.pickup_movement: addComponent(world,PickupEffect,playerId);
@@ -73,15 +79,18 @@ export const pickupSystem = defineSystem((world) => {
                       PickupEffect.oldValue[playerId] = Gun.damage[playerId];
                       PickupEffect.effectValue[playerId] = Gun.damage[playerId]*damageBoostFactor;
                     break;
+
                 case world.assetIdMap.pickup_heal: addComponent(world,PickupEffect,playerId);
-                    PickupEffect.type[playerId] = world.assetIdMap.pickup_heal;
-                    PickupEffect.effectDuration[playerId] = effectDuration;
-                    PickupEffect.oldValue[playerId] = Player.health[playerId];
-                    PickupEffect.effectValue[playerId] = healingFactor;
+                      PickupEffect.type[playerId] = world.assetIdMap.pickup_heal;
+                      PickupEffect.effectDuration[playerId] = effectDuration;
+                      PickupEffect.oldValue[playerId] = Player.health[playerId];
+                      PickupEffect.effectValue[playerId] = healingFactor;
                     break;
+                
             }
+            removeEntity(world, puId);
         }
-        removeEntity(world, puId);
+        
       }
     }
   }
@@ -100,8 +109,11 @@ export const pickupSystem = defineSystem((world) => {
             case world.assetIdMap.pickup_damage: Gun.damage[eId] = PickupEffect.effectValue[eId];
                     break;
 
-            case world.assetIdMap.pickup_heal: Player.health[eId] += PickupEffect.effectValue[eId];
+            case world.assetIdMap.pickup_heal: 
+                      if(Player.health[eId]<100)                  
+                          Player.health[eId] += PickupEffect.effectValue[eId]*world.dt;
                     break;
+
         }
         
     }else{
@@ -116,6 +128,7 @@ export const pickupSystem = defineSystem((world) => {
                   break;
             
             case world.assetIdMap.pickup_heal: break;
+
         }
         removeComponent(world,PickupEffect,eId);
     }
