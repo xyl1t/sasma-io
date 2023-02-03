@@ -31,43 +31,41 @@ export async function setupEvents() {
   let portrait = window.matchMedia("(orientation: portrait)");
 
   checkLoadedWorld();
-  
 }
 
-function checkLoadedWorld(){
-  if (!world.hasLoaded){
+function checkLoadedWorld() {
+  if (!world.hasLoaded) {
     setTimeout(checkLoadedWorld, 1000);
   } else {
-    $('#btnJoin').html('Join');
+    $("#btnJoin").html("Join");
     $("#btnJoin").attr("disabled", false);
   }
 }
 
 function btnJoinClick(e) {
   if (world.hasLoaded) {
+    if (!$("#btnJoin").attr("disabled")) {
+      console.log("Player joined");
+      $("#startPageContainer").css("display", "none");
+      $("#gameContainer").css("filter", "none");
 
-  if (!$('#btnJoin').attr('disabled')) {
-    console.log('Player joined');
-    $("#startPageContainer").css("display", "none");
-    $("#gameContainer").css("filter", "none");
-
-    //activate mobile controls
-    if (world.isMobile) {
-      $("#joyCtrl").css("visibility", "visible");
-      const max = Math.max(
-        world.windowWidth / world.renderScaleWidth,
-        world.windowHeight / world.renderScaleHeight
-      );
-      world.socket.emit("join", max, max);
-    } else {
-      world.socket.emit(
-        "join",
-        world.windowWidth / world.renderScaleWidth,
-        world.windowHeight / world.renderScaleHeight
-      );
+      //activate mobile controls
+      if (world.isMobile) {
+        $("#joyCtrl").css("visibility", "visible");
+        const max = Math.max(
+          world.windowWidth / world.renderScaleWidth,
+          world.windowHeight / world.renderScaleHeight
+        );
+        world.socket.emit("join", max, max);
+      } else {
+        world.socket.emit(
+          "join",
+          world.windowWidth / world.renderScaleWidth,
+          world.windowHeight / world.renderScaleHeight
+        );
+      }
     }
   }
-  
 }
 
 function btnViewClick(e) {
