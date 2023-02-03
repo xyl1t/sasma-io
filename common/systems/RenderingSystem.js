@@ -183,7 +183,7 @@ function drawPlayer(world, id, meId) {
     ctx.fillStyle = "#000000";
     let text = "";
     switch(PickupEffect.type[id]){
-      case assetIdMap["pickup_heal"]: text = "Healing++"; break;
+      case assetIdMap["pickup_heal"]: text = "Healing++"; break
       case assetIdMap["pickup_reload"]: text = "Reload++"; break;
       case assetIdMap["pickup_movement"]: text = "Speed++"; break;
       case assetIdMap["pickup_damage"]: text = "Damage++"; break;
