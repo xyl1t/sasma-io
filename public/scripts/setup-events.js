@@ -122,6 +122,7 @@ function wheel(e) {
   const finalY = (Math.max(-100, Math.min(100, deltaY)) / 100) * 100;
 }
 
+function keydown(e) {
 
   world.keyboard[e.key.toLowerCase()] = true;
 
