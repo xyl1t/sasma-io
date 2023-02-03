@@ -35,6 +35,7 @@ async function welcome(assetIdMap, assetPathMap, colorMap) {
     await img.decode();
     world.assets.push(img);
   }
+  world.hasLoaded = true;
 }
 
 function serverUpdate(packet, meId) {
