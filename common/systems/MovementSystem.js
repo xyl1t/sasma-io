@@ -218,7 +218,7 @@ function resolveStaticCollision(
       const dist = Math.sqrt((x2 - x1) ** 2 + (y2 - y1) ** 2);
 
       // Calculate displacement required
-      const overlap = 0.7 * (dist - r1 - r2);
+      const overlap = 0.6 * (dist - r1 - r2);
 
       // Displace Current ball away from collision
       Position.x[id] -= (overlap * (x1 - x2)) / dist; // TODO: optimize

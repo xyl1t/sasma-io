@@ -15,6 +15,7 @@ import { Sprite } from "../components/Sprite.js";
 import { Pickup } from "../components/Pickup.js";
 import { randBetween } from "../util.js";
 import { Velocity } from "../components/Velocity.js";
+import { CapsuleCollider } from "../components/CapsuleCollider.js";
 
 export const handleCollidingPairsSystem = defineSystem((world) => {
   for (let [id1, id2] of world.collidingPairs) {
@@ -42,9 +43,7 @@ export const handleCollidingPairsSystem = defineSystem((world) => {
   return world;
 });
 
-function handleBulletDropperHit(world, bulletId, dropperId){
-
-
+function handleBulletDropperHit(world, bulletId, dropperId) {
   const explosionId = addEntity(world);
   addComponent(world, Position, explosionId);
   Position.x[explosionId] = Position.x[dropperId];
@@ -70,25 +69,55 @@ function handleBulletDropperHit(world, bulletId, dropperId){
   Layer.layer[pickupId] = 9;
   addComponent(world, Sprite, pickupId);
   addComponent(world, Velocity, pickupId);
-  Velocity.x[pickupId] = randBetween(-100,100);
-  Velocity.y[pickupId] = randBetween(-100,100);
+  Velocity.x[pickupId] = randBetween(-100, 100);
+  Velocity.y[pickupId] = randBetween(-100, 100);
 
-
-  const types = [world.assetIdMap.pickup_damage,
+  const types = [
+    world.assetIdMap.pickup_damage,
     world.assetIdMap.pickup_heal,
     world.assetIdMap.pickup_movement,
-    world.assetIdMap.pickup_reload
+    world.assetIdMap.pickup_reload,
   ];
 
-  let randType = types[Math.round(randBetween(0,types.length-1))];
+  let randType = types[Math.round(randBetween(0, types.length - 1))];
 
   Sprite.texture[pickupId] = randType;
-  addComponent(world,Pickup, pickupId);
+  addComponent(world, Pickup, pickupId);
   Pickup.type[pickupId] = randType;
 
-  removeEntity(world,dropperId);
-  removeEntity(world,bulletId);
+  const newBox = addEntity(world);
+  addComponent(world, Position, newBox);
+  Position.x[newBox] = randomNumber(-2000, 2000);
+  Position.y[newBox] = randomNumber(-2000, 2000);
+  addComponent(world, Layer, newBox);
+  Layer.layer[newBox] = 9;
+  addComponent(world, Sprite, newBox);
+  addComponent(world, CapsuleCollider, newBox);
 
+  addComponent(world, PickupDropper, newBox)
+  Sprite.texture[newBox] = world.assetIdMap.crate_wood;
+  CapsuleCollider.radius[newBox] = 4;
+  CapsuleCollider.sx[newBox][0] = -10;
+  CapsuleCollider.sy[newBox][0] = -10;
+  CapsuleCollider.ex[newBox][0] = -10;
+  CapsuleCollider.ey[newBox][0] = 10;
+  CapsuleCollider.sx[newBox][1] = -10;
+  CapsuleCollider.sy[newBox][1] = 10;
+  CapsuleCollider.ex[newBox][1] = 10;
+  CapsuleCollider.ey[newBox][1] = 10;
+  CapsuleCollider.sx[newBox][2] = 10;
+  CapsuleCollider.sy[newBox][2] = 10;
+  CapsuleCollider.ex[newBox][2] = 10;
+  CapsuleCollider.ey[newBox][2] = -10;
+  CapsuleCollider.sx[newBox][3] = 10;
+  CapsuleCollider.sy[newBox][3] = -10;
+  CapsuleCollider.ex[newBox][3] = -10;
+  CapsuleCollider.ey[newBox][3] = -10;
+  CapsuleCollider.capsuleCount[newBox] = 4;
+
+
+  removeEntity(world, dropperId);
+  removeEntity(world, bulletId);
 }
 
 function handleBulletPlayerHit(world, bulletId, playerId) {
@@ -111,3 +140,9 @@ function handleBulletPlayerHit(world, bulletId, playerId) {
 
   removeEntity(world, bulletId);
 }
+
+
+function randomNumber(min, max) {
+  return Math.random() * (max - min) + min;
+}
+
