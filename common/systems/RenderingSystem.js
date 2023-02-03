@@ -15,10 +15,12 @@ import { Me } from "../components/Me.js";
 import { CircleCollider } from "../components/CircleCollider.js";
 import { Track } from "../components/Track.js";
 import { Layer } from "../components/Layer.js";
+import { Zone } from "../components/Zone.js";
 
 const meQuery = defineQuery([Me]);
 const noLayerQuery = defineQuery([Position, Not(Layer)]);
 const layerQuery = defineQuery([Position, Layer]);
+const zoneQuery = defineQuery([Zone]);
 
 export const renderingSystem = defineSystem((world) => {
   const { canvas, ctx, assetIdMap, getAsset } = world;
@@ -32,6 +34,8 @@ export const renderingSystem = defineSystem((world) => {
   // center screen
   ctx.translate(world.windowWidth / 2, world.windowHeight / 2);
   ctx.scale(world.renderScaleWidth, world.renderScaleHeight);
+
+  const zoneEntitys = zoneQuery(world);
 
   // move to current player
   const meId = meQuery(world)[0];
@@ -105,16 +109,41 @@ export const renderingSystem = defineSystem((world) => {
     }
   }
 
-  // draw circlular border
-  ctx.strokeStyle = "black";
-  ctx.beginPath();
-  ctx.arc(0, 0, 1000, 0, 2 * Math.PI);
-  ctx.stroke();
+
+  drawZones(world,zoneEntitys);
 
   ctx.restore();
 
   return world;
 });
+
+function drawZones(world,zoneEntitys){
+  const { canvas, ctx, assetIdMap, getAsset } = world;
+  ctx.save();
+  ctx.globalAlpha = 0.4;
+  let innerZoneId;
+  for(let zId of zoneEntitys){
+    ctx.strokeStyle = "black";
+    ctx.beginPath();
+    if(Zone.collision[zId]==1 ){
+      ctx.fillStyle = "#7016b5";
+      ctx.arc(0, 0, Zone.size[zId]+20, 0, 2 * Math.PI,false);
+      ctx.arc(0, 0, Zone.size[innerZoneId], 0, 2 * Math.PI,true);
+      ctx.fill()
+      ctx.globalAlpha = 0.5;
+      ctx.fillStyle = "#d60404";
+      ctx.beginPath()
+      ctx.arc(0, 0, Zone.size[zId], 0, 2 * Math.PI,false);
+      ctx.arc(0, 0, Zone.size[zId]+1000, 0, 2 * Math.PI,true);
+      ctx.fill()
+    }else{
+      innerZoneId = zId;
+      ctx.arc(0, 0, Zone.size[zId], 0, 2 * Math.PI);
+    }
+    //ctx.stroke();
+  }
+  ctx.restore();
+}
 
 function drawPlayer(world, id, meId) {
   const { canvas, ctx, assetIdMap, getAsset } = world;

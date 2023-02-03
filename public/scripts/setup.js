@@ -49,6 +49,7 @@ async function setupWorldParameters() {
       bounds: false,
     },
   };
+
   world.windowWidth = -1;
   world.windowHeight = -1;
 

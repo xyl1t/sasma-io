@@ -20,6 +20,7 @@ import { CapsuleCollider } from "./CapsuleCollider.js";
 import { AnimatedSprite } from "./AnimatedSprite.js";
 import { Track } from "./Track.js";
 import { Layer } from "./Layer.js";
+import { Zone } from "./Zone.js";
 
 // necessary config for serialization and deserialization
 export const serializationConfig = [
@@ -44,4 +45,5 @@ export const serializationConfig = [
   CircleCollider,
   CapsuleCollider,
   Layer,
+  Zone
 ];
