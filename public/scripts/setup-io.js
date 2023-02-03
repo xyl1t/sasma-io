@@ -12,10 +12,12 @@ import { Me } from "/components/Me.js";
 
 export function setupConnection() {
   world.socket = io({
+    autoConnect: false,
     auth: {
-      token: "actualUser",
+      token: "actualUser"
     },
   });
+  world.socket.connect();
 }
 
 export function setupIOEvents() {

@@ -136,7 +136,8 @@ function handleBulletPlayerHit(world, bulletId, playerId) {
   AnimatedSprite.lastTime[explosionId] = 0;
   AnimatedSprite.current[explosionId] = 0;
 
-  Player.health[playerId] -= Bullet.damage[bulletId];
+  if(world.currentWaitingTime<=0)
+     Player.health[playerId] -= Bullet.damage[bulletId];
 
   removeEntity(world, bulletId);
 }

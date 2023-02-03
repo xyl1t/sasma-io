@@ -75,7 +75,7 @@ export const playerSystem = defineSystem((world) => {
       addComponent(world, Layer, deadBodyId);
       Layer.layer[deadBodyId] = 5;
       addComponent(world, TimeToLive, deadBodyId);
-      TimeToLive.timeToLive[deadBodyId] = 30;
+      TimeToLive.timeToLive[deadBodyId] = 20;
       TimeToLive.fadeTime[deadBodyId] = 1;
 
       addComponent(world, Position, deadBarrelId);

@@ -16,11 +16,14 @@ import { CircleCollider } from "../components/CircleCollider.js";
 import { Track } from "../components/Track.js";
 import { Layer } from "../components/Layer.js";
 import { Zone } from "../components/Zone.js";
+import { PickupEffect } from "../components/PickupEffect.js";
 
 const meQuery = defineQuery([Me]);
 const noLayerQuery = defineQuery([Position, Not(Layer)]);
 const layerQuery = defineQuery([Position, Layer]);
 const zoneQuery = defineQuery([Zone]);
+const effectQuery = defineQuery([PickupEffect,Player]);
+
 
 export const renderingSystem = defineSystem((world) => {
   const { canvas, ctx, assetIdMap, getAsset } = world;
@@ -113,7 +116,7 @@ export const renderingSystem = defineSystem((world) => {
   drawZones(world,zoneEntitys);
 
   // set player count
-  $("#txtPlayerCount").text(`Players: ${world.players?.length}`);
+  $("#txtPlayerCount").text((world.gameStarted?`Game started, Remaining players: ${world.players?.length}` :"Waiting for Players: "+`${(world.players?.length<=2)?2-world.players?.length:0}`));
   if (world.waitingTime > 0) {
     $("#txtWaitingCount").text(`Game starts in : ${world.waitingTime}`);
   } else {
@@ -155,6 +158,7 @@ function drawZones(world,zoneEntitys){
 
 function drawPlayer(world, id, meId) {
   const { canvas, ctx, assetIdMap, getAsset } = world;
+  let playersWithEffects = effectQuery(world);
   ctx.save();
   ctx.translate(Position.x[id], Position.y[id]);
 
@@ -167,6 +171,31 @@ function drawPlayer(world, id, meId) {
   ctx.translate(-tankBody.width / 2, -tankBody.height / 2);
   ctx.drawImage(tankBody, 0, 0);
   ctx.restore();
+
+  
+  //Effect
+  if(hasComponent(world,PickupEffect,id)){
+    ctx.save();
+    const effect = getAsset(PickupEffect.type[id]);
+    ctx.translate(-effect.width/2,effect.height/2)
+    ctx.drawImage(effect,0,0);
+    if(id==meId){
+      ctx.font = "40px serif";
+      ctx.fillStyle = "#000000";
+      let text = "";
+      switch(PickupEffect.type[id]){
+        case assetIdMap["pickup_heal"]: text = "Healing++"; break
+        case assetIdMap["pickup_reload"]: text = "Reload++"; break;
+        case assetIdMap["pickup_movement"]: text = "Speed++"; break;
+        case assetIdMap["pickup_damage"]: text = "Damage++"; break;
+    }
+      ctx.fillText(text,-world.windowWidth/(2*world.renderScaleWidth)+50,-world.windowHeight/(2*world.renderScaleHeight)+50,)
+    }
+    
+    ctx.restore();
+
+  }
+
 
   // Barrel
   const tankBarrel = getAsset(assetIdMap["tank_barrel_" + color + "_2"]);

@@ -21,6 +21,7 @@ import { AnimatedSprite } from "./AnimatedSprite.js";
 import { Track } from "./Track.js";
 import { Layer } from "./Layer.js";
 import { Zone } from "./Zone.js";
+import { PickupEffect } from "./PickupEffect.js";
 
 // necessary config for serialization and deserialization
 export const serializationConfig = [
@@ -40,6 +41,7 @@ export const serializationConfig = [
   Rotation,
   Sprite,
   // TimeToLive,
+  PickupEffect,
   Track,
   Velocity,
   CircleCollider,
