@@ -38,10 +38,13 @@ async function welcome(assetIdMap, assetPathMap, colorMap) {
   world.hasLoaded = true;
 }
 
-function serverUpdate(packet, meId) {
+function serverUpdate(packet, players, waitingTime, gameStarted) {
   resetWorld(world);
   resetGlobals();
 
+  world.players = players;
+  world.waitingTime = waitingTime;
+  world.gameStarted = gameStarted;
   deserialize(world, packet, DESERIALIZE_MODE.MAP);
   // console.log(getAllEntities(world))
   // const deserializedEntIds = deserialize(world, packet, DESERIALIZE_MODE.MAP);

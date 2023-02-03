@@ -49,6 +49,11 @@ function gameloop(currentTime = 0) {
     $("#startPageContainer").css("display", "none");
     $("#gameContainer").css("filter", "none");
   }
+  if (world.gameStarted) {
+    $("#btnJoin").attr("disabled", true);
+  } else {
+    $("#btnJoin").attr("disabled", false);
+  }
 
   window.requestAnimationFrame(gameloop);
 }

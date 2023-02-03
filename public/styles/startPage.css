@@ -26,13 +26,13 @@ img {
 
     display: grid;
     grid-template-columns: 25% 50% 25%;
-    grid-template-rows: 30% 50% 20%;
+    grid-template-rows: 30% 20%;
     align-items: center;
     
 }
 #animatedName{
   position: relative;
-  font-size: 9vw;
+  font-size: 6vw;
   font-weight: bold;
   grid-row: 1;
   grid-column-start: 1;
