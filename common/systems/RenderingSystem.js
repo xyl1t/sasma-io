@@ -120,15 +120,21 @@ export const renderingSystem = defineSystem((world) => {
 function drawZones(world,zoneEntitys){
   const { canvas, ctx, assetIdMap, getAsset } = world;
   ctx.save();
-  ctx.globalAlpha = 0.5;
+  ctx.globalAlpha = 0.4;
   let innerZoneId;
   for(let zId of zoneEntitys){
     ctx.strokeStyle = "black";
     ctx.beginPath();
     if(Zone.collision[zId]==1 ){
       ctx.fillStyle = "#7016b5";
-      ctx.arc(0, 0, Zone.size[zId]+50, 0, 2 * Math.PI,false);
+      ctx.arc(0, 0, Zone.size[zId]+20, 0, 2 * Math.PI,false);
       ctx.arc(0, 0, Zone.size[innerZoneId], 0, 2 * Math.PI,true);
+      ctx.fill()
+      ctx.globalAlpha = 0.5;
+      ctx.fillStyle = "#d60404";
+      ctx.beginPath()
+      ctx.arc(0, 0, Zone.size[zId], 0, 2 * Math.PI,false);
+      ctx.arc(0, 0, Zone.size[zId]+1000, 0, 2 * Math.PI,true);
       ctx.fill()
     }else{
       innerZoneId = zId;
