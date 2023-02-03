@@ -125,16 +125,16 @@ function drawZones(world,zoneEntitys){
   for(let zId of zoneEntitys){
     ctx.strokeStyle = "black";
     ctx.beginPath();
-    if(Zone.collision[zId]==1){
-      ctx.arc(0, 0, Zone.size[zId], 0, 2 * Math.PI,false);
-      ctx.arc(0, 0, Zone.size[innerZoneId], 0, 2 * Math.PI,true);
+    if(Zone.collision[zId]==1 ){
       ctx.fillStyle = "#7016b5";
+      ctx.arc(0, 0, Zone.size[zId]+50, 0, 2 * Math.PI,false);
+      ctx.arc(0, 0, Zone.size[innerZoneId], 0, 2 * Math.PI,true);
       ctx.fill()
     }else{
       innerZoneId = zId;
       ctx.arc(0, 0, Zone.size[zId], 0, 2 * Math.PI);
     }
-    ctx.stroke();
+    //ctx.stroke();
   }
   ctx.restore();
 }

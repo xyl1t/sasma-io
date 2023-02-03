@@ -11,7 +11,9 @@ export const zoneSystem = defineSystem((world) => {
   const zones = zoneQuery(world);
 
   for(let zId of zones){
-    Zone.size[zId] -= world.dt * world.zoneSpeed;
+    if(Zone.size[zId]>1){
+      Zone.size[zId] -= world.dt * world.zoneSpeed;
+    }
   }
 
   return world;
