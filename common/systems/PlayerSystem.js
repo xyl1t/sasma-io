@@ -1,4 +1,4 @@
-import { addComponent, addEntity, defineQuery, defineSystem, removeComponent } from "../bitecs.js";
+import { addComponent, addEntity, defineQuery, defineSystem, hasComponent, removeComponent } from "../bitecs.js";
 import { Player } from "../components/Player.js";
 import { Acceleration } from "../components/Acceleration.js";
 import { Force } from "../components/Force.js";
@@ -15,6 +15,7 @@ import { Rotation } from "../components/Rotation.js";
 import { Sprite } from "../components/Sprite.js";
 import { randBetween } from "../util.js";
 import { TimeToLive } from "../components/TimeToLive.js";
+import { Bot } from "../components/Bot.js";
 
 const query = defineQuery([Player]);
 
@@ -22,8 +23,11 @@ export const playerSystem = defineSystem((world) => {
   const entities = query(world);
 
   for (const id of entities) {
-    if (Player.health[id] <= 0) {
-      Player.health[id] = 100; // HACK: if you don't do this it will always add a corpse
+    if (Player.health[id] <= 0 && hasComponent(world, Input, id)) {
+      // // HACK: if you don't do this it will always add a corpse
+      // if (!hasComponent(world, Bot, id)) {
+      //   Player.health[id] = 100;
+      // }
       const explosionId = addEntity(world);
       const deadBodyId = addEntity(world);
       const deadBarrelId = addEntity(world);

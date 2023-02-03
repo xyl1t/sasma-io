@@ -20,7 +20,7 @@ const query = defineQuery([Player, Bot, Input]);
 export const botSystem = defineSystem((world) => {
   const bots = botsQuery(world);
   for (const id of bots) {
-    if (Player.health[id] <= 0) {
+    if (Player.health[id] <= 0 && !world.gameStarted) {
       addComponent(world, Player, id);
       addComponent(world, Position, id);
       addComponent(world, Velocity, id);
@@ -46,6 +46,8 @@ export const botSystem = defineSystem((world) => {
       Body.rotationSpeed[id] = Math.PI * 0.8;
       Mass.value[id] = 1;
       CircleCollider.radius[id] = 21;
+    } else if (Player.health[id] <= 0 && world.gameStarted) {
+      Player.health[id] = 100;
     }
   }
 
