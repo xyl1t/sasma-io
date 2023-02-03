@@ -46,23 +46,38 @@ export const pickupSystem = defineSystem((world) => {
 
         const speedBoostFactor = 2;
         const rateOfFireBoostFactor = 0.5;
+        const damageBoostFactor = 2;
+        const healingFactor = 10;
 
         if(hasComponent(world,PickupEffect,playerId)){
             PickupEffect.effectDuration[playerId] = effectDuration;
         }else{
             switch(Pickup.type[puId]){
-                case 0: addComponent(world,PickupEffect,playerId);
-                        PickupEffect.type[playerId] = 0;
+                case world.assetIdMap.pickup_movement: addComponent(world,PickupEffect,playerId);
+                        PickupEffect.type[playerId] = world.assetIdMap.pickup_movement;
                         PickupEffect.effectDuration[playerId] = effectDuration;
                         PickupEffect.oldValue[playerId] = Body.power[playerId];
                         PickupEffect.effectValue[playerId] = Body.power[playerId]*speedBoostFactor;
                     break;
                 
-                case 1: addComponent(world,PickupEffect,playerId);
-                       PickupEffect.type[playerId] = 1;
+                case world.assetIdMap.pickup_reload: addComponent(world,PickupEffect,playerId);
+                       PickupEffect.type[playerId] = world.assetIdMap.pickup_reload;
                        PickupEffect.effectDuration[playerId] = effectDuration;
                        PickupEffect.oldValue[playerId] = Gun.rateOfFire[playerId];
                        PickupEffect.effectValue[playerId] = Gun.rateOfFire[playerId]*rateOfFireBoostFactor;
+                    break;
+
+                case world.assetIdMap.pickup_damage: addComponent(world,PickupEffect,playerId);
+                      PickupEffect.type[playerId] = world.assetIdMap.pickup_damage;
+                      PickupEffect.effectDuration[playerId] = effectDuration;
+                      PickupEffect.oldValue[playerId] = Gun.damage[playerId];
+                      PickupEffect.effectValue[playerId] = Gun.damage[playerId]*damageBoostFactor;
+                    break;
+                case world.assetIdMap.pickup_heal: addComponent(world,PickupEffect,playerId);
+                    PickupEffect.type[playerId] = world.assetIdMap.pickup_heal;
+                    PickupEffect.effectDuration[playerId] = effectDuration;
+                    PickupEffect.oldValue[playerId] = Player.health[playerId];
+                    PickupEffect.effectValue[playerId] = healingFactor;
                     break;
             }
         }
@@ -76,20 +91,31 @@ export const pickupSystem = defineSystem((world) => {
         PickupEffect.effectDuration[eId]-=world.dt;
     
         switch(PickupEffect.type[eId]){
-            case 0:  Body.power[eId] = PickupEffect.effectValue[eId];
+            case world.assetIdMap.pickup_movement:  Body.power[eId] = PickupEffect.effectValue[eId];
                     break;
             
-            case 1:  Gun.rateOfFire[eId] = PickupEffect.effectValue[eId];
+            case world.assetIdMap.pickup_reload:  Gun.rateOfFire[eId] = PickupEffect.effectValue[eId];
+                    break;
+
+            case world.assetIdMap.pickup_damage: Gun.damage[eId] = PickupEffect.effectValue[eId];
+                    break;
+
+            case world.assetIdMap.pickup_heal: Player.health[eId] += PickupEffect.effectValue[eId];
                     break;
         }
         
     }else{
         switch(PickupEffect.type[eId]){
-            case 0:  Body.power[eId] = PickupEffect.oldValue[eId];
+            case world.assetIdMap.pickup_movement:  Body.power[eId] = PickupEffect.oldValue[eId];
                     break;
 
-            case 1:  Gun.rateOfFire[eId] = PickupEffect.oldValue[eId];
+            case world.assetIdMap.pickup_reload:  Gun.rateOfFire[eId] = PickupEffect.oldValue[eId];
                     break;
+
+            case world.assetIdMap.pickup_damage: Gun.damage[eId] = PickupEffect.oldValue[eId];
+                  break;
+            
+            case world.assetIdMap.pickup_heal: break;
         }
         removeComponent(world,PickupEffect,eId);
     }

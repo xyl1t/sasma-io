@@ -98,6 +98,7 @@ export const movementSystem = defineSystem((world) => {
 
   }
 
+  world.collidingPairsWithFake = []
   world.collidingPairs = []
   resolveStaticCollision(
     world,
@@ -186,7 +187,8 @@ function resolveStaticCollision(
             CircleCollider.radius[id];
 
           // Add collision to vector of collisions for dynamic resolution
-          world.collidingPairs.push([id, fakeCircleColliderId]);
+          world.collidingPairsWithFake.push([id, fakeCircleColliderId]);
+          world.collidingPairs.push([id, capsuleId]);
 
           // Calculate displacement required
           const fOverlap = 1.0 * (fDistance - r - r1);
@@ -202,6 +204,7 @@ function resolveStaticCollision(
       if (id == targetId) continue;
       if (!areCirclesOverlapping(id, targetId)) continue;
       // Collision has occured
+      world.collidingPairsWithFake.push([id, targetId]);
       world.collidingPairs.push([id, targetId]);
 
       const x1 = Position.x[id];
@@ -229,7 +232,7 @@ function resolveStaticCollision(
 }
 
 function resolveDynamicCollision(world) {
-  for (const pair of world.collidingPairs) {
+  for (const pair of world.collidingPairsWithFake) {
     const id1 = pair[0];
     const id2 = pair[1];
 
