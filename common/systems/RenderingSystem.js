@@ -116,7 +116,7 @@ export const renderingSystem = defineSystem((world) => {
   drawZones(world,zoneEntitys);
 
   // set player count
-  $("#txtPlayerCount").text((world.gameStarted?`Game started, Remaining players: `:"Waiting for Players: ") + `${(world.players?.length<=2)?2-world.players?.length:0}`);
+  $("#txtPlayerCount").text((world.gameStarted?`Game started, Remaining players: ${world.players?.length}` :"Waiting for Players: "+`${(world.players?.length<=2)?2-world.players?.length:0}`));
   if (world.waitingTime > 0) {
     $("#txtWaitingCount").text(`Game starts in : ${world.waitingTime}`);
   } else {
@@ -179,17 +179,18 @@ function drawPlayer(world, id, meId) {
     const effect = getAsset(PickupEffect.type[id]);
     ctx.translate(-effect.width/2,effect.height/2)
     ctx.drawImage(effect,0,0);
-    ctx.font = "40px serif";
-    ctx.fillStyle = "#000000";
-    let text = "";
-    switch(PickupEffect.type[id]){
-      case assetIdMap["pickup_heal"]: text = "Healing++"; break
-      case assetIdMap["pickup_reload"]: text = "Reload++"; break;
-      case assetIdMap["pickup_movement"]: text = "Speed++"; break;
-      case assetIdMap["pickup_damage"]: text = "Damage++"; break;
-
+    if(id==meId){
+      ctx.font = "40px serif";
+      ctx.fillStyle = "#000000";
+      let text = "";
+      switch(PickupEffect.type[id]){
+        case assetIdMap["pickup_heal"]: text = "Healing++"; break
+        case assetIdMap["pickup_reload"]: text = "Reload++"; break;
+        case assetIdMap["pickup_movement"]: text = "Speed++"; break;
+        case assetIdMap["pickup_damage"]: text = "Damage++"; break;
     }
-    ctx.fillText(text,-world.windowWidth/(2*world.renderScaleWidth)+50,-world.windowHeight/(2*world.renderScaleHeight)+50,)
+      ctx.fillText(text,-world.windowWidth/(2*world.renderScaleWidth)+50,-world.windowHeight/(2*world.renderScaleHeight)+50,)
+    }
     
     ctx.restore();
 
