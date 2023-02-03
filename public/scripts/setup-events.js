@@ -122,11 +122,6 @@ function wheel(e) {
   const finalY = (Math.max(-100, Math.min(100, deltaY)) / 100) * 100;
 }
 
-function keydown(e) {
-  if (e.key == "Enter") {
-    //join on enter
-    $("#btnJoin").click();
-  }
 
   world.keyboard[e.key.toLowerCase()] = true;
 
