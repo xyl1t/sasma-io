@@ -179,10 +179,23 @@ function drawPlayer(world, id, meId) {
     const effect = getAsset(PickupEffect.type[id]);
     ctx.translate(-effect.width/2,effect.height/2)
     ctx.drawImage(effect,0,0);
+    ctx.font = "40px serif";
+    ctx.fillStyle = "#000000";
+    let text = "";
+    switch(PickupEffect.type[id]){
+      case assetIdMap["pickup_heal"]: text = "Healing++"; break;
+      case assetIdMap["pickup_reload"]: text = "Reload++"; break;
+      case assetIdMap["pickup_movement"]: text = "Speed++"; break;
+      case assetIdMap["pickup_damage"]: text = "Damage++"; break;
+
+    }
+    ctx.fillText(text,-world.windowWidth/2+50,-world.windowHeight/2+50,)
+    
     ctx.restore();
+
   }
 
-  
+
   // Barrel
   const tankBarrel = getAsset(assetIdMap["tank_barrel_" + color + "_2"]);
   ctx.save();
