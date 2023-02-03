@@ -189,7 +189,7 @@ function drawPlayer(world, id, meId) {
       case assetIdMap["pickup_damage"]: text = "Damage++"; break;
 
     }
-    ctx.fillText(text,-world.windowWidth/2+50,-world.windowHeight/2+50,)
+    ctx.fillText(text,-world.windowWidth/(2*world.renderScaleWidth)+50,-world.windowHeight/(2*world.renderScaleHeight)+50,)
     
     ctx.restore();
 
