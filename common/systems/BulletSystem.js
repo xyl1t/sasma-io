@@ -26,7 +26,6 @@ export const bulletSystem = defineSystem((world) => {
 
     if (length < 200) {
       // TODO: export to some constant or to bullet/gun comoponent
-      removeEntity(world, id);
       const craterId = addEntity(world);
       addComponent(world, Position, craterId);
       Position.x[craterId] = Position.x[id];
@@ -55,6 +54,7 @@ export const bulletSystem = defineSystem((world) => {
       AnimatedSprite.current[explosionId] = 0;
       addComponent(world, Layer, explosionId);
       Layer.layer[explosionId] = 12;
+      removeEntity(world, id);
     }
   }
 
