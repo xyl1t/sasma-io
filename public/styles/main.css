@@ -95,6 +95,34 @@ canvas {
   width: 100%;
 }
 
+#txtPlayerCount {
+pointer-events: none;
+  position: absolute;
+  top: 3%;
+  width: 100%;
+  border-radius: 30%;
+  text-align:center;
+  font-weight: bold;
+  font-size: 1.5em;
+  color: #fff;
+  text-shadow: 2px 0 #000, -2px 0 #000, 0 2px #000, 0 -2px #000,
+     1px 1px #000, -1px -1px #000, 1px -1px #000, -1px 1px #000;
+}
+
+#txtWaitingCount {
+pointer-events: none;
+  position: absolute;
+  top: 7%;
+  width: 100%;
+  border-radius: 30%;
+  text-align:center;
+  font-weight: bold;
+  font-size: 1.5em;
+  color: #fff;
+  text-shadow: 2px 0 #000, -2px 0 #000, 0 2px #000, 0 -2px #000,
+     1px 1px #000, -1px -1px #000, 1px -1px #000, -1px 1px #000;
+}
+
 #joyCtrl{
   visibility:hidden;
 }

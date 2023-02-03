@@ -69,8 +69,8 @@ export const renderingSystem = defineSystem((world) => {
   } else {
     ctx.drawImage(
       map,
-      meX + map.width / 2 - world.windowWidth / world.renderScaleWidth / 2,
-      meY + map.height / 2 - world.windowHeight / world.renderScaleWidth / 2,
+      meX + map.width / 2 - world.windowWidth/2 / world.renderScaleWidth / 2,
+      meY + map.height / 2 - world.windowHeight/2 / world.renderScaleWidth / 2,
       world.windowWidth / world.renderScaleWidth,
       world.windowHeight / world.renderScaleWidth,
 
@@ -114,6 +114,14 @@ export const renderingSystem = defineSystem((world) => {
 
 
   drawZones(world,zoneEntitys);
+
+  // set player count
+  $("#txtPlayerCount").text(`Players: ${world.players?.length}`);
+  if (world.waitingTime > 0) {
+    $("#txtWaitingCount").text(`Game starts in : ${world.waitingTime}`);
+  } else {
+    $("#txtWaitingCount").text("");
+  }
 
   ctx.restore();
 
