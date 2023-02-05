@@ -26,14 +26,14 @@ export const handleInputSystem = defineSystem((world) => {
     const shooting = Input.shooting[id];
 
     Body.movingDirection[id] = 0;
-    Body.angleVelocity[id] = 0;
+    Body.angleAcceleration[id] = 0;
     Body.force[id] = 0;
     if (inputX) {
-      Body.angleVelocity[id] = Body.rotationSpeed[id] * inputX;
+      Body.angleAcceleration[id] = Body.rotationSpeed[id] * inputX;
     }
     if (inputY) {
       Body.movingDirection[id] = inputY;
-      Body.force[id] = Body.power[id] / Mass.value[id] * inputY;
+      Body.force[id] = Body.power[id] * inputY;
     }
 
     Gun.angle[id] = angle;

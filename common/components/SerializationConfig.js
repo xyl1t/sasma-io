@@ -18,34 +18,66 @@ import { TimeToLive } from "./TimeToLive.js";
 import { Visible } from "./Visible.js";
 import { CapsuleCollider } from "./CapsuleCollider.js";
 import { AnimatedSprite } from "./AnimatedSprite.js";
-import { Track } from "./Track.js";
+import { Follow } from "./Follow.js";
 import { Layer } from "./Layer.js";
 import { Zone } from "./Zone.js";
 import { PickupEffect } from "./PickupEffect.js";
+import { Changed } from "../bitecs.js";
+import { Track } from "./Track.js";
+
+// // necessary config for serialization and deserialization
+// export const serializationConfig = [
+//   // Acceleration,
+//   AnimatedSprite,
+//   Body,
+//   // Bot,
+//   Bullet,
+//   // Force,
+//   Gun,
+//   Input,
+//   // Map,
+//   // Mass,
+//   Me,
+//   Player,
+//   Position,
+//   Rotation,
+//   Sprite,
+//   // TimeToLive,
+//   PickupEffect,
+//   Follow,
+//   Velocity,
+//   CircleCollider,
+//   CapsuleCollider,
+//   Layer,
+//   Zone,
+//   Track,
+// ];
 
 // necessary config for serialization and deserialization
 export const serializationConfig = [
-  // Acceleration,
-  AnimatedSprite,
-  Body,
-  // Bot,
-  Bullet,
-  // Force,
-  Gun,
+  AnimatedSprite.sprites,
+  AnimatedSprite.current,
+  Body.angle,
+  Body.velocity,
+  Body.angleVelocity,
+  Gun.reloadTimeLeft,
+  Gun.rateOfFire,
+  Gun.angle,
   Input,
-  // Map,
-  // Mass,
   Me,
-  Player,
+  Player.color,
+  Player.health,
   Position,
   Rotation,
   Sprite,
-  // TimeToLive,
-  PickupEffect,
-  Track,
+  PickupEffect.type,
+  Follow,
   Velocity,
-  CircleCollider,
-  CapsuleCollider,
+  // CircleCollider,
+  // CapsuleCollider,
   Layer,
-  Zone
+  Zone,
+  Track,
 ];
+
+

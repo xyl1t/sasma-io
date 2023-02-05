@@ -1,8 +1,9 @@
 import { defineComponent, Types } from "../bitecs.js";
 
 export const Player = defineComponent({
-  color: Types.ui32,
-  viewDistanceWidth: Types.i32,
-  viewDistanceHeight: Types.i32,
+  color: Types.ui8,
+  viewDistanceWidth: Types.ui16,
+  viewDistanceHeight: Types.ui16,
   health: Types.f32,
+  isMobile: Types.ui8,
 });

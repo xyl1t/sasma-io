@@ -15,16 +15,16 @@ export const collisionSystem = defineSystem((world) => {
     let posY = Position.y[id];
     // hypotenuse = distance from center of circle to player
     let hypotenuse = Math.sqrt(Math.pow(posX, 2) + Math.pow(posY, 2));
-    for(const zId of zones){
-        let zoneSize = Zone.size[zId];
-        if (hypotenuse >= zoneSize || hypotenuse <= -zoneSize) {
-          if(Zone.collision[zId] == 1){
-            Position.x[id] = (posX * zoneSize) / hypotenuse;
-            Position.y[id] = (posY * zoneSize) / hypotenuse;
-          }else{
-            Player.health[id] -= 10  * world.dt;
-          }
+    for (const zId of zones) {
+      let zoneSize = Zone.size[zId];
+      if (hypotenuse >= zoneSize || hypotenuse <= -zoneSize) {
+        if (Zone.collision[zId] == 1) {
+          Position.x[id] = (posX * zoneSize) / hypotenuse;
+          Position.y[id] = (posY * zoneSize) / hypotenuse;
+        } else {
+          Player.health[id] -= 10 * world.dt;
         }
+      }
     }
   }
   //Collision for outer zone(s)

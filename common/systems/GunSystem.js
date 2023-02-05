@@ -19,7 +19,7 @@ import { Force } from "../components/Force.js";
 import { Mass } from "../components/Mass.js";
 import { CircleCollider } from "../components/CircleCollider.js";
 import { TimeToLive } from "../components/TimeToLive.js";
-import { Track } from "../components/Track.js";
+import { Follow } from "../components/Follow.js";
 import { Layer } from "../components/Layer.js";
 
 // const query = defineQuery([Gun, Position, Not(Bot)]);
@@ -50,22 +50,22 @@ export const gunSystem = defineSystem((world) => {
       addComponent(world, Layer, barrelExplosionId);
       Layer.layer[barrelExplosionId] = 13;
 
-      addComponent(world, Track, barrelExplosionId);
-      Track.source[barrelExplosionId] = id;
+      addComponent(world, Follow, barrelExplosionId);
+      Follow.source[barrelExplosionId] = id;
 
       const bulletId = addEntity(world);
 
       addComponent(world, Position, bulletId);
-      Position.x[bulletId] = Position.x[id] + Math.cos(Gun.angle[id]) * 10;
-      Position.y[bulletId] = Position.y[id] + Math.sin(Gun.angle[id]) * 10;
+      Position.x[bulletId] = Position.x[id] + Math.cos(Gun.angle[id]) * 20;
+      Position.y[bulletId] = Position.y[id] + Math.sin(Gun.angle[id]) * 20;
 
       addComponent(world, Velocity, bulletId);
       addComponent(world, Acceleration, bulletId);
       addComponent(world, Force, bulletId);
       addComponent(world, Mass, bulletId);
       Mass.value[bulletId] = 1; // TODO: add `bulletSpeed` field to gun
-      Force.x[bulletId] = Math.cos(Gun.angle[id]) * 100000; // TODO: add `bulletSpeed` field to gun
-      Force.y[bulletId] = Math.sin(Gun.angle[id]) * 100000;
+      Force.x[bulletId] = Math.cos(Gun.angle[id]) * 2000; // TODO: add `bulletSpeed` field to gun
+      Force.y[bulletId] = Math.sin(Gun.angle[id]) * 2000;
 
       addComponent(world, CircleCollider, bulletId);
       CircleCollider.radius[bulletId] = 5;

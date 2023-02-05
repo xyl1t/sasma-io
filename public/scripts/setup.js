@@ -71,12 +71,12 @@ async function setupWorldParameters() {
       document.documentElement.clientHeight
     ) {
       let ratio = document.documentElement.clientHeight / world.constHeight;
-      ratio = Math.max(0.7, ratio);
+      // ratio = Math.max(0.7, ratio);
       world.renderScaleWidth = ratio;
       world.renderScaleHeight = ratio;
     } else {
       let ratio = document.documentElement.clientWidth / world.constWidth;
-      ratio = Math.max(0.7, ratio);
+      // ratio = Math.max(0.7, ratio);
       world.renderScaleWidth = ratio;
       world.renderScaleHeight = ratio;
     }

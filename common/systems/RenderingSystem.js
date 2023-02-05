@@ -1,4 +1,10 @@
-import { defineQuery, defineSystem, hasComponent, Not } from "../bitecs.js";
+import {
+  defineQuery,
+  defineSystem,
+  getEntityComponents,
+  hasComponent,
+  Not,
+} from "../bitecs.js";
 import { Body } from "../components/Body.js";
 import { Bot } from "../components/Bot.js";
 import { Gun } from "../components/Gun.js";
@@ -13,7 +19,7 @@ import { Velocity } from "../components/Velocity.js";
 import { CapsuleCollider } from "../components/CapsuleCollider.js";
 import { Me } from "../components/Me.js";
 import { CircleCollider } from "../components/CircleCollider.js";
-import { Track } from "../components/Track.js";
+import { Follow } from "../components/Follow.js";
 import { Layer } from "../components/Layer.js";
 import { Zone } from "../components/Zone.js";
 import { PickupEffect } from "../components/PickupEffect.js";
@@ -22,17 +28,14 @@ const meQuery = defineQuery([Me]);
 const noLayerQuery = defineQuery([Position, Not(Layer)]);
 const layerQuery = defineQuery([Position, Layer]);
 const zoneQuery = defineQuery([Zone]);
-const effectQuery = defineQuery([PickupEffect,Player]);
-
+const effectQuery = defineQuery([PickupEffect, Player]);
 
 export const renderingSystem = defineSystem((world) => {
   const { canvas, ctx, assetIdMap, getAsset } = world;
   ctx.save();
 
   // clear screen
-  ctx.fillStyle = "lightgray";
-
-  ctx.fillRect(0, 0, canvas.width, canvas.height);
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
 
   // center screen
   ctx.translate(world.windowWidth / 2, world.windowHeight / 2);
@@ -57,30 +60,56 @@ export const renderingSystem = defineSystem((world) => {
     ctx.drawImage(
       map,
       meX + map.width / 2 - diagnoal / world.renderScaleWidth / 2,
-      meY + map.height / 2 - diagnoal / world.renderScaleWidth / 2,
+      meY + map.height / 2 - diagnoal / world.renderScaleHeight / 2,
       diagnoal / world.renderScaleWidth,
-      diagnoal / world.renderScaleWidth,
+      diagnoal / world.renderScaleHeight,
 
       -diagnoal / 2 / world.renderScaleWidth,
-      -diagnoal / 2 / world.renderScaleWidth,
+      -diagnoal / 2 / world.renderScaleHeight,
       diagnoal / world.renderScaleWidth,
-      diagnoal / world.renderScaleWidth
+      diagnoal / world.renderScaleHeight
     );
   } else {
     ctx.drawImage(
       map,
-      meX + map.width / 2 - world.windowWidth/2 / world.renderScaleWidth / 2,
-      meY + map.height / 2 - world.windowHeight/2 / world.renderScaleWidth / 2,
+      meX + map.width / 2 - world.windowWidth / 2 / world.renderScaleWidth / 2,
+      meY + map.height / 2 - world.windowHeight / 2 / world.renderScaleHeight / 2,
       world.windowWidth / world.renderScaleWidth,
-      world.windowHeight / world.renderScaleWidth,
+      world.windowHeight / world.renderScaleHeight,
 
       -world.windowWidth / 2 / world.renderScaleWidth,
-      -world.windowHeight / 2 / world.renderScaleWidth,
+      -world.windowHeight / 2 / world.renderScaleHeight,
       world.windowWidth / world.renderScaleWidth,
-      world.windowHeight / world.renderScaleWidth
+      world.windowHeight / world.renderScaleHeight
     );
   }
   ctx.translate(-meX, -meY);
+
+  if (hasComponent(world, Gun, meId) && world.isMobile) {
+    ctx.save();
+    ctx.setLineDash([15, 15]); /*dashes are 5px and spaces are 3px*/
+    ctx.translate(Position.x[meId], Position.y[meId]);
+    ctx.beginPath();
+    ctx.moveTo(0, 0);
+    ctx.lineTo(
+      Math.cos(Gun.angle[meId]) * 500,
+      Math.sin(Gun.angle[meId]) * 500
+    );
+    const gradient = ctx.createLinearGradient(
+      0,
+      0,
+      Math.cos(Gun.angle[meId]) * 500,
+      Math.sin(Gun.angle[meId]) * 500
+    );
+    gradient.addColorStop(0, "rgb(127, 127, 127, 0.3)");
+    gradient.addColorStop(1, "rgb(127, 127, 127, 0)");
+    ctx.strokeStyle = gradient;
+    ctx.lineWidth = 4;
+    ctx.lineCap = "round";
+    ctx.stroke();
+    ctx.restore();
+  }
+
 
   let layerIds = layerQuery(world);
   let noLayerIds = noLayerQuery(world);
@@ -88,7 +117,7 @@ export const renderingSystem = defineSystem((world) => {
     return Layer.layer[a] - Layer.layer[b];
   });
   const renderables = [...noLayerIds, ...layerIds];
-  
+
   for (const id of renderables) {
     if (hasComponent(world, Input, id)) {
       drawPlayer(world, id, meId);
@@ -112,42 +141,48 @@ export const renderingSystem = defineSystem((world) => {
     }
   }
 
-
-  drawZones(world,zoneEntitys);
-
-  // set player count
-  $("#txtPlayerCount").text((world.gameStarted?`Game started, Remaining players: ${world.players?.length}` :"Waiting for Players: "+`${(world.players?.length<=2)?2-world.players?.length:0}`));
-  if (world.waitingTime > 0) {
-    $("#txtWaitingCount").text(`Game starts in : ${world.waitingTime}`);
-  } else {
-    $("#txtWaitingCount").text("");
-  }
+  drawZones(world, zoneEntitys);
 
   ctx.restore();
+
+  $("#txtPlayerCount").text("");
+  $("#txtWaitingCount").text("");
+  if (!world.gameStarted && world.players?.length < 2) {
+    $("#txtPlayerCount").text(
+      "Waiting for Players: " +
+        `${world.players?.length <= 2 ? 2 - world.players?.length : 0}`
+    );
+  } else if (!world.gameStarted && world.players?.length >= 2) {
+    $("#txtWaitingCount").text(`Game starts in : ${world.currentWaitingTime}`);
+  } else {
+    $("#txtPlayerCount").text(
+      `Game started, Remaining players: ${world.players?.length}`
+    );
+  }
 
   return world;
 });
 
-function drawZones(world,zoneEntitys){
+function drawZones(world, zoneEntitys) {
   const { canvas, ctx, assetIdMap, getAsset } = world;
   ctx.save();
   ctx.globalAlpha = 0.4;
   let innerZoneId;
-  for(let zId of zoneEntitys){
+  for (let zId of zoneEntitys) {
     ctx.strokeStyle = "black";
     ctx.beginPath();
-    if(Zone.collision[zId]==1 ){
+    if (Zone.collision[zId] == 1) {
       ctx.fillStyle = "#7016b5";
-      ctx.arc(0, 0, Zone.size[zId]+20, 0, 2 * Math.PI,false);
-      ctx.arc(0, 0, Zone.size[innerZoneId], 0, 2 * Math.PI,true);
-      ctx.fill()
+      ctx.arc(0, 0, Zone.size[zId] + 20, 0, 2 * Math.PI, false);
+      ctx.arc(0, 0, Zone.size[innerZoneId], 0, 2 * Math.PI, true);
+      ctx.fill();
       ctx.globalAlpha = 0.5;
       ctx.fillStyle = "#d60404";
-      ctx.beginPath()
-      ctx.arc(0, 0, Zone.size[zId], 0, 2 * Math.PI,false);
-      ctx.arc(0, 0, Zone.size[zId]+1000, 0, 2 * Math.PI,true);
-      ctx.fill()
-    }else{
+      ctx.beginPath();
+      ctx.arc(0, 0, Zone.size[zId], 0, 2 * Math.PI, false);
+      ctx.arc(0, 0, Zone.size[zId] + 1000, 0, 2 * Math.PI, true);
+      ctx.fill();
+    } else {
       innerZoneId = zId;
       ctx.arc(0, 0, Zone.size[zId], 0, 2 * Math.PI);
     }
@@ -172,30 +207,50 @@ function drawPlayer(world, id, meId) {
   ctx.drawImage(tankBody, 0, 0);
   ctx.restore();
 
-  
   //Effect
-  if(hasComponent(world,PickupEffect,id)){
+  if (hasComponent(world, PickupEffect, id)) {
     ctx.save();
     const effect = getAsset(PickupEffect.type[id]);
-    ctx.translate(-effect.width/2,effect.height/2)
-    ctx.drawImage(effect,0,0);
-    if(id==meId){
-      ctx.font = "40px serif";
-      ctx.fillStyle = "#000000";
-      let text = "";
-      switch(PickupEffect.type[id]){
-        case assetIdMap["pickup_heal"]: text = "Healing++"; break
-        case assetIdMap["pickup_reload"]: text = "Reload++"; break;
-        case assetIdMap["pickup_movement"]: text = "Speed++"; break;
-        case assetIdMap["pickup_damage"]: text = "Damage++"; break;
-    }
-      ctx.fillText(text,-world.windowWidth/(2*world.renderScaleWidth)+50,-world.windowHeight/(2*world.renderScaleHeight)+50,)
-    }
-    
+    ctx.rotate(Body.angle[id] + Math.PI / 2);
+    ctx.translate(-effect.width / 2, effect.height / 2);
+    ctx.drawImage(effect, 0, 0);
     ctx.restore();
-
+    if (id == meId) {
+      let text = "";
+      switch (PickupEffect.type[id]) {
+        case assetIdMap["pickup_heal"]:
+          text = "Healing++";
+          break;
+        case assetIdMap["pickup_reload"]:
+          text = "Reload++";
+          break;
+        case assetIdMap["pickup_movement"]:
+          text = "Speed++";
+          break;
+        case assetIdMap["pickup_damage"]:
+          text = "Damage++";
+          break;
+      }
+      ctx.save();
+      ctx.lineCap = "round";
+      ctx.font = "40px Verdana";
+      ctx.lineWidth = 6;
+      ctx.fillStyle = "#fff";
+      ctx.strokeStyle = "#000";
+      ctx.translate(-effect.width / 2, effect.height / 2);
+      ctx.strokeText(
+        text,
+        -world.windowWidth / (2 * world.renderScaleWidth) + 50,
+        -world.windowHeight / (2 * world.renderScaleHeight) + 50
+      );
+      ctx.fillText(
+        text,
+        -world.windowWidth / (2 * world.renderScaleWidth) + 50,
+        -world.windowHeight / (2 * world.renderScaleHeight) + 50
+      );
+      ctx.restore();
+    }
   }
-
 
   // Barrel
   const tankBarrel = getAsset(assetIdMap["tank_barrel_" + color + "_2"]);
@@ -211,38 +266,40 @@ function drawPlayer(world, id, meId) {
   ctx.drawImage(tankBarrel, 0, 0);
   ctx.restore();
 
-  if (world.isMobile && id == meId) {
+  if (/*world.isMobile && */ id == meId) {
     drawPath(world, id);
   }
 
   //healthbar
-  ctx.save();
-  const width = 50;
-  const height = 8;
-  const healthWidth = (width * Player.health[id]) / 100;
-  const rad = height / 2;
-  const verticalOffset = -20 * 2;
-  ctx.beginPath();
-  ctx.fillStyle = "#444";
-  ctx.arc(-width / 2, verticalOffset + rad, rad, 0, Math.PI * 2, false);
-  ctx.arc(+width / 2, verticalOffset + rad, rad, 0, Math.PI * 2, false);
-  ctx.rect(-width / 2, verticalOffset, width, height);
-  ctx.fill();
+  if (world.gameStarted) {
+    ctx.save();
+    const width = 50;
+    const height = 8;
+    const healthWidth = (width * Player.health[id]) / 100;
+    const rad = height / 2;
+    const verticalOffset = -20 * 2;
+    ctx.beginPath();
+    ctx.fillStyle = "#444";
+    ctx.arc(-width / 2, verticalOffset + rad, rad, 0, Math.PI * 2, false);
+    ctx.arc(+width / 2, verticalOffset + rad, rad, 0, Math.PI * 2, false);
+    ctx.rect(-width / 2, verticalOffset, width, height);
+    ctx.fill();
 
-  ctx.beginPath();
-  ctx.fillStyle = "#3d0";
-  ctx.arc(-width / 2, verticalOffset + rad, rad - 2, 0, Math.PI * 2, false);
-  ctx.arc(
-    healthWidth - width / 2,
-    verticalOffset + rad,
-    rad - 2,
-    0,
-    Math.PI * 2,
-    false
-  );
-  ctx.rect(-width / 2, verticalOffset + 2, healthWidth, height - 4);
-  ctx.fill();
-  ctx.restore();
+    ctx.beginPath();
+    ctx.fillStyle = "#3d0";
+    ctx.arc(-width / 2, verticalOffset + rad, rad - 2, 0, Math.PI * 2, false);
+    ctx.arc(
+      healthWidth - width / 2,
+      verticalOffset + rad,
+      rad - 2,
+      0,
+      Math.PI * 2,
+      false
+    );
+    ctx.rect(-width / 2, verticalOffset + 2, healthWidth, height - 4);
+    ctx.fill();
+    ctx.restore();
+  }
 
   if (id == meId && hasComponent(world, Gun, id)) {
     drawReloadIndicator(world, id);
@@ -256,57 +313,44 @@ function drawPath(world, id) {
   const arrow = getAsset(assetIdMap["directionArrow"]);
   let inputY = Input.inputY[id];
   let inputX = Input.inputX[id];
+  let velocity = Math.abs(Body.velocity[id] / 10);
+  let angleVel = Body.angleVelocity[id];
+  let direction = Body.velocity[id] >= -5 ? 1 : -1;
 
-  let moving = false;
-  const space = Math.sqrt(Math.pow(inputY * 20, 2));
-  const rotationStep = (Input.inputX[id] * 2) / 4;
   ctx.save();
+  const space = velocity; //(velocity + 15)/1.5;
+  const rotationStep = angleVel / 10;
 
-  const threshhold = 0.3;
+  if (velocity < 5 && Math.abs(angleVel) > 0.1) {
+    arrow.width = 20;
 
-  if (inputY >= threshhold) {
+    const rotationFactor = angleVel > 0 ? 1 : -1;
+
+    ctx.save();
     ctx.rotate(Body.angle[id] + Math.PI / 2);
-    ctx.translate(0, -40);
-    moving = true;
-  } else {
-    if (inputY <= -threshhold) {
-      ctx.rotate(Body.angle[id] - Math.PI / 2);
-      ctx.translate(0, -40);
-      moving = true;
-    }
+    ctx.translate(-35 * rotationFactor, 0);
+    ctx.translate(0, (-angleVel * 8) / 2);
+    ctx.drawImage(arrow, -arrow.width / 2, -arrow.height / 2, 20, 8);
+    ctx.translate(0, angleVel * 8);
+    ctx.drawImage(arrow, -arrow.width / 2, -arrow.height / 2, 20, 8);
+    ctx.restore();
+    ctx.save();
+    ctx.rotate(Body.angle[id] - Math.PI / 2);
+    ctx.translate(-35 * rotationFactor, 0);
+    ctx.translate(0, (-angleVel * 8) / 2);
+    ctx.drawImage(arrow, -arrow.width / 2, -arrow.height / 2, 20, 8);
+    ctx.translate(0, angleVel * 8);
+    ctx.drawImage(arrow, -arrow.width / 2, -arrow.height / 2, 20, 8);
+    ctx.restore();
   }
-
-  if (moving) {
-    for (let i = 0; i < 4; i++) {
-      ctx.drawImage(arrow, -arrow.width / 2, 0, 25, 8);
+  ctx.rotate(Body.angle[id] + (Math.PI / 2) * direction);
+  ctx.translate(0, -35);
+  for (let i = 0; i < 4; i++) {
+    if (!(velocity < 5 && Math.abs(angleVel) > 0.1)) {
       ctx.rotate(rotationStep);
-      ctx.translate(0, -space);
     }
-  } else {
-    if (inputX >= threshhold || inputX <= -threshhold) {
-      let rotationFactor;
-
-      if (inputX >= threshhold) {
-        rotationFactor = 1;
-      } else {
-        if (inputX <= -threshhold) rotationFactor = -1;
-      }
-
-      arrow.width = 20;
-
-      ctx.save();
-      ctx.rotate(Body.angle[id] + Math.PI / 2);
-      ctx.translate(-35 * rotationFactor, -10);
-      ctx.drawImage(arrow, -arrow.width / 2, -arrow.height / 2, 20, 8);
-      ctx.translate(0, 20);
-      ctx.drawImage(arrow, -arrow.width / 2, -arrow.height / 2, 20, 8);
-      ctx.restore();
-      ctx.rotate(Body.angle[id] - Math.PI / 2);
-      ctx.translate(-35 * rotationFactor, -10);
-      ctx.drawImage(arrow, -arrow.width / 2, -arrow.height / 2, 20, 8);
-      ctx.translate(0, 20);
-      ctx.drawImage(arrow, -arrow.width / 2, -arrow.height / 2, 20, 8);
-    }
+    ctx.translate(0, -space);
+    ctx.drawImage(arrow, -arrow.width / 2, 0, 25, 8);
   }
 
   ctx.restore();
@@ -319,13 +363,18 @@ function drawReloadIndicator(world, id) {
     const radius = 10;
     const startAngleDeg = -90;
     const startAngle = startAngleDeg * (Math.PI / 180);
-    const endAngle = startAngle + Math.PI * (2 * (Gun.reloadTimeLeft[id] / Gun.rateOfFire[id]));
+    const endAngle =
+      startAngle +
+      Math.PI * (2 * (Gun.reloadTimeLeft[id] / Gun.rateOfFire[id]));
 
     ctx.beginPath();
     ctx.moveTo(0, 0);
 
     ctx.arc(0, 0, radius, startAngle, endAngle, false);
+    ctx.fillStyle = "white";
+    ctx.strokeStyle = "gray";
     ctx.fill();
+    ctx.stroke();
   }
 }
 
@@ -336,9 +385,9 @@ function drawSprite(world, id) {
   ctx.save();
   ctx.translate(Position.x[id], Position.y[id]);
 
-  if (hasComponent(world, Track, id)) {
-    const offsetX = Position.x[Track.source[id]];
-    const offsetY = Position.y[Track.source[id]];
+  if (hasComponent(world, Follow, id)) {
+    const offsetX = Position.x[Follow.source[id]];
+    const offsetY = Position.y[Follow.source[id]];
     ctx.translate(offsetX, offsetY);
   }
   if (hasComponent(world, Rotation, id)) {
@@ -400,6 +449,18 @@ function drawId(world, id) {
   );
   ctx.fillStyle = "#000";
   ctx.fillText(id, -ctx.measureText(id).width / 2, 0);
+  let lines = 0;
+  for (const comp of getEntityComponents(world, id)) {
+    for (const key in comp) {
+      const componentString = `${key}: ${comp[key][id]}\n`;
+      ctx.fillText(
+        componentString,
+        -ctx.measureText(id).width / 2,
+        ++lines * 10
+      );
+    }
+  }
+
   ctx.restore();
 }
 
@@ -414,11 +475,7 @@ function drawColliders(world, id) {
     ctx.stroke();
   }
   if (hasComponent(world, CapsuleCollider, id)) {
-    for (
-      let i_cap = 0;
-      i_cap < CapsuleCollider.capsuleCount[id];
-      i_cap++
-    ) {
+    for (let i_cap = 0; i_cap < CapsuleCollider.capsuleCount[id]; i_cap++) {
       const sx = CapsuleCollider.sx[id][i_cap];
       const sy = CapsuleCollider.sy[id][i_cap];
       const ex = CapsuleCollider.ex[id][i_cap];

@@ -87,8 +87,8 @@ function handleBulletDropperHit(world, bulletId, dropperId) {
 
   const newBox = addEntity(world);
   addComponent(world, Position, newBox);
-  Position.x[newBox] = randomNumber(-2000, 2000);
-  Position.y[newBox] = randomNumber(-2000, 2000);
+  Position.x[newBox] = randomNumber(-1000, 1000);
+  Position.y[newBox] = randomNumber(-1000, 1000);
   addComponent(world, Layer, newBox);
   Layer.layer[newBox] = 9;
   addComponent(world, Sprite, newBox);
