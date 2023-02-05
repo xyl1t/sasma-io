@@ -33,7 +33,7 @@ export const handleInputSystem = defineSystem((world) => {
     }
     if (inputY) {
       Body.movingDirection[id] = inputY;
-      Body.force[id] = Body.power[id] / Mass.value[id] * inputY;
+      Body.force[id] = Body.power[id] * inputY;
     }
 
     Gun.angle[id] = angle;

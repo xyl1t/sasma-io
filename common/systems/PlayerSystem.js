@@ -1,4 +1,11 @@
-import { addComponent, addEntity, defineQuery, defineSystem, hasComponent, removeComponent } from "../bitecs.js";
+import {
+  addComponent,
+  addEntity,
+  defineQuery,
+  defineSystem,
+  hasComponent,
+  removeComponent,
+} from "../bitecs.js";
 import { Player } from "../components/Player.js";
 import { Acceleration } from "../components/Acceleration.js";
 import { Force } from "../components/Force.js";
@@ -16,6 +23,7 @@ import { Sprite } from "../components/Sprite.js";
 import { randBetween } from "../util.js";
 import { TimeToLive } from "../components/TimeToLive.js";
 import { Bot } from "../components/Bot.js";
+import { Pickup } from "../components/Pickup.js";
 
 const query = defineQuery([Player]);
 
@@ -86,13 +94,37 @@ export const playerSystem = defineSystem((world) => {
       addComponent(world, Rotation, deadBarrelId);
       Rotation.angle[deadBarrelId] = Gun.angle[id];
       addComponent(world, Velocity, deadBarrelId);
-      Velocity.x[deadBarrelId] = Math.cos(Body.velocity[id]) * randBetween(-50, -300);
-      Velocity.y[deadBarrelId] = Math.sin(Body.velocity[id]) * randBetween(-50, -300);
+      Velocity.x[deadBarrelId] =
+        Math.cos(Body.velocity[id]) * randBetween(-50, -300);
+      Velocity.y[deadBarrelId] =
+        Math.sin(Body.velocity[id]) * randBetween(-50, -300);
       addComponent(world, Layer, deadBarrelId);
       Layer.layer[deadBarrelId] = 7;
       addComponent(world, TimeToLive, deadBarrelId);
       TimeToLive.timeToLive[deadBarrelId] = 30;
       TimeToLive.fadeTime[deadBarrelId] = 1;
+
+      // add pickup
+      const pickupId = addEntity(world);
+      addComponent(world, Position, pickupId);
+      Position.x[pickupId] = Position.x[id];
+      Position.y[pickupId] = Position.y[id];
+      addComponent(world, Layer, pickupId);
+      Layer.layer[pickupId] = 9;
+      addComponent(world, Sprite, pickupId);
+      addComponent(world, Velocity, pickupId);
+      Velocity.x[pickupId] = randBetween(-300, 300);
+      Velocity.y[pickupId] = randBetween(-300, 300);
+      const types = [
+        world.assetIdMap.pickup_damage,
+        world.assetIdMap.pickup_heal,
+        world.assetIdMap.pickup_movement,
+        world.assetIdMap.pickup_reload,
+      ];
+      let randType = types[Math.round(randBetween(0, types.length - 1))];
+      Sprite.texture[pickupId] = randType;
+      addComponent(world, Pickup, pickupId);
+      Pickup.type[pickupId] = randType;
 
       removeComponent(world, Input, id);
       removeComponent(world, CircleCollider, id);

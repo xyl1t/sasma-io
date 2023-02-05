@@ -56,8 +56,8 @@ export const gunSystem = defineSystem((world) => {
       const bulletId = addEntity(world);
 
       addComponent(world, Position, bulletId);
-      Position.x[bulletId] = Position.x[id] + Math.cos(Gun.angle[id]) * 24;
-      Position.y[bulletId] = Position.y[id] + Math.sin(Gun.angle[id]) * 24;
+      Position.x[bulletId] = Position.x[id] + Math.cos(Gun.angle[id]) * 20;
+      Position.y[bulletId] = Position.y[id] + Math.sin(Gun.angle[id]) * 20;
 
       addComponent(world, Velocity, bulletId);
       addComponent(world, Acceleration, bulletId);

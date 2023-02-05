@@ -1,4 +1,4 @@
-import { defineQuery, defineSystem, addComponent, Not } from "../bitecs.js";
+import { defineQuery, defineSystem, addComponent, Not, removeEntity } from "../bitecs.js";
 import { Vector, randBetween } from "../util.js";
 
 import { Player } from "../components/Player.js";
@@ -46,6 +46,8 @@ export const botSystem = defineSystem((world) => {
       Body.rotationSpeed[id] = Math.PI * 0.8;
       Mass.value[id] = 1;
       CircleCollider.radius[id] = 21;
+    } else if (Player.health[id] <= 0 && world.gameStarted) {
+      removeEntity(world, id);
     }
   }
 

@@ -32,8 +32,6 @@ const effectQuery = defineQuery([PickupEffect, Player]);
 
 export const renderingSystem = defineSystem((world) => {
   const { canvas, ctx, assetIdMap, getAsset } = world;
-  ctx.setLineDash([15, 15]); /*dashes are 5px and spaces are 3px*/
-
   ctx.save();
 
   // clear screen
@@ -62,35 +60,34 @@ export const renderingSystem = defineSystem((world) => {
     ctx.drawImage(
       map,
       meX + map.width / 2 - diagnoal / world.renderScaleWidth / 2,
-      meY + map.height / 2 - diagnoal / world.renderScaleWidth / 2,
+      meY + map.height / 2 - diagnoal / world.renderScaleHeight / 2,
       diagnoal / world.renderScaleWidth,
-      diagnoal / world.renderScaleWidth,
+      diagnoal / world.renderScaleHeight,
 
       -diagnoal / 2 / world.renderScaleWidth,
-      -diagnoal / 2 / world.renderScaleWidth,
+      -diagnoal / 2 / world.renderScaleHeight,
       diagnoal / world.renderScaleWidth,
-      diagnoal / world.renderScaleWidth
+      diagnoal / world.renderScaleHeight
     );
   } else {
     ctx.drawImage(
       map,
       meX + map.width / 2 - world.windowWidth / 2 / world.renderScaleWidth / 2,
-      meY +
-        map.height / 2 -
-        world.windowHeight / 2 / world.renderScaleWidth / 2,
+      meY + map.height / 2 - world.windowHeight / 2 / world.renderScaleHeight / 2,
       world.windowWidth / world.renderScaleWidth,
-      world.windowHeight / world.renderScaleWidth,
+      world.windowHeight / world.renderScaleHeight,
 
       -world.windowWidth / 2 / world.renderScaleWidth,
-      -world.windowHeight / 2 / world.renderScaleWidth,
+      -world.windowHeight / 2 / world.renderScaleHeight,
       world.windowWidth / world.renderScaleWidth,
-      world.windowHeight / world.renderScaleWidth
+      world.windowHeight / world.renderScaleHeight
     );
   }
   ctx.translate(-meX, -meY);
 
   if (hasComponent(world, Gun, meId) && world.isMobile) {
     ctx.save();
+    ctx.setLineDash([15, 15]); /*dashes are 5px and spaces are 3px*/
     ctx.translate(Position.x[meId], Position.y[meId]);
     ctx.beginPath();
     ctx.moveTo(0, 0);
