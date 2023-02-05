@@ -1,5 +1,5 @@
 import { defineComponent, Types } from "../bitecs.js";
 
-export const Track = defineComponent({
+export const Follow = defineComponent({
   source: Types.eid,
 });

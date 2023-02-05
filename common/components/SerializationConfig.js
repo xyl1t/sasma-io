@@ -18,10 +18,11 @@ import { TimeToLive } from "./TimeToLive.js";
 import { Visible } from "./Visible.js";
 import { CapsuleCollider } from "./CapsuleCollider.js";
 import { AnimatedSprite } from "./AnimatedSprite.js";
-import { Track } from "./Track.js";
+import { Follow } from "./Follow.js";
 import { Layer } from "./Layer.js";
 import { Zone } from "./Zone.js";
 import { PickupEffect } from "./PickupEffect.js";
+import { Changed } from "../bitecs.js";
 
 // necessary config for serialization and deserialization
 export const serializationConfig = [
@@ -42,7 +43,7 @@ export const serializationConfig = [
   Sprite,
   // TimeToLive,
   PickupEffect,
-  Track,
+  Follow,
   Velocity,
   CircleCollider,
   CapsuleCollider,

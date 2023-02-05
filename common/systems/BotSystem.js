@@ -46,8 +46,6 @@ export const botSystem = defineSystem((world) => {
       Body.rotationSpeed[id] = Math.PI * 0.8;
       Mass.value[id] = 1;
       CircleCollider.radius[id] = 21;
-    } else if (Player.health[id] <= 0 && world.gameStarted) {
-      Player.health[id] = 100;
     }
   }
 

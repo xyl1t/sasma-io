@@ -40,12 +40,12 @@ async function welcome(assetIdMap, assetPathMap, colorMap) {
   world.hasLoaded = true;
 }
 
-function serverUpdate(packet, players, waitingTime, gameStarted) {
+function serverUpdate(packet, players, currentWaitingTime, gameStarted) {
   resetWorld(world);
   resetGlobals();
 
   world.players = players;
-  world.waitingTime = waitingTime;
+  world.currentWaitingTime = currentWaitingTime;
   world.gameStarted = gameStarted;
   deserialize(world, packet, DESERIALIZE_MODE.MAP);
   // console.log(getAllEntities(world))

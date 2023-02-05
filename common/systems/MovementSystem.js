@@ -36,7 +36,6 @@ const capsuleColliderQuery = defineQuery([Position, CapsuleCollider]);
 
 const friction = 3;
 
-
 // SYSTEMS // a function that runs through some entities and modifies their components
 export const movementSystem = defineSystem((world) => {
   const movingEntities = movementQuery(world);
@@ -47,8 +46,8 @@ export const movementSystem = defineSystem((world) => {
       Acceleration.y[id] = Force.y[id] / mass;
     }
     if (hasComponent(world, Acceleration, id)) {
-      Velocity.x[id] += Acceleration.x[id] * world.dt;
-      Velocity.y[id] += Acceleration.y[id] * world.dt;
+      Velocity.x[id] += Acceleration.x[id];
+      Velocity.y[id] += Acceleration.y[id];
     }
 
     if (hasComponent(world, Body, id)) {
@@ -58,7 +57,17 @@ export const movementSystem = defineSystem((world) => {
       Position.y[id] += Math.sin(Body.angle[id]) * Body.velocity[id] * world.dt;
       Body.velocity[id] += Body.velocity[id] * -friction * world.dt;
 
+      if (Math.abs(Body.velocity[id]) < 0.0001) {
+        Body.velocity[id] = 0;
+      }
+
+      if (Math.abs(Body.angleVelocity[id]) < 0.01) {
+        Body.angleVelocity[id] = 0;
+      }
+
+      Body.angleVelocity[id] += Body.angleAcceleration[id] * world.dt;
       Body.angle[id] += Body.angleVelocity[id] * world.dt;
+      Body.angleVelocity[id] += Body.angleVelocity[id] * -5 * world.dt; // NOTE: friction
       Body.lastTrackDistance[id] += Math.abs(
         Body.angleVelocity[id] * world.dt * 32
       );
@@ -93,13 +102,19 @@ export const movementSystem = defineSystem((world) => {
     Velocity.x[id] += Velocity.x[id] * -friction * 1 * world.dt;
     Velocity.y[id] += Velocity.y[id] * -friction * 1 * world.dt;
 
+    if (Math.abs(Velocity.x[id]) < 0.01) {
+      Velocity.x[id] = 0;
+    }
+    if (Math.abs(Velocity.y[id]) < 0.01) {
+      Velocity.y[id] = 0;
+    }
+
     Force.x[id] = 0;
     Force.y[id] = 0;
-
   }
 
-  world.collidingPairsWithFake = []
-  world.collidingPairs = []
+  world.collidingPairsWithFake = [];
+  world.collidingPairs = [];
   resolveStaticCollision(
     world,
     circleColliderWithoutFakeQuery(world),
@@ -118,7 +133,6 @@ function resolveStaticCollision(
   circleCollidersWithoutFake,
   capsuleColliders
 ) {
-
   // Static collisions, i.e. overlap
   for (const id of circleCollidersWithoutFake) {
     const x1 = Position.x[id];
