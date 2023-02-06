@@ -24,8 +24,10 @@ import { randBetween } from "../util.js";
 import { TimeToLive } from "../components/TimeToLive.js";
 import { Bot } from "../components/Bot.js";
 import { Pickup } from "../components/Pickup.js";
+import { Follow } from "../components/Follow.js";
 
 const query = defineQuery([Player]);
+const followQuery = defineQuery([Player, Follow]);
 
 export const playerSystem = defineSystem((world) => {
   const entities = query(world);
@@ -125,6 +127,16 @@ export const playerSystem = defineSystem((world) => {
       Sprite.texture[pickupId] = randType;
       addComponent(world, Pickup, pickupId);
       Pickup.type[pickupId] = randType;
+
+      addComponent(world, Follow, id);
+      Follow.source[id] = Player.damagedBy[id];
+
+      const followIds = followQuery(world);
+      for (const fId of followIds) {
+        if (Follow.source[fId] == id) {
+          Follow.source[fId] = Player.damagedBy[id];
+        }
+      }
 
       removeComponent(world, Input, id);
       removeComponent(world, CircleCollider, id);

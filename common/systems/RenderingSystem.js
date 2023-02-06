@@ -47,7 +47,11 @@ export const renderingSystem = defineSystem((world) => {
   const meId = meQuery(world)[0];
   let meX = 0;
   let meY = 0;
-  if (hasComponent(world, Position, meId)) {
+  if (hasComponent(world, Follow, meId)) {
+    meX = Position.x[Follow.source[meId]];
+    meY = Position.y[Follow.source[meId]];
+    console.log(Follow.source[meId], meX, meY);
+  } else if (hasComponent(world, Position, meId)) {
     meX = Position.x[meId];
     meY = Position.y[meId];
   }
@@ -72,8 +76,8 @@ export const renderingSystem = defineSystem((world) => {
   } else {
     ctx.drawImage(
       map,
-      meX + map.width / 2 - world.windowWidth / 2 / world.renderScaleWidth / 2,
-      meY + map.height / 2 - world.windowHeight / 2 / world.renderScaleHeight / 2,
+      meX + map.width / 2 - world.windowWidth / 2 / world.renderScaleWidth,
+      meY + map.height / 2 - world.windowHeight / 2 / world.renderScaleHeight,
       world.windowWidth / world.renderScaleWidth,
       world.windowHeight / world.renderScaleHeight,
 
@@ -109,7 +113,6 @@ export const renderingSystem = defineSystem((world) => {
     ctx.stroke();
     ctx.restore();
   }
-
 
   let layerIds = layerQuery(world);
   let noLayerIds = noLayerQuery(world);

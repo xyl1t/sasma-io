@@ -16,6 +16,7 @@ import { Pickup } from "../components/Pickup.js";
 import { randBetween } from "../util.js";
 import { Velocity } from "../components/Velocity.js";
 import { CapsuleCollider } from "../components/CapsuleCollider.js";
+import { Gun } from "../components/Gun.js";
 
 export const handleCollidingPairsSystem = defineSystem((world) => {
   for (let [id1, id2] of world.collidingPairs) {
@@ -94,7 +95,7 @@ function handleBulletDropperHit(world, bulletId, dropperId) {
   addComponent(world, Sprite, newBox);
   addComponent(world, CapsuleCollider, newBox);
 
-  addComponent(world, PickupDropper, newBox)
+  addComponent(world, PickupDropper, newBox);
   Sprite.texture[newBox] = world.assetIdMap.crate_wood;
   CapsuleCollider.radius[newBox] = 4;
   CapsuleCollider.sx[newBox][0] = -10;
@@ -114,7 +115,6 @@ function handleBulletDropperHit(world, bulletId, dropperId) {
   CapsuleCollider.ex[newBox][3] = -10;
   CapsuleCollider.ey[newBox][3] = -10;
   CapsuleCollider.capsuleCount[newBox] = 4;
-
 
   removeEntity(world, dropperId);
   removeEntity(world, bulletId);
@@ -136,14 +136,14 @@ function handleBulletPlayerHit(world, bulletId, playerId) {
   AnimatedSprite.lastTime[explosionId] = 0;
   AnimatedSprite.current[explosionId] = 0;
 
-  if(world.currentWaitingTime<=0)
-     Player.health[playerId] -= Bullet.damage[bulletId];
+  if (world.currentWaitingTime <= 0) {
+    Player.health[playerId] -= Bullet.damage[bulletId];
+    Player.damagedBy[playerId] = Gun.source[Bullet.source[bulletId]];
+  }
 
   removeEntity(world, bulletId);
 }
 
-
 function randomNumber(min, max) {
   return Math.random() * (max - min) + min;
 }
-
