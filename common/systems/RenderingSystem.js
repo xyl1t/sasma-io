@@ -240,7 +240,11 @@ function drawPlayer(world, id, meId) {
       ctx.lineWidth = 6;
       ctx.fillStyle = "#fff";
       ctx.strokeStyle = "#000";
+      if (world.dynamicCamera) {
+        ctx.rotate(Body.angle[meId] + Math.PI / 2);
+      }
       ctx.translate(-effect.width / 2, effect.height / 2);
+
       ctx.strokeText(
         text,
         -world.windowWidth / (2 * world.renderScaleWidth) + 50,
@@ -276,6 +280,9 @@ function drawPlayer(world, id, meId) {
   //healthbar
   if (world.gameStarted) {
     ctx.save();
+    if (world.dynamicCamera) {
+      ctx.rotate(Body.angle[meId] + Math.PI / 2);
+    }
     const width = 50;
     const height = 8;
     const healthWidth = (width * Player.health[id]) / 100;
@@ -510,3 +517,9 @@ function drawColliders(world, id) {
   }
   ctx.restore();
 }
+
+function lerp(value1, value2, amount) {
+	amount = amount < 0 ? 0 : amount;
+	amount = amount > 1 ? 1 : amount;
+	return value1 + (value2 - value1) * amount;
+};

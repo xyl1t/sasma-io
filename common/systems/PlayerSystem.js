@@ -34,10 +34,6 @@ export const playerSystem = defineSystem((world) => {
 
   for (const id of entities) {
     if (Player.health[id] <= 0 && hasComponent(world, Input, id)) {
-      // // HACK: if you don't do this it will always add a corpse
-      // if (!hasComponent(world, Bot, id)) {
-      //   Player.health[id] = 100;
-      // }
       const explosionId = addEntity(world);
       const deadBodyId = addEntity(world);
       const deadBarrelId = addEntity(world);
@@ -128,8 +124,10 @@ export const playerSystem = defineSystem((world) => {
       addComponent(world, Pickup, pickupId);
       Pickup.type[pickupId] = randType;
 
-      addComponent(world, Follow, id);
-      Follow.source[id] = Player.damagedBy[id];
+      if (Player.damagedBy[id] != 0) {
+        addComponent(world, Follow, id);
+        Follow.source[id] = Player.damagedBy[id];
+      }
 
       const followIds = followQuery(world);
       for (const fId of followIds) {

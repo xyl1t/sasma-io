@@ -42,17 +42,19 @@ function gameloop(currentTime = 0) {
   // TODO: interpolate game states for rendering?
   renderingSystem(world);
 
-  if (!hasComponent(world, Input, queryMe(world)[0])) {
-    $("#startPageContainer").css("display", "block");
-    $("#gameContainer").css("filter", "brightness(30%)");
-  } else {
-    $("#startPageContainer").css("display", "none");
-    $("#gameContainer").css("filter", "none");
-  }
   if (world.gameStarted) {
     $("#btnJoin").attr("disabled", true);
+    $("#txtNotice").css("visibility", "visible");
   } else {
+    if (!hasComponent(world, Input, queryMe(world)[0])) {
+      $("#startPageContainer").css("display", "block");
+      $("#gameContainer").css("filter", "brightness(30%)");
+    } else {
+      $("#startPageContainer").css("display", "none");
+      $("#gameContainer").css("filter", "none");
+    }
     $("#btnJoin").attr("disabled", false);
+    $("#txtNotice").css("visibility", "hidden");
   }
 
   window.requestAnimationFrame(gameloop);

@@ -40,20 +40,12 @@ const friction = 3;
 // SYSTEMS // a function that runs through some entities and modifies their components
 export const movementSystem = defineSystem((world) => {
   const movingEntities = movementQuery(world);
-  world.simulationSteps = 8;
+  world.simulationSteps = 4;
   world.simulationDt = world.dt / world.simulationSteps;
   world.collidingPairs = [];
   for (let sim = 0; sim < world.simulationSteps; sim++) {
     for (const id of movingEntities) {
       const mass = hasComponent(world, Mass, id) ? Mass.value[id] : 1;
-      if (hasComponent(world, Force, id)) {
-        Acceleration.x[id] = Force.x[id] / mass;
-        Acceleration.y[id] = Force.y[id] / mass;
-      }
-      if (hasComponent(world, Acceleration, id)) {
-        Velocity.x[id] += Acceleration.x[id];
-        Velocity.y[id] += Acceleration.y[id];
-      }
 
       if (hasComponent(world, Body, id)) {
         Body.acceleration[id] = Body.force[id] / mass;
@@ -72,13 +64,17 @@ export const movementSystem = defineSystem((world) => {
           Body.angleVelocity[id] = 0;
         }
 
-        Body.angleVelocity[id] += Body.angleAcceleration[id] * world.simulationDt;
+        Body.angleVelocity[id] +=
+          Body.angleAcceleration[id] * world.simulationDt;
         Body.angle[id] += Body.angleVelocity[id] * world.simulationDt;
-        Body.angleVelocity[id] += Body.angleVelocity[id] * -5 * world.simulationDt; // NOTE: friction
+        Body.angleVelocity[id] +=
+          Body.angleVelocity[id] * -5 * world.simulationDt; // NOTE: friction
         Body.lastTrackDistance[id] += Math.abs(
           Body.angleVelocity[id] * world.simulationDt * 32
         );
-        Body.lastTrackDistance[id] += Math.abs(Body.velocity[id] * world.simulationDt);
+        Body.lastTrackDistance[id] += Math.abs(
+          Body.velocity[id] * world.simulationDt
+        );
 
         if (Body.lastTrackDistance[id] > 20) {
           Body.lastTrackDistance[id] = 0;
@@ -102,6 +98,16 @@ export const movementSystem = defineSystem((world) => {
           addComponent(world, Layer, trackId);
           Layer.layer[trackId] = 9;
         }
+      }
+
+      if (hasComponent(world, Force, id)) {
+        Acceleration.x[id] = Force.x[id] / mass;
+        Acceleration.y[id] = Force.y[id] / mass;
+      }
+
+      if (hasComponent(world, Acceleration, id)) {
+        Velocity.x[id] += Acceleration.x[id];
+        Velocity.y[id] += Acceleration.y[id];
       }
 
       Position.x[id] += Velocity.x[id] * world.simulationDt;
@@ -132,6 +138,8 @@ export const movementSystem = defineSystem((world) => {
       removeEntity(world, id);
     }
   }
+
+  world.collidingPairs = [...new Set(world.collidingPairs)];
 
   return world;
 });
@@ -226,6 +234,7 @@ function resolveStaticCollision(
       if (id == targetId) continue;
       if (!areCirclesOverlapping(id, targetId)) continue;
       // Collision has occured
+
       world.collidingPairsWithFake.push([id, targetId]);
       world.collidingPairs.push([id, targetId]);
 
