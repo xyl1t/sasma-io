@@ -1,4 +1,4 @@
-import { defineQuery, defineSystem, addComponent, Not, removeEntity } from "../bitecs.js";
+import { defineQuery, defineSystem, addComponent, Not, removeEntity, removeComponent } from "../bitecs.js";
 import { Vector, randBetween } from "../util.js";
 
 import { Player } from "../components/Player.js";
@@ -13,6 +13,7 @@ import { Velocity } from "../components/Velocity.js";
 import { Position } from "../components/Position.js";
 import { Input } from "../components/Input.js";
 import { Bot } from "../components/Bot.js";
+import { Follow } from "../components/Follow.js";
 
 const botsQuery = defineQuery([Player, Bot]);
 const query = defineQuery([Player, Bot, Input]);
@@ -21,6 +22,7 @@ export const botSystem = defineSystem((world) => {
   const bots = botsQuery(world);
   for (const id of bots) {
     if (Player.health[id] <= 0 && !world.gameStarted) {
+      // TODO: use addPlayerComponents() from server.js
       addComponent(world, Player, id);
       addComponent(world, Position, id);
       addComponent(world, Velocity, id);
@@ -32,6 +34,7 @@ export const botSystem = defineSystem((world) => {
       addComponent(world, Input, id);
       addComponent(world, CircleCollider, id);
       addComponent(world, Layer, id);
+      removeComponent(world, Follow, id);
 
       Layer.layer[id] = 10;
       Player.color[id] = randBetween(0, 4);
@@ -41,10 +44,10 @@ export const botSystem = defineSystem((world) => {
       Gun.rateOfFire[id] = 1; // second
       Gun.source[id] = id;
       Gun.damage[id] = 40;
-      Body.power[id] = 200; // ms
+      Body.power[id] = 2000; // ms
       Body.angle[id] = Math.random() * Math.PI * 2;
       Body.rotationSpeed[id] = Math.PI * 0.8;
-      Mass.value[id] = 1;
+      Mass.value[id] = 5;
       CircleCollider.radius[id] = 21;
     } else if (Player.health[id] <= 0 && world.gameStarted) {
       removeEntity(world, id);

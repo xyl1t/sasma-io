@@ -5,5 +5,6 @@ export const Player = defineComponent({
   viewDistanceWidth: Types.ui16,
   viewDistanceHeight: Types.ui16,
   health: Types.f32,
+  damagedBy: Types.eid,
   isMobile: Types.ui8,
 });

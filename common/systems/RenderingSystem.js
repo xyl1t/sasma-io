@@ -47,7 +47,11 @@ export const renderingSystem = defineSystem((world) => {
   const meId = meQuery(world)[0];
   let meX = 0;
   let meY = 0;
-  if (hasComponent(world, Position, meId)) {
+  if (hasComponent(world, Follow, meId)) {
+    meX = Position.x[Follow.source[meId]];
+    meY = Position.y[Follow.source[meId]];
+    console.log(Follow.source[meId], meX, meY);
+  } else if (hasComponent(world, Position, meId)) {
     meX = Position.x[meId];
     meY = Position.y[meId];
   }
@@ -72,8 +76,8 @@ export const renderingSystem = defineSystem((world) => {
   } else {
     ctx.drawImage(
       map,
-      meX + map.width / 2 - world.windowWidth / 2 / world.renderScaleWidth / 2,
-      meY + map.height / 2 - world.windowHeight / 2 / world.renderScaleHeight / 2,
+      meX + map.width / 2 - world.windowWidth / 2 / world.renderScaleWidth,
+      meY + map.height / 2 - world.windowHeight / 2 / world.renderScaleHeight,
       world.windowWidth / world.renderScaleWidth,
       world.windowHeight / world.renderScaleHeight,
 
@@ -109,7 +113,6 @@ export const renderingSystem = defineSystem((world) => {
     ctx.stroke();
     ctx.restore();
   }
-
 
   let layerIds = layerQuery(world);
   let noLayerIds = noLayerQuery(world);
@@ -237,7 +240,11 @@ function drawPlayer(world, id, meId) {
       ctx.lineWidth = 6;
       ctx.fillStyle = "#fff";
       ctx.strokeStyle = "#000";
+      if (world.dynamicCamera) {
+        ctx.rotate(Body.angle[meId] + Math.PI / 2);
+      }
       ctx.translate(-effect.width / 2, effect.height / 2);
+
       ctx.strokeText(
         text,
         -world.windowWidth / (2 * world.renderScaleWidth) + 50,
@@ -273,6 +280,9 @@ function drawPlayer(world, id, meId) {
   //healthbar
   if (world.gameStarted) {
     ctx.save();
+    if (world.dynamicCamera) {
+      ctx.rotate(Body.angle[meId] + Math.PI / 2);
+    }
     const width = 50;
     const height = 8;
     const healthWidth = (width * Player.health[id]) / 100;
@@ -507,3 +517,9 @@ function drawColliders(world, id) {
   }
   ctx.restore();
 }
+
+function lerp(value1, value2, amount) {
+	amount = amount < 0 ? 0 : amount;
+	amount = amount > 1 ? 1 : amount;
+	return value1 + (value2 - value1) * amount;
+};

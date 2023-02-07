@@ -25,34 +25,6 @@ import { PickupEffect } from "./PickupEffect.js";
 import { Changed } from "../bitecs.js";
 import { Track } from "./Track.js";
 
-// // necessary config for serialization and deserialization
-// export const serializationConfig = [
-//   // Acceleration,
-//   AnimatedSprite,
-//   Body,
-//   // Bot,
-//   Bullet,
-//   // Force,
-//   Gun,
-//   Input,
-//   // Map,
-//   // Mass,
-//   Me,
-//   Player,
-//   Position,
-//   Rotation,
-//   Sprite,
-//   // TimeToLive,
-//   PickupEffect,
-//   Follow,
-//   Velocity,
-//   CircleCollider,
-//   CapsuleCollider,
-//   Layer,
-//   Zone,
-//   Track,
-// ];
-
 // necessary config for serialization and deserialization
 export const serializationConfig = [
   AnimatedSprite.sprites,
