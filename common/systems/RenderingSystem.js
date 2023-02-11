@@ -116,9 +116,9 @@ export const renderingSystem = defineSystem((world) => {
 
   let layerIds = layerQuery(world);
   let noLayerIds = noLayerQuery(world);
-  layerIds = layerIds.sort((a, b) => {
-    return Layer.layer[a] - Layer.layer[b];
-  });
+  layerIds = layerIds.sort((a, b) =>
+    Layer.layer[a] == Layer.layer[b] ? a - b : Layer.layer[a] - Layer.layer[b]
+  );
   const renderables = [...noLayerIds, ...layerIds];
 
   for (const id of renderables) {
@@ -519,7 +519,7 @@ function drawColliders(world, id) {
 }
 
 function lerp(value1, value2, amount) {
-	amount = amount < 0 ? 0 : amount;
-	amount = amount > 1 ? 1 : amount;
-	return value1 + (value2 - value1) * amount;
-};
+  amount = amount < 0 ? 0 : amount;
+  amount = amount > 1 ? 1 : amount;
+  return value1 + (value2 - value1) * amount;
+}
