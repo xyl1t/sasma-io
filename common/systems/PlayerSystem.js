@@ -25,6 +25,7 @@ import { TimeToLive } from "../components/TimeToLive.js";
 import { Bot } from "../components/Bot.js";
 import { Pickup } from "../components/Pickup.js";
 import { Follow } from "../components/Follow.js";
+import { PickupEffect } from "../components/PickupEffect.js";
 
 const query = defineQuery([Player]);
 const followQuery = defineQuery([Player, Follow]);
@@ -102,7 +103,7 @@ export const playerSystem = defineSystem((world) => {
       TimeToLive.timeToLive[deadBarrelId] = 30;
       TimeToLive.fadeTime[deadBarrelId] = 1;
 
-      // add pickup
+      // drop pickup
       const pickupId = addEntity(world);
       addComponent(world, Position, pickupId);
       Position.x[pickupId] = Position.x[id];
@@ -113,16 +114,14 @@ export const playerSystem = defineSystem((world) => {
       addComponent(world, Velocity, pickupId);
       Velocity.x[pickupId] = randBetween(-300, 300);
       Velocity.y[pickupId] = randBetween(-300, 300);
-      const types = [
-        world.assetIdMap.pickup_damage,
-        world.assetIdMap.pickup_heal,
-        world.assetIdMap.pickup_movement,
-        world.assetIdMap.pickup_reload,
-      ];
-      let randType = types[Math.round(randBetween(0, types.length - 1))];
-      Sprite.texture[pickupId] = randType;
+      let pickupType = hasComponent(world, PickupEffect, id)
+        ? PickupEffect.type[id]
+        : world.pickupTypes[
+            parseInt(randBetween(0, world.pickupTypes.length - 1))
+          ];
+      Sprite.texture[pickupId] = pickupType;
       addComponent(world, Pickup, pickupId);
-      Pickup.type[pickupId] = randType;
+      Pickup.type[pickupId] = pickupType;
 
       if (Player.damagedBy[id] != 0) {
         addComponent(world, Follow, id);
@@ -139,6 +138,8 @@ export const playerSystem = defineSystem((world) => {
       removeComponent(world, Input, id);
       removeComponent(world, CircleCollider, id);
       removeComponent(world, Body, id);
+      removeComponent(world, Gun, id);
+      removeComponent(world, PickupEffect, id);
     }
   }
 

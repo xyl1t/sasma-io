@@ -45,10 +45,11 @@ export const serializationConfig = [
   PickupEffect.type,
   Follow,
   Velocity,
-  // CircleCollider,
-  // CapsuleCollider,
+  CircleCollider,
+  CapsuleCollider,
   Layer,
-  Zone,
+  Zone.size,
+  Zone.collision,
   Track,
 ];
 

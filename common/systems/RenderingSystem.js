@@ -41,8 +41,6 @@ export const renderingSystem = defineSystem((world) => {
   ctx.translate(world.windowWidth / 2, world.windowHeight / 2);
   ctx.scale(world.renderScaleWidth, world.renderScaleHeight);
 
-  const zoneEntitys = zoneQuery(world);
-
   // move to current player
   const meId = meQuery(world)[0];
   let meX = 0;
@@ -131,6 +129,9 @@ export const renderingSystem = defineSystem((world) => {
     if (hasComponent(world, AnimatedSprite, id)) {
       drawAnimation(world, id);
     }
+  }
+
+  for (const id of renderables) {
     if (world.debug.showVelocity) {
       if (hasComponent(world, Body, id) || hasComponent(world, Velocity, id)) {
         drawVelocityVectors(world, id);
@@ -139,11 +140,15 @@ export const renderingSystem = defineSystem((world) => {
     if (world.debug.showIds) {
       drawId(world, id);
     }
+    if (world.debug.showComponents) {
+      drawComponents(world, id);
+    }
     if (world.debug.showColliders) {
       drawColliders(world, id);
     }
   }
 
+  const zoneEntitys = zoneQuery(world);
   drawZones(world, zoneEntitys);
 
   ctx.restore();
@@ -459,6 +464,14 @@ function drawId(world, id) {
   );
   ctx.fillStyle = "#000";
   ctx.fillText(id, -ctx.measureText(id).width / 2, 0);
+
+  ctx.restore();
+}
+
+function drawComponents(world, id) {
+  const { ctx } = world;
+  ctx.save();
+  ctx.translate(Position.x[id], Position.y[id]);
   let lines = 0;
   for (const comp of getEntityComponents(world, id)) {
     for (const key in comp) {

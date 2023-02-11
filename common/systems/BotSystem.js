@@ -14,6 +14,7 @@ import { Position } from "../components/Position.js";
 import { Input } from "../components/Input.js";
 import { Bot } from "../components/Bot.js";
 import { Follow } from "../components/Follow.js";
+import { addPlayerComponents } from "../serverWorld.js";
 
 const botsQuery = defineQuery([Player, Bot]);
 const query = defineQuery([Player, Bot, Input]);
@@ -23,32 +24,7 @@ export const botSystem = defineSystem((world) => {
   for (const id of bots) {
     if (Player.health[id] <= 0 && !world.gameStarted) {
       // TODO: use addPlayerComponents() from server.js
-      addComponent(world, Player, id);
-      addComponent(world, Position, id);
-      addComponent(world, Velocity, id);
-      addComponent(world, Acceleration, id);
-      addComponent(world, Force, id);
-      addComponent(world, Mass, id);
-      addComponent(world, Gun, id);
-      addComponent(world, Body, id);
-      addComponent(world, Input, id);
-      addComponent(world, CircleCollider, id);
-      addComponent(world, Layer, id);
-      removeComponent(world, Follow, id);
-
-      Layer.layer[id] = 10;
-      Player.color[id] = randBetween(0, 4);
-      Player.health[id] = 100;
-      Position.x[id] = randBetween(-400, 400);
-      Position.y[id] = randBetween(-400, 400);
-      Gun.rateOfFire[id] = 1; // second
-      Gun.source[id] = id;
-      Gun.damage[id] = 40;
-      Body.power[id] = 2000; // ms
-      Body.angle[id] = Math.random() * Math.PI * 2;
-      Body.rotationSpeed[id] = Math.PI * 0.8;
-      Mass.value[id] = 5;
-      CircleCollider.radius[id] = 21;
+      addPlayerComponents(world, id);
     } else if (Player.health[id] <= 0 && world.gameStarted) {
       removeEntity(world, id);
     }

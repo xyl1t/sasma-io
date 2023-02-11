@@ -42,11 +42,6 @@ export const pickupSystem = defineSystem((world) => {
         Position.y[puId] - collectRadius <= Position.y[playerId] &&
         Position.y[puId] + collectRadius >= Position.y[playerId]
       ) {
-        /******* 
-        Pickup types
-        0: Speedboost
-        1: Increased Rate of Fire
-        ********/
         const effectDuration = 4;
 
         if (hasComponent(world, PickupEffect, playerId)) {
