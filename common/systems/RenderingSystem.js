@@ -1,6 +1,7 @@
 import {
   defineQuery,
   defineSystem,
+  entityExists,
   getEntityComponents,
   hasComponent,
   Not,
@@ -161,7 +162,7 @@ export const renderingSystem = defineSystem((world) => {
         `${world.players?.length <= 2 ? 2 - world.players?.length : 0}`
     );
   } else if (!world.gameStarted && world.players?.length >= 2) {
-    $("#txtWaitingCount").text(`Game starts in : ${world.currentWaitingTime}`);
+    $("#txtWaitingCount").text(`Game starts in : ${world.currentWaitingTime+1}`);
   } else {
     $("#txtPlayerCount").text(
       `Game started, Remaining players: ${world.players?.length}`
@@ -232,7 +233,7 @@ function drawPlayer(world, id, meId) {
       ctx.save();
       ctx.rotate(world.timeSinceStart + (i / maxParticles) * Math.PI * 2);
       ctx.translate(0, tankBody.height * appearValue);
-      ctx.translate(0, Math.sin(world.timeSinceStart + i * 4) * 6);
+      ctx.translate(0, Math.sin(world.timeSinceStart*4 + i * 4) * 6);
       ctx.rotate(-(world.timeSinceStart + (i / maxParticles) * Math.PI * 2));
       ctx.translate(-healParticle.width / 2, -healParticle.height / 2);
       ctx.scale(0.8, 0.8);
@@ -431,7 +432,7 @@ function drawSprite(world, id) {
   ctx.save();
   ctx.translate(Position.x[id], Position.y[id]);
 
-  if (hasComponent(world, Follow, id)) {
+  if (hasComponent(world, Follow, id) && entityExists(world, Follow.source[id])) {
     const offsetX = Position.x[Follow.source[id]];
     const offsetY = Position.y[Follow.source[id]];
     ctx.translate(offsetX, offsetY);

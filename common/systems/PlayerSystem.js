@@ -71,6 +71,8 @@ export const playerSystem = defineSystem((world) => {
       Position.x[deadBodyId] = Position.x[id];
       Position.y[deadBodyId] = Position.y[id];
       addComponent(world, Velocity, deadBodyId);
+      Velocity.x[deadBodyId] = Velocity.x[id];
+      Velocity.y[deadBodyId] = Velocity.y[id];
       addComponent(world, Mass, deadBodyId);
       Mass.value[deadBodyId] = 4;
       addComponent(world, CircleCollider, deadBodyId);

@@ -72,8 +72,8 @@ function shootBullet(world, gunId) {
   const bulletId = addEntity(world);
 
   addComponent(world, Position, bulletId);
-  Position.x[bulletId] = Position.x[gunId] + Math.cos(Gun.angle[gunId]) * 20;
-  Position.y[bulletId] = Position.y[gunId] + Math.sin(Gun.angle[gunId]) * 20;
+  Position.x[bulletId] = Position.x[gunId] + Math.cos(Gun.angle[gunId]) * 22;
+  Position.y[bulletId] = Position.y[gunId] + Math.sin(Gun.angle[gunId]) * 22;
 
   addComponent(world, Velocity, bulletId);
   addComponent(world, Acceleration, bulletId);
