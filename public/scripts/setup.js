@@ -20,6 +20,7 @@ export async function setup() {
 async function setupWorldParameters() {
   world.tickRate = 60;
   world.dt = 1 / world.tickRate;
+  world.timeSinceStart = 0;
   world.currentTick = 0;
   world.gotInput = false;
   world.mouse = {
@@ -53,8 +54,8 @@ async function setupWorldParameters() {
   world.windowWidth = -1;
   world.windowHeight = -1;
 
-  world.constWidth = 800;
-  world.constHeight = 800;
+  world.constWidth = 700;
+  world.constHeight = 700;
   world.renderScaleWidth = 1;
   world.renderScaleHeight = 1;
 

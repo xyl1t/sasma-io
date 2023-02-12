@@ -117,7 +117,7 @@ export const playerSystem = defineSystem((world) => {
       let pickupType = hasComponent(world, PickupEffect, id)
         ? PickupEffect.type[id]
         : world.pickupTypes[
-            parseInt(randBetween(0, world.pickupTypes.length - 1))
+            parseInt(randBetween(0, world.pickupTypes.length))
           ];
       Sprite.texture[pickupId] = pickupType;
       addComponent(world, Pickup, pickupId);

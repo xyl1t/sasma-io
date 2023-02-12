@@ -194,7 +194,6 @@ function drawZones(world, zoneEntitys) {
       innerZoneId = zId;
       ctx.arc(0, 0, Zone.size[zId], 0, 2 * Math.PI);
     }
-    //ctx.stroke();
   }
   ctx.restore();
 }
@@ -206,66 +205,98 @@ function drawPlayer(world, id, meId) {
   ctx.translate(Position.x[id], Position.y[id]);
 
   const color = world.colorMap[Player.color[id]];
+  let effectType;
+  if (hasComponent(world, PickupEffect, id)) {
+    effectType = PickupEffect.type[id];
+  }
+  const tankBody = getAsset(assetIdMap["tank_body_" + color]);
+
+  if (effectType == assetIdMap.pickup_movement && Body.force[id] > 0) {
+    ctx.save();
+    const effectImg = getAsset(
+      Math.random() > 0.8 ? assetIdMap.shot_4 : assetIdMap.shot_3
+    );
+    ctx.rotate(Body.angle[id] + Math.PI / 2);
+    ctx.translate(-effectImg.width / 2, tankBody.height / 2 + 2);
+    ctx.drawImage(effectImg, 10, 0);
+    ctx.drawImage(effectImg, -10, 0);
+    ctx.restore();
+  }
+
+  if (effectType == assetIdMap.pickup_heal) {
+    const healParticle = getAsset(assetIdMap.heal_particle);
+    const maxParticles = 10;
+    for (let i = 0; i < maxParticles; i++) {
+      const normalized = (4 - PickupEffect.effectDuration[id]) / 4;
+      const appearValue = Math.min(1,Math.max(0,(Math.sin(normalized*Math.PI*2-Math.PI/2)+1)/2*4));
+      ctx.save();
+      ctx.rotate(world.timeSinceStart + (i / maxParticles) * Math.PI * 2);
+      ctx.translate(0, tankBody.height * appearValue);
+      ctx.translate(0, Math.sin(world.timeSinceStart + i * 4) * 6);
+      ctx.rotate(-(world.timeSinceStart + (i / maxParticles) * Math.PI * 2));
+      ctx.translate(-healParticle.width / 2, -healParticle.height / 2);
+      ctx.scale(0.8, 0.8);
+      ctx.drawImage(healParticle, 0, 0);
+      ctx.restore();
+    }
+  }
+
+  //Effect
+  if (effectType && id === meId) {
+    let text = "";
+    switch (PickupEffect.type[id]) {
+      case assetIdMap["pickup_heal"]:
+        text = "Healing++";
+        break;
+      case assetIdMap["pickup_reload"]:
+        text = "Reload++";
+        break;
+      case assetIdMap["pickup_movement"]:
+        text = "Speed++";
+        break;
+      case assetIdMap["pickup_damage"]:
+        text = "Damage++";
+        break;
+    }
+    ctx.save();
+    ctx.lineCap = "round";
+    ctx.font = "40px Verdana";
+    ctx.lineWidth = 6;
+    ctx.fillStyle = "#fff";
+    ctx.strokeStyle = "#000";
+    if (world.dynamicCamera) {
+      ctx.rotate(Body.angle[meId] + Math.PI / 2);
+    }
+    // ctx.translate(-effect.width / 2, effect.height / 2);
+
+    ctx.strokeText(
+      text,
+      -world.windowWidth / (2 * world.renderScaleWidth) + 50,
+      -world.windowHeight / (2 * world.renderScaleHeight) + 50
+    );
+    ctx.fillText(
+      text,
+      -world.windowWidth / (2 * world.renderScaleWidth) + 50,
+      -world.windowHeight / (2 * world.renderScaleHeight) + 50
+    );
+    ctx.restore();
+  }
 
   // Body
-  const tankBody = getAsset(assetIdMap["tank_body_" + color]);
   ctx.save();
   ctx.rotate(Body.angle[id] - Math.PI / 2);
   ctx.translate(-tankBody.width / 2, -tankBody.height / 2);
   ctx.drawImage(tankBody, 0, 0);
   ctx.restore();
 
-  //Effect
-  if (hasComponent(world, PickupEffect, id)) {
-    ctx.save();
-    const effect = getAsset(PickupEffect.type[id]);
-    ctx.rotate(Body.angle[id] + Math.PI / 2);
-    ctx.translate(-effect.width / 2, effect.height / 2);
-    ctx.drawImage(effect, 0, 0);
-    ctx.restore();
-    if (id == meId) {
-      let text = "";
-      switch (PickupEffect.type[id]) {
-        case assetIdMap["pickup_heal"]:
-          text = "Healing++";
-          break;
-        case assetIdMap["pickup_reload"]:
-          text = "Reload++";
-          break;
-        case assetIdMap["pickup_movement"]:
-          text = "Speed++";
-          break;
-        case assetIdMap["pickup_damage"]:
-          text = "Damage++";
-          break;
-      }
-      ctx.save();
-      ctx.lineCap = "round";
-      ctx.font = "40px Verdana";
-      ctx.lineWidth = 6;
-      ctx.fillStyle = "#fff";
-      ctx.strokeStyle = "#000";
-      if (world.dynamicCamera) {
-        ctx.rotate(Body.angle[meId] + Math.PI / 2);
-      }
-      ctx.translate(-effect.width / 2, effect.height / 2);
-
-      ctx.strokeText(
-        text,
-        -world.windowWidth / (2 * world.renderScaleWidth) + 50,
-        -world.windowHeight / (2 * world.renderScaleHeight) + 50
-      );
-      ctx.fillText(
-        text,
-        -world.windowWidth / (2 * world.renderScaleWidth) + 50,
-        -world.windowHeight / (2 * world.renderScaleHeight) + 50
-      );
-      ctx.restore();
-    }
-  }
-
   // Barrel
-  const tankBarrel = getAsset(assetIdMap["tank_barrel_" + color + "_2"]);
+  let tankBarrel = getAsset(assetIdMap["tank_barrel_" + color + "_2"]);
+  if (effectType == assetIdMap.pickup_damage) {
+    tankBarrel = getAsset(assetIdMap["tank_barrel_" + color + "_1"]);
+  }
+  if (effectType == assetIdMap.pickup_reload) {
+    tankBarrel = getAsset(assetIdMap["tank_barrel_" + color + "_3"]);
+  }
   ctx.save();
   ctx.rotate(
     Gun.angle[id] - Math.PI / 2
@@ -423,6 +454,11 @@ function drawAnimation(world, id) {
   const img = getAsset(AnimatedSprite.sprites[id][AnimatedSprite.current[id]]);
   ctx.save();
   ctx.translate(Position.x[id], Position.y[id]);
+  if (hasComponent(world, Follow, id)) {
+    const offsetX = Position.x[Follow.source[id]];
+    const offsetY = Position.y[Follow.source[id]];
+    ctx.translate(offsetX, offsetY);
+  }
   if (hasComponent(world, Rotation, id)) {
     ctx.rotate(Rotation.angle[id] + Math.PI / 2);
   }
@@ -455,6 +491,11 @@ function drawId(world, id) {
   const { ctx } = world;
   ctx.save();
   ctx.translate(Position.x[id], Position.y[id]);
+  if (hasComponent(world, Follow, id)) {
+    const offsetX = Position.x[Follow.source[id]];
+    const offsetY = Position.y[Follow.source[id]];
+    ctx.translate(offsetX, offsetY);
+  }
   ctx.fillStyle = "#fff";
   ctx.fillRect(
     -ctx.measureText(id).width / 2 - 2,

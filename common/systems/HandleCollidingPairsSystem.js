@@ -74,7 +74,7 @@ function handleBulletDropperHit(world, bulletId, dropperId) {
   Velocity.y[pickupId] = randBetween(-100, 100);
 
   let randType =
-    world.pickupTypes[parseInt(randBetween(0, world.pickupTypes.length - 1))];
+    world.pickupTypes[parseInt(randBetween(0, world.pickupTypes.length))];
 
   Sprite.texture[pickupId] = randType;
   addComponent(world, Pickup, pickupId);
