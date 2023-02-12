@@ -24,6 +24,7 @@ function gameloop(currentTime = 0) {
   const frameTime = currentTime - oldTime;
   oldTime = currentTime;
   accumulator += frameTime;
+  world.timeSinceStart += frameTime;
 
   while (accumulator >= world.dt) {
     // NOTE: game logic here (input, client prediction, etc.)

@@ -73,14 +73,8 @@ function handleBulletDropperHit(world, bulletId, dropperId) {
   Velocity.x[pickupId] = randBetween(-100, 100);
   Velocity.y[pickupId] = randBetween(-100, 100);
 
-  const types = [
-    world.assetIdMap.pickup_damage,
-    world.assetIdMap.pickup_heal,
-    world.assetIdMap.pickup_movement,
-    world.assetIdMap.pickup_reload,
-  ];
-
-  let randType = types[Math.round(randBetween(0, types.length - 1))];
+  let randType =
+    world.pickupTypes[parseInt(randBetween(0, world.pickupTypes.length))];
 
   Sprite.texture[pickupId] = randType;
   addComponent(world, Pickup, pickupId);

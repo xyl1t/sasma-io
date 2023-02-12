@@ -13,7 +13,7 @@ export const zoneSystem = defineSystem((world) => {
   if (world.gameStarted) {
     for (let zId of zones) {
       if (Zone.size[zId] > 1) {
-        Zone.size[zId] -= world.dt * world.zoneSpeed;
+        Zone.size[zId] -= world.dt * Zone.speed[zId];
       }
     }
   }
